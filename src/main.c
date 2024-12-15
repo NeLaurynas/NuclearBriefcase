@@ -14,6 +14,7 @@
 #define I2C_SCL 9
 
 #include "blink.pio.h"
+#include "defines/gp_masks.h"
 
 void blink_pin_forever(PIO pio, uint sm, uint offset, uint pin, uint freq) {
 	// blink_program_init(pio, sm, offset, pin);
@@ -28,13 +29,28 @@ void blink_pin_forever(PIO pio, uint sm, uint offset, uint pin, uint freq) {
 
 bool on = true;
 
+uint MASK_ALL = GPM_0 | GPM_1 | GPM_2 | GPM_3 | GPM_4 |
+					GPM_5 | GPM_6 | GPM_7 | GPM_8 | GPM_9 |
+					GPM_10 | GPM_11 | GPM_12 | GPM_13 | GPM_14 |
+					GPM_15 | GPM_16 | GPM_17 | GPM_18 | GPM_19 |
+					GPM_20 | GPM_21 | GPM_22 |
+					GPM_INTERNAL_LED | GPM_26 | GPM_27 | GPM_28;
+
 int main() {
 	// only for usb printf
 	stdio_init_all();
 
-	// on board led
-	gpio_init(25);
-	gpio_set_dir(25, GPIO_OUT);
+	// ALL TEST
+	// gpio_init_mask(MASK_ALL);
+	// gpio_set_dir_out_masked(MASK_ALL);
+	// gpio_put_all(MASK_ALL);
+	// gpio_put_masked(MASK_ALL, 1); // value is also a mask...
+
+	// gpio_init(25);
+	// gpio_set_dir(25, GPIO_OUT);
+
+	// all pins test
+	// gpio_init_mask()
 
 	// TODO: picotool load -f blink_simple.uf2 after build
 
@@ -60,10 +76,11 @@ int main() {
 	//     // For more pio examples see https://github.com/raspberrypi/pico-examples/tree/master/pio
 
 	while (true) {
-		gpio_put(25, on);
+		// gpio_put(25, on);
 		on = !on;
 
-		printf("Toggle LED\n");
-		sleep_ms(1000);
+		if (on) printf("ping\n");
+		else printf("pong\n");
+		sleep_ms(2000);
 	}
 }
