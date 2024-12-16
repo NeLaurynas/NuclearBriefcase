@@ -13,7 +13,8 @@
 #define I2C_SDA 8
 #define I2C_SCL 9
 
-#include "blink.pio.h"
+#include "numbers.pio.h"
+#include "defines/config.h"
 #include "defines/gp_masks.h"
 
 void blink_pin_forever(PIO pio, uint sm, uint offset, uint pin, uint freq) {
@@ -46,13 +47,30 @@ int main() {
 	// gpio_put_all(MASK_ALL);
 	// gpio_put_masked(MASK_ALL, 1); // value is also a mask...
 
-	// gpio_init(25);
-	// gpio_set_dir(25, GPIO_OUT);
+	gpio_init(25);
+	gpio_set_dir(25, GPIO_OUT);
+
+	// gpio_init(MOD_NUM_DPGROUND2);
+	// gpio_set_dir(MOD_NUM_DPGROUND2, GPIO_OUT);
+	// gpio_init(MOD_NUM_DPGROUND1);
+	// gpio_set_dir(MOD_NUM_DPGROUND1, GPIO_OUT);
+	// gpio_init(MOD_NUM_DISP1);
+	// gpio_set_dir(MOD_NUM_DISP1, GPIO_OUT);
+	// gpio_init(MOD_NUM_DISP2);
+	// gpio_set_dir(MOD_NUM_DISP2, GPIO_OUT);
+	// gpio_init(MOD_NUM_DISP3);
+	// gpio_set_dir(MOD_NUM_DISP3, GPIO_OUT);
+	// gpio_init(MOD_NUM_DISP4);
+	// gpio_set_dir(MOD_NUM_DISP4, GPIO_OUT);
+	// gpio_init(MOD_NUM_DISP5);
+	// gpio_set_dir(MOD_NUM_DISP5, GPIO_OUT);
+	// gpio_init(MOD_NUM_DISP6);
+	// gpio_set_dir(MOD_NUM_DISP6, GPIO_OUT);
+	// gpio_init(MOD_NUM_DISP7);
+	// gpio_set_dir(MOD_NUM_DISP7, GPIO_OUT);
 
 	// all pins test
 	// gpio_init_mask()
-
-	// TODO: picotool load -f blink_simple.uf2 after build
 
 	// I2C Initialisation. Using it at 400Khz.
 	// i2c_init(I2C_PORT, 400 * 1000);
@@ -75,12 +93,40 @@ int main() {
 	// #endif
 	//     // For more pio examples see https://github.com/raspberrypi/pico-examples/tree/master/pio
 
+	PIO pio = pio0;
+	int sm = 0;
+	uint offset = pio_add_program(pio, &numbers_program);
+	printf("Loaded program at %d\n", offset);
+	pio_sm_claim(pio, sm);
+	numbers_program_init(pio, sm, offset, MOD_NUM_DISP7, MOD_NUM_DISP6, MOD_NUM_DISP5, MOD_NUM_DISP4,
+		MOD_NUM_DISP3, MOD_NUM_DISP2, MOD_NUM_DISP1, MOD_NUM_DPGROUND2, MOD_NUM_DPGROUND1,
+		10000.0);
+	pio_sm_set_enabled(pio, sm, true);
+
 	while (true) {
-		// gpio_put(25, on);
+		gpio_put(25, on);
+		// gpio_put(MOD_NUM_DPGROUND1, on);
+		// gpio_put(MOD_NUM_DPGROUND2, !on);
+		// gpio_put(MOD_NUM_DISP1, 1);
+		// gpio_put(MOD_NUM_DISP2, 1);
+		// gpio_put(MOD_NUM_DISP3, 1);
+		// gpio_put(MOD_NUM_DISP4, 1);
+		// gpio_put(MOD_NUM_DISP5, 1);
+		// gpio_put(MOD_NUM_DISP6, 1);
+		// gpio_put(MOD_NUM_DISP7, 1);
 		on = !on;
+
+		if (on) {
+			pio_sm_put_blocking(pio, sm, 0b11111110000000);
+			// pio_sm_put_blocking(pio, sm, 0b11111100111111); // 7 bytes - first number, 7 bytes - second number
+		} else {
+			pio_sm_put_blocking(pio, sm, 0b00000001111111);
+		}
+		// 0b00000000000000
+		// 0b11111111111111
 
 		if (on) printf("ping\n");
 		else printf("pong\n");
-		sleep_ms(2000);
+		sleep_ms(1000);
 	}
 }
