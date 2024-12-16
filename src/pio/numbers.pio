@@ -4,10 +4,10 @@
 .program numbers
 .side_set 2
 .wrap_target
-    PULL NOBLOCK side 0b00 	; pull data from FIFO into OSR, noblock - if no data, pull from X (recycle)
-    MOV X, OSR side 0b00	; copy data into X register from OSR
+	PULL NOBLOCK side 0b00	; pull data from FIFO into OSR, noblock - if no data, pull from X (recycle)
+	MOV X, OSR side 0b00	; copy data into X register from OSR
 
-	OUT PINS, 7 side 0b00 	; SEND 7 bits to PINS (so like 0b100101..), and every bit is one pin either HIGH or LOW
+	OUT PINS, 7 side 0b00	; SEND 7 bits to PINS (so like 0b100101..), and every bit is one pin either HIGH or LOW
 	NOP [7] SIDE 0b10		; turn on display 1 ground pin for 8 cycles
 
 	NOP [1] side 0b00		; wait for 2 cycles (like first display waits for PULL and BLOCK instructions) - 1 cycle for NOP and 1 for [1]
@@ -20,25 +20,25 @@
 // this is a raw helper function for use by the user which sets up the GPIO output, and configures the SM to output on a particular pin
 
 void numbers_program_init(PIO pio, uint sm, uint offset, uint pin1, uint pin2, uint pin3, uint pin4, uint pin5, uint pin6,
-	uint pin7, uint pin8, uint pin9, float clk_div) {
-   pio_gpio_init(pio, pin1);
-   pio_gpio_init(pio, pin2);
-   pio_gpio_init(pio, pin3);
-   pio_gpio_init(pio, pin4);
-   pio_gpio_init(pio, pin5);
-   pio_gpio_init(pio, pin6);
-   pio_gpio_init(pio, pin7);
-   pio_gpio_init(pio, pin8);
-   pio_gpio_init(pio, pin9);
+		uint pin7, uint pin8, uint pin9, float clk_div) {
+	pio_gpio_init(pio, pin1);
+	pio_gpio_init(pio, pin2);
+	pio_gpio_init(pio, pin3);
+	pio_gpio_init(pio, pin4);
+	pio_gpio_init(pio, pin5);
+	pio_gpio_init(pio, pin6);
+	pio_gpio_init(pio, pin7);
+	pio_gpio_init(pio, pin8);
+	pio_gpio_init(pio, pin9);
 
-   pio_sm_config c = numbers_program_get_default_config(offset);
+	pio_sm_config c = numbers_program_get_default_config(offset);
 
-   pio_sm_set_consecutive_pindirs(pio, sm, pin1, 9, true); // 9 pins, is_out = true
-   sm_config_set_out_pins(&c, pin1, 7);
-   sm_config_set_sideset_pins(&c, pin8);
+	pio_sm_set_consecutive_pindirs(pio, sm, pin1, 9, true); // 9 pins, is_out = true
+	sm_config_set_out_pins(&c, pin1, 7);
+	sm_config_set_sideset_pins(&c, pin8);
 
-   sm_config_set_clkdiv(&c, clk_div);
+	sm_config_set_clkdiv(&c, clk_div);
 
-   pio_sm_init(pio, sm, offset, &c);
+	pio_sm_init(pio, sm, offset, &c);
 }
 %}
