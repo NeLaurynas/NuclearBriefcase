@@ -6,11 +6,13 @@
 .wrap_target
     PULL NOBLOCK [7] side 0b01 	; pull data from FIFO into OSR, noblock - if no data, pull from X (recycle)
     MOV X, OSR [7] side 0b01		; copy data into X register from OSR
+	NOP [5] side 0b00
 
 	OUT PINS, 7 [7] side 0b00 	; SEND 7 bits to PINS (so like 0b100101..), and every bit is one pin either HIGH or LOW
 
     NOP [7] side 0b10
     NOP [7] side 0b10
+    NOP [5] side 0b00
 
     OUT PINS, 7 [7] side 0b00 	; SEND 7 bits to PINS (so like 0b100101..), and every bit is one pin either HIGH or LOW
 .wrap

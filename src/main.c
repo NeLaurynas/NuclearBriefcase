@@ -37,6 +37,19 @@ uint MASK_ALL = GPM_0 | GPM_1 | GPM_2 | GPM_3 | GPM_4 |
 					GPM_20 | GPM_21 | GPM_22 |
 					GPM_INTERNAL_LED | GPM_26 | GPM_27 | GPM_28;
 
+uint8_t numbers[] = {
+	0b1110111, // 0
+	0b0010001, // 1
+	0b1101011, // 2
+	0b0111011, // 3
+	0b0011101, // 4
+	0b0111110, // 5
+	0b1111110, // 6
+	0b0010011, // 7
+	0b1111111, // 8
+	0b0111111, // 9
+};
+
 int main() {
 	// only for usb printf
 	stdio_init_all();
@@ -103,8 +116,10 @@ int main() {
 		10000.0);
 	pio_sm_set_enabled(pio, sm, true);
 
+	uint i = 0;
+
 	while (true) {
-		gpio_put(25, on);
+		// gpio_put(25, on);
 		// gpio_put(MOD_NUM_DPGROUND1, on);
 		// gpio_put(MOD_NUM_DPGROUND2, !on);
 		// gpio_put(MOD_NUM_DISP1, 1);
@@ -116,17 +131,29 @@ int main() {
 		// gpio_put(MOD_NUM_DISP7, 1);
 		on = !on;
 
+		int tens = i / 10;
+		int units = i % 10;
+
+		gpio_put(25, units == 0);
+
+		pio_sm_put_blocking(pio, sm, numbers[tens] << 7 | numbers[units]);
+
 		if (on) {
-			pio_sm_put_blocking(pio, sm, 0b11111110000000);
 			// pio_sm_put_blocking(pio, sm, 0b11111100111111); // 7 bytes - first number, 7 bytes - second number
 		} else {
-			pio_sm_put_blocking(pio, sm, 0b00000001111111);
+			// pio_sm_put_blocking(pio, sm, 0b00000001111111);
 		}
 		// 0b00000000000000
 		// 0b11111111111111
 
 		if (on) printf("ping\n");
 		else printf("pong\n");
-		sleep_ms(1000);
+		sleep_ms(100);
+
+		if (i == 99) {
+			i = 0;
+		} else {
+			i++;
+		}
 	}
 }
