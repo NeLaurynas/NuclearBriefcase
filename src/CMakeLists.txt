@@ -19,6 +19,8 @@ pico_sdk_init()
 add_executable(NuclearBriefcase main.c
 		defines/gp_masks.h
 		defines/config.h
+		modules/numbers/numbers.c
+		modules/numbers/numbers.h
 )
 
 pico_set_program_name(NuclearBriefcase "NuclearBriefcase")

@@ -14,5 +14,9 @@
 #define MOD_NUM_DISP6 8
 #define MOD_NUM_DISP7 7
 #define MOD_NUM_BTN 0
+#define MOD_NUM_PIO pio0
+#define MOD_NUM_SM 0
+#define MOD_NUM_DMA_CH 0
+
 
 #endif //CONFIG_H
