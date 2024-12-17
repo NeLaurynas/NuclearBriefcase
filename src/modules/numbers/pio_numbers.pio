@@ -1,7 +1,7 @@
 ; Copyright (C) 2024 Laurynas 'Deviltry' Ekekeke
 ; SPDX-License-Identifier: BSD-3-Clause
 
-.program numbers
+.program pio_numbers
 .side_set 2					; controls two side pins - ground for display 1 and 2 ("ground" is positive, as it's common anode display, so not really ground)
 .wrap_target
 	; we turn off ground for 3 cycles, because my NPN + PNP complementary pair is too slow to react (maybe wrong resistors, maybe display has capacitors, idk)
@@ -20,7 +20,7 @@
 % c-sdk {
 // this is a raw helper function for use by the user which sets up the GPIO output, and configures the SM to output on a particular pin
 
-void numbers_program_init(PIO pio, uint sm, uint offset, uint pin1, uint pin2, uint pin3, uint pin4, uint pin5, uint pin6,
+void pio_numbers_program_init(PIO pio, uint sm, uint offset, uint pin1, uint pin2, uint pin3, uint pin4, uint pin5, uint pin6,
 		uint pin7, uint pin8, uint pin9, float clk_div) {
 	pio_gpio_init(pio, pin1);
 	pio_gpio_init(pio, pin2);
@@ -32,7 +32,7 @@ void numbers_program_init(PIO pio, uint sm, uint offset, uint pin1, uint pin2, u
 	pio_gpio_init(pio, pin8);
 	pio_gpio_init(pio, pin9);
 
-	pio_sm_config c = numbers_program_get_default_config(offset);
+	pio_sm_config c = pio_numbers_program_get_default_config(offset);
 
 	pio_sm_set_consecutive_pindirs(pio, sm, pin1, 9, true); // 9 pins, is_out = true
 	sm_config_set_out_pins(&c, pin1, 7); // set pin1..pin2 to be controlled with OUT PINS
