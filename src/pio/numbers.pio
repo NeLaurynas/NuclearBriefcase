@@ -2,15 +2,16 @@
 ; SPDX-License-Identifier: BSD-3-Clause
 
 .program numbers
-.side_set 2
+.side_set 2					; controls two side pins - ground for display 1 and 2 ("ground" is positive, as it's common anode display, so not really ground)
 .wrap_target
-	PULL NOBLOCK side 0b00	; pull data from FIFO into OSR, noblock - if no data, pull from X (recycle)
-	MOV X, OSR side 0b00	; copy data into X register from OSR
+	; we turn off ground for 3 cycles, because my NPN + PNP complementary pair is too slow to react (maybe wrong resistors, maybe display has capacitors, idk)
+	PULL NOBLOCK SIDE 0b00	; pull data from FIFO into OSR, noblock - if no data, pull from X (recycle)
+	MOV X, OSR SIDE 0b00	; copy data into X register from OSR
 
-	OUT PINS, 7 side 0b00	; SEND 7 bits to PINS (so like 0b100101..), and every bit is one pin either HIGH or LOW
+	OUT PINS, 7 SIDE 0b00	; SEND 7 bits to PINS (so like 0b100101..), and every bit is one pin either HIGH or LOW
 	NOP [7] SIDE 0b10		; turn on display 1 ground pin for 8 cycles
 
-	NOP [1] side 0b00		; wait for 2 cycles (like first display waits for PULL and BLOCK instructions) - 1 cycle for NOP and 1 for [1]
+	NOP [1] SIDE 0b00		; wait for 2 cycles (like first display waits for PULL and BLOCK instructions) - 1 cycle for NOP and 1 for [1]
 	OUT PINS, 7 side 0b00	; SEND the rest of 7 bits
 	NOP [7] SIDE 0b01		; turn on display 2 ground pin
 .wrap
@@ -34,8 +35,8 @@ void numbers_program_init(PIO pio, uint sm, uint offset, uint pin1, uint pin2, u
 	pio_sm_config c = numbers_program_get_default_config(offset);
 
 	pio_sm_set_consecutive_pindirs(pio, sm, pin1, 9, true); // 9 pins, is_out = true
-	sm_config_set_out_pins(&c, pin1, 7);
-	sm_config_set_sideset_pins(&c, pin8);
+	sm_config_set_out_pins(&c, pin1, 7); // set pin1..pin2 to be controlled with OUT PINS
+	sm_config_set_sideset_pins(&c, pin8); // set pin8..pin9 to be controlled with SIDE
 
 	sm_config_set_clkdiv(&c, clk_div);
 

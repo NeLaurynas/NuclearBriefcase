@@ -44,6 +44,8 @@ target_include_directories(NuclearBriefcase PRIVATE
 target_link_libraries(NuclearBriefcase
 		hardware_i2c
 		hardware_pio
+		hardware_adc
+		hardware_dma
 )
 
 pico_add_extra_outputs(NuclearBriefcase)
