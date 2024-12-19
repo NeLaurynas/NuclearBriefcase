@@ -7,6 +7,7 @@
 #include "hardware/dma.h"
 #include "hardware/pio.h"
 #include "pico/stdlib.h"
+#include "hardware/clocks.h"
 
 #include "modules/numbers/numbers.h"
 
@@ -25,6 +26,8 @@ float read_onboard_temperature() {
 }
 
 int main() {
+	set_sys_clock_khz(48000, false);
+
 	stdio_init_all(); // only for serial over usb - printf
 	numbers_init();
 
@@ -36,6 +39,12 @@ int main() {
 	gpio_set_dir(25, GPIO_OUT);
 
 	while (true) {
+		anim(i++);
+		if (i > 5) i = 0;
+		sleep_ms(100);
+	}
+
+	while (true) {
 		ping = !ping;
 		sleep_ms(100);
 
@@ -44,13 +53,15 @@ int main() {
 
 		gpio_put(25, units == 0);
 
-		numbers_display_both(tens, units);
-		// if (ping) printf("ping\n");
-		// else printf("pong\n");
-
 		if (units == 0 && tens % 2 == 0) {
 			const float temperature = read_onboard_temperature();
 			printf("Onboard temperature = %.02f C\n", temperature);
+			uint32_t sys_clk = clock_get_hz(clk_sys);
+			printf("System clock: %u Hz\n", sys_clk);
+			uint32_t sys_clk_khz = clock_get_hz(clk_sys) / 1000;
+			printf("System clock: %u kHz\n", sys_clk_khz);
+			float peri_clk_mhz = clock_get_hz(clk_peri) / 1000000;
+			printf("Peripheral clock: %.2f MHz\n", peri_clk_mhz);
 		}
 
 		if (i == 99) { i = 0; }

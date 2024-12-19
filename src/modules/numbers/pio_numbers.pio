@@ -16,10 +16,7 @@
 	NOP [7] SIDE 0b01		; turn on display 2 ground pin
 .wrap
 
-
 % c-sdk {
-// this is a raw helper function for use by the user which sets up the GPIO output, and configures the SM to output on a particular pin
-
 void pio_numbers_program_init(PIO pio, uint sm, uint offset, uint pin1, uint pin2, uint pin3, uint pin4, uint pin5, uint pin6,
 		uint pin7, uint pin8, uint pin9, float clk_div) {
 	pio_gpio_init(pio, pin1);
