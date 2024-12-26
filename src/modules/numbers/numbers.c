@@ -19,6 +19,7 @@ uint8_t bytes[] = {
 	0b0010011, // 7
 	0b1111111, // 8
 	0b0111111, // 9
+	0b0000000, // 10
 };
 
 // blank line circle
@@ -49,19 +50,19 @@ void numbers_init() {
 	channel_config_set_read_increment(&dma_c, false);
 	channel_config_set_write_increment(&dma_c, false);
 	channel_config_set_dreq(&dma_c, DREQ_FORCE);
-	dma_channel_configure(MOD_NUM_DMA_CH, &dma_c, &MOD_NUM_PIO->txf[MOD_NUM_SM], buffer, 1, false);
+	dma_channel_configure(MOD_NUM_DMA_CH, &dma_c, &MOD_NUM_PIO->txf[MOD_NUM_SM], buffer, 1, true);
 
 	// init PIO
 	const uint offset = pio_add_program(MOD_NUM_PIO, &pio_numbers_program);
 	hard_assert(offset > 0); // TODO: led blinking error module
 	pio_sm_claim(MOD_NUM_PIO, MOD_NUM_SM);
 	pio_numbers_program_init(MOD_NUM_PIO, MOD_NUM_SM, offset, MOD_NUM_DISP7, MOD_NUM_DISP6, MOD_NUM_DISP5,
-	                         MOD_NUM_DISP4,
-	                         MOD_NUM_DISP3, MOD_NUM_DISP2, MOD_NUM_DISP1, MOD_NUM_DPGROUND2, MOD_NUM_DPGROUND1, 333.3f);
+	                         MOD_NUM_DISP4, MOD_NUM_DISP3, MOD_NUM_DISP2, MOD_NUM_DISP1, MOD_NUM_DPGROUND2,
+	                         MOD_NUM_DPGROUND1, 333.3f);
 	pio_sm_set_enabled(MOD_NUM_PIO, MOD_NUM_SM, true);
 }
 
-void numbers_display_both(uint8_t number1, uint8_t number2) {
+void numbers_display(uint8_t number1, uint8_t number2) {
 	buffer[0] = bytes[number1] << 7 | bytes[number2];
 	dma_channel_transfer_from_buffer_now(MOD_NUM_DMA_CH, &buffer, 1);
 }

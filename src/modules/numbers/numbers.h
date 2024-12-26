@@ -8,7 +8,7 @@
 
 void numbers_init();
 
-void numbers_display_both(uint8_t number1, uint8_t number2);
+void numbers_display(uint8_t number1, uint8_t number2);
 
 void anim(uint8_t frame);
 

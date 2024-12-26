@@ -38,20 +38,29 @@ int main() {
 	gpio_init(25); // internal LED
 	gpio_set_dir(25, GPIO_OUT);
 
-	while (true) {
-		anim(i++);
-		if (i > 5) i = 0;
-		sleep_ms(100);
-	}
+	// while (true) {
+	// 	anim(i++);
+	// 	if (i > 5) i = 0;
+	// 	sleep_ms(100);
+	// }
 
 	while (true) {
 		ping = !ping;
-		sleep_ms(100);
+		sleep_ms(300);
 
 		const uint8_t tens = i / 10;
 		const uint8_t units = i % 10;
 
-		gpio_put(25, units == 0);
+		// gpio_put(25, units == 0);
+		gpio_put(25, ping);
+
+		if (ping) {
+			numbers_display(8, 8);
+		}
+		else {
+			numbers_display(10, 10);
+		}
+		// numbers_display(tens, units);
 
 		if (units == 0 && tens % 2 == 0) {
 			const float temperature = read_onboard_temperature();
