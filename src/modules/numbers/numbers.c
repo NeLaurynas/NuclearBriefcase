@@ -1,13 +1,12 @@
 // Copyright (C) 2024 Laurynas 'Deviltry' Ekekeke
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <pio_numbers.pio.h>
-#include <hardware/dma.h>
-#include <hardware/pio.h>
-
 #include "numbers.h"
 
+#include <pio_numbers.pio.h>
 #include <stdio.h>
+#include <hardware/dma.h>
+#include <hardware/pio.h>
 
 #include "state.h"
 #include "utils.h"

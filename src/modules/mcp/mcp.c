@@ -79,24 +79,10 @@ void mcp_init() {
 	write_register(MOD_MCP_ADDR_1, GPIOA, 0b11111111);
 }
 
-void display_bytes_as_binary(const void* data, size_t size) {
-	const unsigned char* bytes = (const unsigned char*)data;
-	for (size_t i = 0; i < size; i++) {
-		for (int bit = 7; bit >= 0; bit--) { // Iterate through bits from MSB to LSB
-			printf("%d", (bytes[i] >> bit) & 1);
-		}
-		printf(" "); // Separate each byte
-	}
-	printf("\n");
-}
-
 void mcp_all() {
 	// Read the current state of both GPIOA and GPIOB in one operation
 	uint8_t dataA = read_register(MOD_MCP_ADDR_1, GPIOA);
 	uint8_t dataB = read_register(MOD_MCP_ADDR_1, GPIOB);
-
-	// display_bytes_as_binary(&dataA, sizeof(uint8_t));
-	// display_bytes_as_binary(&dataB, sizeof(uint8_t));
 
 	dataA ^= 0b11111111;
 	dataB ^= 0b11111111;
