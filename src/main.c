@@ -9,9 +9,8 @@
 #include "hardware/clocks.h"
 #include "hardware/pio.h"
 #include "modules/mcp/mcp.h"
-#include "pico/stdlib.h"
-
 #include "modules/numbers/numbers.h"
+#include "pico/stdlib.h"
 
 bool ping = true;
 uint8_t i = 0;

@@ -2,7 +2,9 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 #include "utils.h"
+
 #include <stdio.h>
+
 #include "pico/rand.h"
 
 uint32_t util_random_in_range(uint32_t fromInclusive, uint32_t toInclusive) {
