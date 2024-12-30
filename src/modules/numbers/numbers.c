@@ -8,7 +8,7 @@
 #include "numbers.h"
 #include "defines/config.h"
 
-uint8_t bytes[] = {
+uint8_t bits[] = {
 	0b0111111, // 0
 	0b0001001, // 1
 	0b1011110, // 2
@@ -31,7 +31,7 @@ uint8_t bytes[] = {
 // 	0b1110101, // 4
 // 	0b1110011, // 5
 // };
-uint8_t animation_bytes[] = {
+uint8_t animation_bits[] = {
 	0b1000000, // 0
 	0b0100000, // 1
 	0b0010000, // 2
@@ -63,11 +63,11 @@ void numbers_init() {
 }
 
 void numbers_display(uint8_t number1, uint8_t number2) {
-	buffer[0] = bytes[number1] << 7 | bytes[number2];
+	buffer[0] = bits[number1] << 7 | bits[number2];
 	dma_channel_transfer_from_buffer_now(MOD_NUM_DMA_CH, &buffer, 1);
 }
 
 void anim(uint8_t frame) {
-	buffer[0] = animation_bytes[frame] << 7 | animation_bytes[frame];
+	buffer[0] = animation_bits[frame] << 7 | animation_bits[frame];
 	dma_channel_transfer_from_buffer_now(MOD_NUM_DMA_CH, &buffer, 1);
 }

@@ -21,6 +21,8 @@ add_executable(NuclearBriefcase main.c
 		defines/config.h
 		modules/numbers/numbers.c
 		modules/numbers/numbers.h
+		modules/mcp/mcp.c
+		modules/mcp/mcp.h
 )
 
 pico_set_program_name(NuclearBriefcase "NuclearBriefcase")
