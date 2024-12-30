@@ -25,5 +25,4 @@
 #define MOD_MCP_I2C_PORT (&i2c0_inst)
 #define MOD_MCP_ADDR_1 0x20
 
-
 #endif //CONFIG_H
