@@ -10,13 +10,11 @@
 
 #include "defines/config.h"
 
-// MCP23017 registers
+// MCP23017 registers (Bank Mode 1)
 #define IODIRA 0x00  // I/O Direction Register A
-#define IODIRB 0x01  // I/O Direction Register B
-#define GPIOA  0x12  // GPIO Register A
-#define GPIOB  0x13  // GPIO Register B
-// #define OLATA  0x14  // Output Latch Register A
-// #define OLATB  0x15  // Output Latch Register B
+#define IODIRB 0x10  // I/O Direction Register B
+#define GPIOA  0x09  // GPIO Register A
+#define GPIOB  0x19  // GPIO Register B
 
 #define IOCONA 0x0A  //IO Configuration Register A - BANK/MIRROR/SLEW/INTPOL
 #define IOCONB 0x0B  //IO Configuration Register B - BANK/MIRROR/SLEW/INTPOL
@@ -31,11 +29,6 @@
 void write_register(uint8_t address, uint8_t regist, uint8_t value) {
 	const uint8_t data[2] = {regist, value};
 	i2c_write_blocking(MOD_MCP_I2C_PORT, address, data, 2, false);
-}
-
-void write_both_register(uint8_t address, uint8_t regist, uint16_t value) {
-	const uint8_t data[3] = {regist, (uint8_t)value, (uint8_t)(value >> 8)};
-	i2c_write_blocking(MOD_MCP_I2C_PORT, address, data, 3, false);
 }
 
 uint8_t read_register(uint8_t address, uint8_t regist) {
@@ -59,7 +52,7 @@ inline bool is_bit_set(uint8_t value, uint8_t bit) {
 
 void setup_bank_configuration(uint8_t address, uint8_t regist) {
 	uint8_t ioconData = 0;
-	set_bit(&ioconData, IOCON_BANK_BIT, false);
+	set_bit(&ioconData, IOCON_BANK_BIT, true); // set to Bank Mode 1
 	set_bit(&ioconData, IOCON_MIRROR_BIT, false);
 	set_bit(&ioconData, IOCON_SEQOP_BIT, false);
 	set_bit(&ioconData, IOCON_DISSLW_BIT, false);
@@ -75,12 +68,13 @@ void mcp_init() {
 	gpio_set_function(MOD_MCP_PIN_SCL, GPIO_FUNC_I2C);
 	gpio_pull_up(MOD_MCP_PIN_SDA);
 	gpio_pull_up(MOD_MCP_PIN_SCL);
+	sleep_ms(10);
 
 	setup_bank_configuration(MOD_MCP_ADDR_1, IOCONA);
 	setup_bank_configuration(MOD_MCP_ADDR_1, IOCONB);
 
-	write_register(MOD_MCP_ADDR_1, IODIRA, 0x00); // Set all GPA pins as outputs
-	write_register(MOD_MCP_ADDR_1, IODIRB, 0x00); // Set all GPB pins as outputs
+	write_register(MOD_MCP_ADDR_1, IODIRA, 0b00000000); // Set all GPA pins as outputs
+	write_register(MOD_MCP_ADDR_1, IODIRB, 0b00000000); // Set all GPB pins as outputs
 
 	write_register(MOD_MCP_ADDR_1, GPIOA, 0b11111111);
 }
@@ -101,19 +95,11 @@ void mcp_all() {
 	uint8_t dataA = read_register(MOD_MCP_ADDR_1, GPIOA);
 	uint8_t dataB = read_register(MOD_MCP_ADDR_1, GPIOB);
 
-	display_bytes_as_binary(&dataA, sizeof(uint8_t));
-	display_bytes_as_binary(&dataB, sizeof(uint8_t));
+	// display_bytes_as_binary(&dataA, sizeof(uint8_t));
+	// display_bytes_as_binary(&dataB, sizeof(uint8_t));
 
-	// i2c_scan();
-
-	// Toggle the corresponding bit (0 to 15)
-	// dataA ^= 0b11111111; // Toggle bit i for GPIOA (0 to 7) and GPIOB (8 to 15) // XOR - 1 ^ 1 = 0, 0 ^ 1 = 1
-	// dataB ^= 0b11111111;
-	dataA = 0b01000000;
-	dataB = 0b00000010;
-	// write_register(MOD_MCP_ADDR_1, OLATA, data); // Write back the toggled value
+	dataA ^= 0b11111111;
+	dataB ^= 0b11111111;
 	write_register(MOD_MCP_ADDR_1, GPIOA, dataA);
 	write_register(MOD_MCP_ADDR_1, GPIOB, dataB);
-
-	// printf("Toggled GPIO%d\n", i);
 }

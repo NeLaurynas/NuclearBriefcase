@@ -51,6 +51,7 @@ void numbers_init() {
 	channel_config_set_write_increment(&dma_c, false);
 	channel_config_set_dreq(&dma_c, DREQ_FORCE);
 	dma_channel_configure(MOD_NUM_DMA_CH, &dma_c, &MOD_NUM_PIO->txf[MOD_NUM_SM], buffer, 1, false);
+	sleep_ms(10);
 
 	// init PIO
 	const uint offset = pio_add_program(MOD_NUM_PIO, &pio_numbers_program);
