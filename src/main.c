@@ -4,13 +4,12 @@
 #include <stdio.h>
 #include <hardware/i2c.h>
 
-#include "defines/config.h"
+#include "state.h"
 #include "hardware/adc.h"
-#include "hardware/dma.h"
-#include "hardware/pio.h"
-#include "pico/stdlib.h"
 #include "hardware/clocks.h"
+#include "hardware/pio.h"
 #include "modules/mcp/mcp.h"
+#include "pico/stdlib.h"
 
 #include "modules/numbers/numbers.h"
 
@@ -42,7 +41,6 @@ int main() {
 
 	gpio_init(25); // internal LED
 	gpio_set_dir(25, GPIO_OUT);
-
 
 	while (true) {
 		ping = !ping;

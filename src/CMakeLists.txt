@@ -23,6 +23,10 @@ add_executable(NuclearBriefcase main.c
 		modules/numbers/numbers.h
 		modules/mcp/mcp.c
 		modules/mcp/mcp.h
+		state.c
+		state.h
+		utils.c
+		utils.h
 )
 
 pico_set_program_name(NuclearBriefcase "NuclearBriefcase")
@@ -50,6 +54,7 @@ target_link_libraries(NuclearBriefcase
 		hardware_pio
 		hardware_adc
 		hardware_dma
+		pico_rand
 )
 
 pico_add_extra_outputs(NuclearBriefcase)

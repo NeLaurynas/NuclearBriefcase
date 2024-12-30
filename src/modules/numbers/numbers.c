@@ -6,6 +6,11 @@
 #include <hardware/pio.h>
 
 #include "numbers.h"
+
+#include <stdio.h>
+
+#include "state.h"
+#include "utils.h"
 #include "defines/config.h"
 
 uint8_t bits[] = {
@@ -43,6 +48,8 @@ uint8_t animation_bits[] = {
 uint16_t buffer[] = {0b11111111111111};
 
 void numbers_init() {
+	state.numbers.target = util_random_in_range(3, 9);
+
 	// init DMA
 	dma_channel_claim(MOD_NUM_DMA_CH);
 	dma_channel_config dma_c = dma_channel_get_default_config(MOD_NUM_DMA_CH);
@@ -55,7 +62,7 @@ void numbers_init() {
 
 	// init PIO
 	const uint offset = pio_add_program(MOD_NUM_PIO, &pio_numbers_program);
-	hard_assert(offset > 0); // TODO: led blinking error module
+	// hard_assert(offset > 0); // TODO: led blinking error module
 	pio_sm_claim(MOD_NUM_PIO, MOD_NUM_SM);
 	pio_numbers_program_init(MOD_NUM_PIO, MOD_NUM_SM, offset, MOD_NUM_DISP7, MOD_NUM_DISP6, MOD_NUM_DISP5,
 	                         MOD_NUM_DISP4, MOD_NUM_DISP3, MOD_NUM_DISP2, MOD_NUM_DISP1, MOD_NUM_DPGROUND2,
@@ -66,6 +73,12 @@ void numbers_init() {
 void numbers_display(uint8_t number1, uint8_t number2) {
 	buffer[0] = bits[number1] << 7 | bits[number2];
 	dma_channel_transfer_from_buffer_now(MOD_NUM_DMA_CH, &buffer, 1);
+}
+
+void numbers_generate_target() {
+	uint8_t target = util_random_in_range(0, 9);
+	if (target == state.numbers.number || target == state.numbers.target) target = (target + 1) % 10;
+	state.numbers.target = target;
 }
 
 void anim(uint8_t frame) {
