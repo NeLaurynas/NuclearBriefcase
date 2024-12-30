@@ -9,16 +9,16 @@
 #include "defines/config.h"
 
 uint8_t bytes[] = {
-	0b1110111, // 0
-	0b0010001, // 1
-	0b1101011, // 2
-	0b0111011, // 3
-	0b0011101, // 4
-	0b0111110, // 5
-	0b1111110, // 6
-	0b0010011, // 7
+	0b0111111, // 0
+	0b0001001, // 1
+	0b1011110, // 2
+	0b1011011, // 3
+	0b1101001, // 4
+	0b1110011, // 5
+	0b1110111, // 6
+	0b0011001, // 7
 	0b1111111, // 8
-	0b0111111, // 9
+	0b1111011, // 9
 	0b0000000, // 10
 };
 
@@ -47,10 +47,10 @@ void numbers_init() {
 	dma_channel_claim(MOD_NUM_DMA_CH);
 	dma_channel_config dma_c = dma_channel_get_default_config(MOD_NUM_DMA_CH);
 	channel_config_set_transfer_data_size(&dma_c, DMA_SIZE_16);
-	channel_config_set_read_increment(&dma_c, false);
+	channel_config_set_read_increment(&dma_c, false); // incr false - we always read from same memory location
 	channel_config_set_write_increment(&dma_c, false);
 	channel_config_set_dreq(&dma_c, DREQ_FORCE);
-	dma_channel_configure(MOD_NUM_DMA_CH, &dma_c, &MOD_NUM_PIO->txf[MOD_NUM_SM], buffer, 1, true);
+	dma_channel_configure(MOD_NUM_DMA_CH, &dma_c, &MOD_NUM_PIO->txf[MOD_NUM_SM], buffer, 1, false);
 
 	// init PIO
 	const uint offset = pio_add_program(MOD_NUM_PIO, &pio_numbers_program);

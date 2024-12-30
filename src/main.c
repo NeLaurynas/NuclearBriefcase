@@ -46,21 +46,14 @@ int main() {
 
 	while (true) {
 		ping = !ping;
-		sleep_ms(300);
+		sleep_ms(100);
 
 		const uint8_t tens = i / 10;
 		const uint8_t units = i % 10;
 
-		// gpio_put(25, units == 0);
-		gpio_put(25, ping);
+		gpio_put(25, units == 0);
 
-		if (ping) {
-			numbers_display(8, 8);
-		}
-		else {
-			numbers_display(10, 10);
-		}
-		// numbers_display(tens, units);
+		numbers_display(tens, units);
 
 		if (units == 0 && tens % 2 == 0) {
 			const float temperature = read_onboard_temperature();
