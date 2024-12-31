@@ -7,6 +7,7 @@
 #include <hardware/adc.h>
 #include <hardware/clocks.h>
 
+#include "defines/config.h"
 #include "pico/rand.h"
 
 uint32_t util_random_in_range(uint32_t fromInclusive, uint32_t toInclusive) {
@@ -22,12 +23,14 @@ uint32_t util_random_in_range(uint32_t fromInclusive, uint32_t toInclusive) {
 }
 
 void utils_display_bytes_as_binary(const void* data, size_t size) {
+#if DBG
 	const unsigned char* bytes = (const unsigned char*)data;
 	for (size_t i = 0; i < size; i++) {
 		for (int bit = 7; bit >= 0; bit--) { printf("%d", (bytes[i] >> bit) & 1); }
 		printf(" ");
 	}
 	printf("\n");
+#endif
 }
 
 float utils_print_onboard_temp() {
@@ -36,14 +39,18 @@ float utils_print_onboard_temp() {
 	float adc = (float)adc_read() * conversionFactor;
 	float tempC = 27.0f - (adc - 0.706f) / 0.001721f;
 
+#if DBG
 	printf("Onboard temperature = %.02f C\n", tempC);
+#endif
 
 	return tempC;
 }
 
 void utils_print_cpu_speed() {
+#if DBG
 	uint32_t freq_hz = clock_get_hz(clk_sys);
 
 	float freq_mhz = (float)freq_hz / 1000000.0f;
 	printf("System clock: %.2f MHz\n", freq_mhz);
+#endif
 }
