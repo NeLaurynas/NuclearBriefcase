@@ -9,6 +9,7 @@
 #include "state.h"
 #include "utils.h"
 #include "defines/config.h"
+#include "modules/mcp/mcp.h"
 
 void renderer_loop() {
 	int64_t acc_elapsed_us = 0;
@@ -29,7 +30,7 @@ void renderer_loop() {
 		acc_elapsed_us += (remaining_us + elapsed_us);
 
 		if (acc_elapsed_us >= 3 * 1000000) { // 3 seconds
-			int a = MOD_NUM_BTN;
+			mcp_all();
 			float elapsed_ms = elapsed_us / 1000.0f;
 			printf("render took: %.2f ms (%lld us)\n", elapsed_ms, elapsed_us);
 			utils_print_onboard_temp();
