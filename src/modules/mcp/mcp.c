@@ -80,7 +80,6 @@ void mcp_init() {
 }
 
 void mcp_all() {
-	// Read the current state of both GPIOA and GPIOB in one operation
 	uint8_t dataA = read_register(MOD_MCP_ADDR_1, GPIOA);
 	uint8_t dataB = read_register(MOD_MCP_ADDR_1, GPIOB);
 

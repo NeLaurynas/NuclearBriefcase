@@ -16,5 +16,6 @@ typedef struct {
 } State;
 
 extern State state;
+extern State currentState;
 
 #endif //STATE_H

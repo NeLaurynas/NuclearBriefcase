@@ -4,6 +4,8 @@
 #include "utils.h"
 
 #include <stdio.h>
+#include <hardware/adc.h>
+#include <hardware/clocks.h>
 
 #include "pico/rand.h"
 
@@ -26,4 +28,22 @@ void utils_display_bytes_as_binary(const void* data, size_t size) {
 		printf(" ");
 	}
 	printf("\n");
+}
+
+float utils_print_onboard_temp() {
+	const float conversionFactor = 3.3f / (1 << 12);
+
+	float adc = (float)adc_read() * conversionFactor;
+	float tempC = 27.0f - (adc - 0.706f) / 0.001721f;
+
+	printf("Onboard temperature = %.02f C\n", tempC);
+
+	return tempC;
+}
+
+void utils_print_cpu_speed() {
+	uint32_t freq_hz = clock_get_hz(clk_sys);
+
+	float freq_mhz = (float)freq_hz / 1000000.0f;
+	printf("System clock: %.2f MHz\n", freq_mhz);
 }

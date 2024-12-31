@@ -10,3 +10,5 @@ State state = {
 	},
 	.another_value = 0
 };
+
+State currentState = {};

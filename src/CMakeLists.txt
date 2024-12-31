@@ -27,6 +27,8 @@ add_executable(NuclearBriefcase main.c
 		state.h
 		utils.c
 		utils.h
+		renderer.c
+		renderer.h
 )
 
 pico_set_program_name(NuclearBriefcase "NuclearBriefcase")
