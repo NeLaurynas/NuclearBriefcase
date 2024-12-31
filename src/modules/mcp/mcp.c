@@ -39,7 +39,7 @@ uint8_t read_register(uint8_t address, uint8_t regist) {
 }
 
 inline bool is_bit_set(uint8_t value, uint8_t bit) {
-	return (bool)(0b1 & (value >> bit));
+	return 0b1 & (value >> bit);
 }
 
 inline uint8_t cfg_address(uint8_t data) {
@@ -82,11 +82,11 @@ void setup_bank_configuration(uint8_t address, uint8_t regist) {
 	set_bit(&ioconData, C_IOCON_HAEN_BIT, false);
 	set_bit(&ioconData, C_IOCON_ODR_BIT, false);
 	set_bit(&ioconData, C_IOCON_INTPOL_BIT, false);
-	return write_register(address, regist, ioconData);
+	write_register(address, regist, ioconData);
 }
 
 void mcp_init() {
-	i2c_init(MOD_MCP_I2C_PORT, 400 * 1000); // 400 khz
+	i2c_init(MOD_MCP_I2C_PORT, 400'000); // 400 khz
 	gpio_set_function(MOD_MCP_PIN_SDA, GPIO_FUNC_I2C);
 	gpio_set_function(MOD_MCP_PIN_SCL, GPIO_FUNC_I2C);
 	gpio_pull_up(MOD_MCP_PIN_SDA);

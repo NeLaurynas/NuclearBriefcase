@@ -29,7 +29,7 @@ void renderer_loop() {
 #if DBG
 		acc_elapsed_us += (remaining_us + elapsed_us);
 
-		if (acc_elapsed_us >= 3 * 1000000) { // 3 seconds
+		if (acc_elapsed_us >= 3 * 1'000'000) { // 3 seconds
 			mcp_all();
 			float elapsed_ms = elapsed_us / 1000.0f;
 			printf("render took: %.2f ms (%lld us)\n", elapsed_ms, elapsed_us);

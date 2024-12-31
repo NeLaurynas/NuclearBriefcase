@@ -15,7 +15,7 @@
 #include "pico/stdlib.h"
 
 int main() {
-	set_sys_clock_khz(48000, false);
+	set_sys_clock_khz(48'000, false);
 
 	stdio_init_all(); // only for serial over usb - printf
 

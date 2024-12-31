@@ -8,7 +8,6 @@
 #include <stdio.h>
 
 uint32_t util_random_in_range(uint32_t fromInclusive, uint32_t toInclusive) ;
-void utils_display_bytes_as_binary(const void* data, size_t size);
 float utils_print_onboard_temp();
 void utils_print_cpu_speed();
 

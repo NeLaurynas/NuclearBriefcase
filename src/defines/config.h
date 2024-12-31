@@ -8,18 +8,7 @@
 
 #define DBG true
 
-#define RENDER_TICK 10000
-
-/* MCP Layout (one byte):
- *   bit 7: MCP 1 or MCP 2
- *   bit 6: Bank A or Bank B
- *   rest: 6-bit number (max val 63)
- *
- *    7   6   5   4   3   2   1   0
- *  +---+---+---+---+---+---+---+---+
- *  | M | B |       number          |
- *  +---+---+---+---+---+---+---+---+
- */
+#define RENDER_TICK 10'000
 
 #define MOD_NUM_DPGROUND1 15
 #define MOD_NUM_DPGROUND2 14
@@ -33,9 +22,16 @@
 #define MOD_NUM_PIO pio0
 #define MOD_NUM_SM 0
 #define MOD_NUM_DMA_CH 0
-#define MOD_NUM_BTN ((0 << 7) | (1 << 6) | 2) // MCP - first bit - MCP 1, second bit - Bank B - pin 12
-#define MOD_NUM_LED_R ((0 << 7) | (1 << 6) | 0) // MCP - first bit - MCP 1, second bit - Bank B - pin 12
-#define MOD_NUM_LED_G ((0 << 7) | (1 << 6) | 1) // MCP - first bit - MCP 1, second bit - Bank B - pin 12
+/* MCP Layout (one byte):
+ *   bit 7: MCP 1 or MCP 2
+ *   bit 6: Bank A or Bank B
+ *   rest: 6-bit number (max val 63)
+ *    7   6   5   4   3   2   1   0
+ *  | M | B |       number          |
+ */
+#define MOD_NUM_BTN ((0 << 7) | (1 << 6) | 2) // MCP - first bit - MCP 1, second bit - Bank B - pin 2
+#define MOD_NUM_LED_R ((0 << 7) | (1 << 6) | 0) // MCP - first bit - MCP 1, second bit - Bank B - pin 0
+#define MOD_NUM_LED_G ((0 << 7) | (1 << 6) | 1) // MCP - first bit - MCP 1, second bit - Bank B - pin 1
 
 #define MOD_MCP_PIN_SDA 16
 #define MOD_MCP_PIN_SCL 17
