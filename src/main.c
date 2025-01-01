@@ -5,8 +5,8 @@
 #include <hardware/i2c.h>
 
 #include "renderer.h"
-#include "state.h"
 #include "utils.h"
+#include "defines/config.h"
 #include "hardware/adc.h"
 #include "hardware/clocks.h"
 #include "hardware/pio.h"
@@ -15,6 +15,11 @@
 #include "pico/stdlib.h"
 
 int main() {
+#if DBG
+	sleep_ms(2000);
+	utils_printf("Slept for 2 seconds\n");
+#endif
+
 	set_sys_clock_khz(48'000, false);
 
 	stdio_init_all(); // only for serial over usb - printf
@@ -28,8 +33,6 @@ int main() {
 
 	gpio_init(25); // internal LED
 	gpio_set_dir(25, GPIO_OUT);
-
-	memcpy(&currentState, &state, sizeof(State));
 
 	renderer_loop();
 }

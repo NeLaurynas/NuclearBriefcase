@@ -10,6 +10,23 @@
 #include "utils.h"
 #include "defines/config.h"
 #include "modules/mcp/mcp.h"
+#include "modules/numbers/numbers.h"
+
+void set_state() {
+
+}
+
+void render_state() {
+	// Numbers module
+	if (state.numbers.number != currentState.numbers.number || state.numbers.target != currentState.numbers.target) {
+		utils_printf("Numbers state [number/target] changed, rendering\n");
+		currentState.numbers.number = state.numbers.number;
+		currentState.numbers.target = state.numbers.target;
+
+		numbers_display(state.numbers.number, state.numbers.target);
+		numbers_ok(state.numbers.number == state.numbers.target);
+	}
+}
 
 void renderer_loop() {
 	int64_t acc_elapsed_us = 0;
@@ -19,18 +36,18 @@ void renderer_loop() {
 		const absolute_time_t start = get_absolute_time();
 
 		// ------------ work
-		// utils_print_onboard_temp();
+		set_state();
+		render_state();
 
 		// ------------ end
-		absolute_time_t end = get_absolute_time();
-		int64_t elapsed_us = absolute_time_diff_us(start, end);
-		int64_t remaining_us = RENDER_TICK - elapsed_us;
+		auto end = get_absolute_time();
+		auto elapsed_us = absolute_time_diff_us(start, end);
+		auto remaining_us = RENDER_TICK - elapsed_us;
 
 #if DBG
 		acc_elapsed_us += (remaining_us + elapsed_us);
 
-		if (acc_elapsed_us >= 3 * 1'000'000) { // 3 seconds
-			mcp_all();
+		if (acc_elapsed_us >= 10 * 1'000'000) { // 10 seconds
 			float elapsed_ms = elapsed_us / 1000.0f;
 			printf("render took: %.2f ms (%lld us)\n", elapsed_ms, elapsed_us);
 			utils_print_onboard_temp();

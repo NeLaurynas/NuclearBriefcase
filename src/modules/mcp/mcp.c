@@ -26,35 +26,35 @@
 #define C_IOCON_ODR_BIT 2
 #define C_IOCON_INTPOL_BIT 1
 
-void write_register(uint8_t address, uint8_t regist, uint8_t value) {
+void write_register(const uint8_t address, const uint8_t regist, const uint8_t value) {
 	const uint8_t data[2] = { regist, value };
 	i2c_write_blocking(MOD_MCP_I2C_PORT, address, data, 2, false);
 }
 
-uint8_t read_register(uint8_t address, uint8_t regist) {
+uint8_t read_register(const uint8_t address, const uint8_t regist) {
 	uint8_t value;
 	i2c_write_blocking(MOD_MCP_I2C_PORT, address, &regist, 1, true);
 	i2c_read_blocking(MOD_MCP_I2C_PORT, address, &value, 1, false);
 	return value;
 }
 
-inline bool is_bit_set(uint8_t value, uint8_t bit) {
+inline bool is_bit_set(const uint8_t value, const uint8_t bit) {
 	return 0b1 & (value >> bit);
 }
 
-inline uint8_t cfg_address(uint8_t data) {
+inline uint8_t cfg_address(const uint8_t data) {
 	return is_bit_set(data, 7) ? MOD_MCP_ADDR_2 : MOD_MCP_ADDR_1;
 }
 
-inline uint8_t cfg_gpio_bank(uint8_t data) {
+inline uint8_t cfg_gpio_bank(const uint8_t data) {
 	return is_bit_set(data, 6) ? C_GPIOB : C_GPIOA;
 }
 
-inline uint8_t cfg_iodir_bank(uint8_t data) {
+inline uint8_t cfg_iodir_bank(const uint8_t data) {
 	return is_bit_set(data, 6) ? C_IODIRB : C_IODIRA;
 }
 
-inline void set_bit(uint8_t* value, uint8_t bit, bool set) {
+inline void set_bit(uint8_t* value, const uint8_t bit, const bool set) {
 	if (set) {
 		*value |= (1 << bit);
 	}
@@ -63,17 +63,17 @@ inline void set_bit(uint8_t* value, uint8_t bit, bool set) {
 	}
 }
 
-inline uint8_t cfg_get_number(uint8_t data) {
+inline uint8_t cfg_get_number(const uint8_t data) {
 	return data & 0b00111111; // last 6 bits
 }
 
-void set_pin_out(uint8_t data) {
-	uint8_t options = read_register(cfg_address(data), cfg_iodir_bank(data));
+void set_pin_out_mode(const uint8_t data) {
+	auto options = read_register(cfg_address(data), cfg_iodir_bank(data));
 	set_bit(&options, cfg_get_number(data), false);
 	write_register(cfg_address(data), cfg_iodir_bank(data), options); // Set all GPA pins as outputs
 }
 
-void setup_bank_configuration(uint8_t address, uint8_t regist) {
+void setup_bank_configuration(const uint8_t address, const uint8_t regist) {
 	uint8_t ioconData = 0;
 	set_bit(&ioconData, C_IOCON_BANK_BIT, true); // set to Bank Mode 1
 	set_bit(&ioconData, C_IOCON_MIRROR_BIT, false);
@@ -96,12 +96,20 @@ void mcp_init() {
 	setup_bank_configuration(MOD_MCP_ADDR_1, C_IOCONA);
 	setup_bank_configuration(MOD_MCP_ADDR_1, C_IOCONB);
 
-	set_pin_out(MOD_NUM_LED_G);
-	set_pin_out(MOD_NUM_LED_R);
+	set_pin_out_mode(MOD_NUM_LED_G);
+	set_pin_out_mode(MOD_NUM_LED_R);
+}
+
+void mcp_set_out(const uint8_t pinData, const bool out) {
+	const auto address = cfg_address(pinData);
+	const auto bank = cfg_gpio_bank(pinData);
+	auto data = read_register(address, bank);
+	set_bit(&data, cfg_get_number(pinData), out);
+	write_register(address, bank, data);
 }
 
 void mcp_all() {
-	uint8_t dataB = read_register(MOD_MCP_ADDR_1, C_GPIOB);
+	auto dataB = read_register(MOD_MCP_ADDR_1, C_GPIOB);
 	dataB ^= 0b11111111;
 	write_register(MOD_MCP_ADDR_1, C_GPIOB, dataB);
 }

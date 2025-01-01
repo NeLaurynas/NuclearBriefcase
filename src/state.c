@@ -7,6 +7,7 @@ State state = {
 	.numbers = {
 		.target = 0,
 		.number = 0,
+		.btn_pressed = false,
 	},
 	.another_value = 0
 };

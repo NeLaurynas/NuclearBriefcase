@@ -11,6 +11,7 @@
 #include "state.h"
 #include "utils.h"
 #include "defines/config.h"
+#include "modules/mcp/mcp.h"
 
 uint8_t bits[] = {
 	0b0111111, // 0
@@ -44,7 +45,7 @@ uint8_t animation_bits[] = {
 	0b0000100, // 5
 };
 
-uint16_t buffer[] = {0b11111111111111};
+uint16_t buffer[] = { 0b11111111111111 };
 
 void numbers_init() {
 	state.numbers.target = util_random_in_range(3, 9);
@@ -59,19 +60,27 @@ void numbers_init() {
 	dma_channel_configure(MOD_NUM_DMA_CH, &dma_c, &MOD_NUM_PIO->txf[MOD_NUM_SM], buffer, 1, false);
 	sleep_ms(10);
 
+	const auto clk_div = utils_calculate_pio_clk_div(7);
+	utils_printf("NUMBERS PIO CLK DIV: %f\n", clk_div);
+
 	// init PIO
-	const uint offset = pio_add_program(MOD_NUM_PIO, &pio_numbers_program);
+	const auto offset = pio_add_program(MOD_NUM_PIO, &pio_numbers_program);
 	// hard_assert(offset > 0); // TODO: led blinking error module
 	pio_sm_claim(MOD_NUM_PIO, MOD_NUM_SM);
 	pio_numbers_program_init(MOD_NUM_PIO, MOD_NUM_SM, offset, MOD_NUM_DISP7, MOD_NUM_DISP6, MOD_NUM_DISP5,
 	                         MOD_NUM_DISP4, MOD_NUM_DISP3, MOD_NUM_DISP2, MOD_NUM_DISP1, MOD_NUM_DPGROUND2,
-	                         MOD_NUM_DPGROUND1, 333.3f);
+	                         MOD_NUM_DPGROUND1, clk_div);
 	pio_sm_set_enabled(MOD_NUM_PIO, MOD_NUM_SM, true);
 }
 
-void numbers_display(uint8_t number1, uint8_t number2) {
+void numbers_display(const uint8_t number1, const uint8_t number2) {
 	buffer[0] = bits[number1] << 7 | bits[number2];
 	dma_channel_transfer_from_buffer_now(MOD_NUM_DMA_CH, &buffer, 1);
+}
+
+void numbers_ok(const bool ok) {
+	mcp_set_out(MOD_NUM_LED_G, ok);
+	mcp_set_out(MOD_NUM_LED_R, !ok);
 }
 
 void numbers_generate_target() {
@@ -80,7 +89,7 @@ void numbers_generate_target() {
 	state.numbers.target = target;
 }
 
-void anim(uint8_t frame) {
+void anim(const uint8_t frame) {
 	buffer[0] = animation_bits[frame] << 7 | animation_bits[frame];
 	dma_channel_transfer_from_buffer_now(MOD_NUM_DMA_CH, &buffer, 1);
 }

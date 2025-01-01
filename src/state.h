@@ -10,6 +10,7 @@ typedef struct {
 	struct {
 		uint8_t target;
 		uint8_t number;
+		bool btn_pressed;
 	} numbers;
 
 	int another_value;
