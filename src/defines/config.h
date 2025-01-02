@@ -43,5 +43,6 @@
 #define MOD_MCP_I2C_PORT (&i2c0_inst)
 #define MOD_MCP_ADDR1 0x20
 #define MOD_MCP_ADDR2 0x21
+#define MOD_MCP_GPIO_CACHE_MS 6
 
 #endif //CONFIG_H

@@ -61,11 +61,11 @@ void numbers_init() {
 	sleep_ms(2);
 
 	// get clock divider
-	auto const clk_div = utils_calculate_pio_clk_div(7);
+	const auto clk_div = utils_calculate_pio_clk_div(7);
 	utils_printf("NUMBERS PIO CLK DIV: %f\n", clk_div);
 
 	// init PIO
-	auto const offset = pio_add_program(MOD_NUM_PIO, &pio_numbers_program);
+	const auto offset = pio_add_program(MOD_NUM_PIO, &pio_numbers_program);
 	// hard_assert(offset > 0); // TODO: led blinking error module
 	pio_sm_claim(MOD_NUM_PIO, MOD_NUM_SM);
 	pio_numbers_program_init(MOD_NUM_PIO, MOD_NUM_SM, offset, MOD_NUM_DISP7, MOD_NUM_DISP6, MOD_NUM_DISP5,

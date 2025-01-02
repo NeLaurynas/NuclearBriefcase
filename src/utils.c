@@ -13,13 +13,13 @@
 
 uint32_t util_random_in_range(uint32_t fromInclusive, uint32_t toInclusive) {
 	if (fromInclusive > toInclusive) {
-		auto const tmp = toInclusive;
+		const auto tmp = toInclusive;
 		toInclusive = fromInclusive;
 		fromInclusive = tmp;
 	}
 
-	auto const range = toInclusive - fromInclusive + 1; // +1 because to is inclusive
-	auto const rnd = get_rand_32();
+	const auto range = toInclusive - fromInclusive + 1; // +1 because to is inclusive
+	const auto rnd = get_rand_32();
 	return fromInclusive + (rnd % range);
 }
 
@@ -38,7 +38,7 @@ float utils_print_onboard_temp() {
 
 void utils_print_cpu_speed() {
 #if DBG
-	auto const freq_hz = clock_get_hz(clk_sys);
+	const auto freq_hz = clock_get_hz(clk_sys);
 
 	const float freq_mhz = (float)freq_hz / 1'000'000.0f;
 	printf("System clock: %.2f MHz\n", freq_mhz);
@@ -46,7 +46,7 @@ void utils_print_cpu_speed() {
 }
 
 float utils_calculate_pio_clk_div(float instruction_execution_in_us) {
-	auto const frequency_hz = clock_get_hz(clk_sys);
+	const auto frequency_hz = clock_get_hz(clk_sys);
 
 	float const clk_div = ((float)frequency_hz * instruction_execution_in_us) / 1'000'000.0f;
 

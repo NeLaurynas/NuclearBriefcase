@@ -15,7 +15,7 @@
 
 void set_state() {
 	// Numbers module
-	auto const num_btn_pressed = mcp_is_pin_low(MOD_NUM_BTN);
+	const auto num_btn_pressed = mcp_is_pin_low(MOD_NUM_BTN);
 	if (state.numbers.btn_pressed != num_btn_pressed) {
 		state.numbers.btn_pressed = num_btn_pressed;
 		if (num_btn_pressed) {
@@ -25,8 +25,8 @@ void set_state() {
 
 	// todo: cache mcp_is_pin_low based on mcp no and bank, because each read is 130 microseconds! cache for 5 miliseconds?
 	if (utils_time_diff_ms(state.numbers.last_encoder_change, time_us_32()) > MOD_NUM_ENC_DEBOUNCE_MS) {
-		auto const num_enc1 = mcp_is_pin_low(MOD_NUM_ENC1);
-		auto const num_enc2 = mcp_is_pin_low(MOD_NUM_ENC2);
+		const auto num_enc1 = mcp_is_pin_low(MOD_NUM_ENC1);
+		const auto num_enc2 = mcp_is_pin_low(MOD_NUM_ENC2);
 		if (num_enc1 != num_enc2) {
 			state.numbers.last_encoder_change = time_us_32(); // TODO: change in other paths for debounce?
 			if (num_enc1 == true && num_enc2 == false) {
@@ -55,7 +55,6 @@ void set_state() {
 void render_state() {
 	// Numbers module
 	if (state.numbers.number != currentState.numbers.number || state.numbers.target != currentState.numbers.target) {
-		utils_printf("Numbers state [number/target] changed, rendering\n");
 		currentState.numbers.number = state.numbers.number;
 		currentState.numbers.target = state.numbers.target;
 
@@ -65,7 +64,6 @@ void render_state() {
 
 	// Status module
 	if (state.status.numbers_on != currentState.status.numbers_on) {
-		utils_printf("Status state [numbers] changed, rendering\n");
 		currentState.status.numbers_on = state.status.numbers_on;
 		status_numbers_on(state.status.numbers_on);
 	}

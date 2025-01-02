@@ -44,6 +44,7 @@ target_compile_options(NuclearBriefcase PRIVATE
 		-Wextra
 		-Winline
 		-Werror
+		-Wno-error=old-style-declaration
 )
 
 # Generate PIO header
