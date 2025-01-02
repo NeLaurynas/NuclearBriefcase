@@ -47,6 +47,10 @@ target_compile_options(NuclearBriefcase PRIVATE
 		-Wno-error=old-style-declaration
 )
 
+target_compile_options(NuclearBriefcase PRIVATE
+		$<$<COMPILE_LANGUAGE:C>:-Wno-old-style-declaration>
+)
+
 # Generate PIO header
 pico_generate_pio_header(NuclearBriefcase ${CMAKE_CURRENT_LIST_DIR}/modules/numbers/pio_numbers.pio)
 

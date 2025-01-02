@@ -15,6 +15,4 @@ void mcp_set_out(uint8_t pinData, bool out);
 
 bool mcp_is_pin_low(uint8_t pinData);
 
-void mcp_all();
-
 #endif //MPC_H

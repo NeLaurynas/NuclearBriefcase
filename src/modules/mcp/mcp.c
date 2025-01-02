@@ -167,9 +167,3 @@ bool mcp_is_pin_low(uint8_t pinData) {
 	}
 	return !is_bit_set(data, cfg_get_number(pinData));
 }
-
-void mcp_all() {
-	auto dataB = read_register(MOD_MCP_ADDR1, C_GPIOB);
-	dataB ^= 0b11111111;
-	write_register(MOD_MCP_ADDR1, C_GPIOB, dataB);
-}
