@@ -12,11 +12,11 @@
 
 // MCP23017 registers (Bank Mode 1)
 #define C_IODIRA	0x00 // I/O Direction Register A
-#define C_IODIRB	0x10 // I/O Direction Register B
-#define C_GPIOA		0x09 // GPIO Register A
-#define C_GPIOB		0x19 // GPIO Register B
-#define C_GPPUA		0x06 // PULL UP A
-#define C_GPPUB		0x16 // PULL UP B
+#define C_IODIRB	0x01 // I/O Direction Register B
+#define C_GPIOA		0x12 // GPIO Register A
+#define C_GPIOB		0x13 // GPIO Register B
+#define C_GPPUA		0x0C // PULL UP A
+#define C_GPPUB		0x0D // PULL UP B
 
 #define C_IOCONA			0x0A  //IO Configuration Register A - BANK/MIRROR/SLEW/INTPOL
 #define C_IOCONB			0x0B  //IO Configuration Register B - BANK/MIRROR/SLEW/INTPOL
@@ -91,7 +91,7 @@ void mcp_cfg_set_pull_up(uint8_t pinData, bool pull_up) {
 
 void setup_bank_configuration(const uint8_t address, const uint8_t regist) {
 	uint8_t ioconData = 0;
-	set_bit(&ioconData, C_IOCON_BANK_BIT, true); // set to Bank Mode 1
+	set_bit(&ioconData, C_IOCON_BANK_BIT, false); // set to Bank Mode 0
 	set_bit(&ioconData, C_IOCON_MIRROR_BIT, false);
 	set_bit(&ioconData, C_IOCON_SEQOP_BIT, false);
 	set_bit(&ioconData, C_IOCON_DISSLW_BIT, false);
