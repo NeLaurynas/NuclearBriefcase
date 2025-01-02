@@ -12,6 +12,7 @@
 #include "hardware/pio.h"
 #include "modules/mcp/mcp.h"
 #include "modules/numbers/numbers.h"
+#include "modules/status/status.h"
 #include "pico/stdlib.h"
 
 int main() {
@@ -26,6 +27,7 @@ int main() {
 
 	mcp_init(); // init first, other modules use mcp...
 	numbers_init();
+	status_init();
 
 	adc_init();
 	adc_set_temp_sensor_enabled(true);

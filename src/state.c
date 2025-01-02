@@ -12,6 +12,9 @@ State state = {
 		.last_encoder_incrementing = false,
 		.last_encoder_decrementing = false,
 	},
+	.status = {
+		.numbers_on = false,
+	},
 	.another_value = 0
 };
 

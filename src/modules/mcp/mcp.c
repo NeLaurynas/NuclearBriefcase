@@ -107,10 +107,13 @@ void mcp_init() {
 	gpio_set_function(MOD_MCP_PIN_SCL, GPIO_FUNC_I2C);
 	gpio_pull_up(MOD_MCP_PIN_SDA);
 	gpio_pull_up(MOD_MCP_PIN_SCL);
-	sleep_ms(10);
+	sleep_ms(2);
 
 	setup_bank_configuration(MOD_MCP_ADDR1, C_IOCONA);
 	setup_bank_configuration(MOD_MCP_ADDR1, C_IOCONB);
+	setup_bank_configuration(MOD_MCP_ADDR2, C_IOCONA);
+	setup_bank_configuration(MOD_MCP_ADDR2, C_IOCONB);
+	sleep_ms(2);
 }
 
 void mcp_set_out(const uint8_t pinData, const bool out) {

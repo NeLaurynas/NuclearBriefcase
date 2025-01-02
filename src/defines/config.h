@@ -6,7 +6,7 @@
 
 #include <hardware/i2c.h>
 
-#define DBG false
+#define DBG true
 
 #define RENDER_TICK 10'000
 
@@ -35,6 +35,8 @@
 #define MOD_NUM_ENC1 ((0 << 7) | (1 << 6) | 3)
 #define MOD_NUM_ENC2 ((0 << 7) | (1 << 6) | 4)
 #define MOD_NUM_ENC_DEBOUNCE_MS 66
+
+#define MOD_STAT_LED_NUMBERS ((1 << 7) | (1 << 6) | 0)
 
 #define MOD_MCP_PIN_SDA 16
 #define MOD_MCP_PIN_SCL 17

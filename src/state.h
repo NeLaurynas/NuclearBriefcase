@@ -16,6 +16,10 @@ typedef struct {
 		bool last_encoder_decrementing;
 	} numbers;
 
+	struct {
+		bool numbers_on;
+	} status;
+
 	int another_value;
 } State;
 
@@ -24,6 +28,10 @@ typedef struct {
 		uint8_t target;
 		uint8_t number;
 	} numbers;
+
+	struct {
+		bool numbers_on;
+	} status;
 
 	int another_value;
 } CurrentState;

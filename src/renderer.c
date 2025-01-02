@@ -11,10 +11,11 @@
 #include "defines/config.h"
 #include "modules/mcp/mcp.h"
 #include "modules/numbers/numbers.h"
+#include "modules/status/status.h"
 
 void set_state() {
 	// Numbers module
-	auto num_btn_pressed = mcp_is_pin_low(MOD_NUM_BTN);
+	auto const num_btn_pressed = mcp_is_pin_low(MOD_NUM_BTN);
 	if (state.numbers.btn_pressed != num_btn_pressed) {
 		state.numbers.btn_pressed = num_btn_pressed;
 		if (num_btn_pressed) {
@@ -24,21 +25,20 @@ void set_state() {
 
 	// todo: cache mcp_is_pin_low based on mcp no and bank, because each read is 130 microseconds! cache for 5 miliseconds?
 	if (utils_time_diff_ms(state.numbers.last_encoder_change, time_us_32()) > MOD_NUM_ENC_DEBOUNCE_MS) {
-		auto num_enc1 = mcp_is_pin_low(MOD_NUM_ENC1);
-		auto num_enc2 = mcp_is_pin_low(MOD_NUM_ENC2);
-		if (num_enc1 != num_enc2) { // discard 1 and 1, can't tell direction (0 and 0 also discarded - not spinning)
-			state.numbers.last_encoder_change = time_us_32();
+		auto const num_enc1 = mcp_is_pin_low(MOD_NUM_ENC1);
+		auto const num_enc2 = mcp_is_pin_low(MOD_NUM_ENC2);
+		if (num_enc1 != num_enc2) {
+			state.numbers.last_encoder_change = time_us_32(); // TODO: change in other paths for debounce?
 			if (num_enc1 == true && num_enc2 == false) {
 				numbers_dec();
 				state.numbers.last_encoder_incrementing = false;
 				state.numbers.last_encoder_decrementing = true;
-			}
-			else if (num_enc1 == false && num_enc2 == true) {
+			} else if (num_enc1 == false && num_enc2 == true) {
 				numbers_inc();
 				state.numbers.last_encoder_incrementing = true;
 				state.numbers.last_encoder_decrementing = false;
 			}
-		// wtf is this crap...
+			// wtf is this crap...
 		} else if (num_enc1 == true && num_enc2 == true) {
 			if (state.numbers.last_encoder_incrementing) numbers_inc();
 			else if (state.numbers.last_encoder_decrementing) numbers_dec();
@@ -47,6 +47,9 @@ void set_state() {
 			state.numbers.last_encoder_decrementing = false;
 		}
 	}
+
+	// Status module
+	state.status.numbers_on = state.numbers.target == state.numbers.number;
 }
 
 void render_state() {
@@ -58,6 +61,13 @@ void render_state() {
 
 		numbers_display(state.numbers.number, state.numbers.target);
 		numbers_ok(state.numbers.number == state.numbers.target);
+	}
+
+	// Status module
+	if (state.status.numbers_on != currentState.status.numbers_on) {
+		utils_printf("Status state [numbers] changed, rendering\n");
+		currentState.status.numbers_on = state.status.numbers_on;
+		status_numbers_on(state.status.numbers_on);
 	}
 }
 
