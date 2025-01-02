@@ -11,12 +11,25 @@ typedef struct {
 		uint8_t target;
 		uint8_t number;
 		bool btn_pressed;
+		uint32_t last_encoder_change;
+		bool last_encoder_incrementing;
+		bool last_encoder_decrementing;
 	} numbers;
 
 	int another_value;
 } State;
 
+typedef struct {
+	struct {
+		uint8_t target;
+		uint8_t number;
+	} numbers;
+
+	int another_value;
+} CurrentState;
+
+
 extern State state;
-extern State currentState;
+extern CurrentState currentState;
 
 #endif //STATE_H

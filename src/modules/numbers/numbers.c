@@ -60,17 +60,28 @@ void numbers_init() {
 	dma_channel_configure(MOD_NUM_DMA_CH, &dma_c, &MOD_NUM_PIO->txf[MOD_NUM_SM], buffer, 1, false);
 	sleep_ms(10);
 
-	const auto clk_div = utils_calculate_pio_clk_div(7);
+	// get clock divider
+	auto const clk_div = utils_calculate_pio_clk_div(7);
 	utils_printf("NUMBERS PIO CLK DIV: %f\n", clk_div);
 
 	// init PIO
-	const auto offset = pio_add_program(MOD_NUM_PIO, &pio_numbers_program);
+	auto const offset = pio_add_program(MOD_NUM_PIO, &pio_numbers_program);
 	// hard_assert(offset > 0); // TODO: led blinking error module
 	pio_sm_claim(MOD_NUM_PIO, MOD_NUM_SM);
 	pio_numbers_program_init(MOD_NUM_PIO, MOD_NUM_SM, offset, MOD_NUM_DISP7, MOD_NUM_DISP6, MOD_NUM_DISP5,
 	                         MOD_NUM_DISP4, MOD_NUM_DISP3, MOD_NUM_DISP2, MOD_NUM_DISP1, MOD_NUM_DPGROUND2,
 	                         MOD_NUM_DPGROUND1, clk_div);
 	pio_sm_set_enabled(MOD_NUM_PIO, MOD_NUM_SM, true);
+
+	// init MCP
+	mcp_cfg_set_pin_out_mode(MOD_NUM_LEDG, true);
+	mcp_cfg_set_pin_out_mode(MOD_NUM_LEDR, true);
+	mcp_cfg_set_pin_out_mode(MOD_NUM_BTN, false);
+	mcp_cfg_set_pull_up(MOD_NUM_BTN, true);
+	mcp_cfg_set_pin_out_mode(MOD_NUM_ENC1, false);
+	mcp_cfg_set_pull_up(MOD_NUM_ENC1, true);
+	mcp_cfg_set_pin_out_mode(MOD_NUM_ENC2, false);
+	mcp_cfg_set_pull_up(MOD_NUM_ENC2, true);
 }
 
 void numbers_display(const uint8_t number1, const uint8_t number2) {
@@ -79,14 +90,26 @@ void numbers_display(const uint8_t number1, const uint8_t number2) {
 }
 
 void numbers_ok(const bool ok) {
-	mcp_set_out(MOD_NUM_LED_G, ok);
-	mcp_set_out(MOD_NUM_LED_R, !ok);
+	mcp_set_out(MOD_NUM_LEDG, ok);
+	mcp_set_out(MOD_NUM_LEDR, !ok);
 }
 
 void numbers_generate_target() {
 	uint8_t target = util_random_in_range(0, 9);
-	if (target == state.numbers.number || target == state.numbers.target) target = (target + 1) % 10;
+
+	while (target == state.numbers.number || target == state.numbers.target) {
+		target = (target + 1) % 10;
+	}
 	state.numbers.target = target;
+}
+
+void numbers_inc() {
+	state.numbers.number = (state.numbers.number + 1) % 10;
+}
+
+void numbers_dec() {
+	if (state.numbers.number == 0) state.numbers.number = 9;
+	else state.numbers.number -= 1;
 }
 
 void anim(const uint8_t frame) {

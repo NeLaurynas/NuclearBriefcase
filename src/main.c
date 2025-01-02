@@ -15,17 +15,17 @@
 #include "pico/stdlib.h"
 
 int main() {
+	set_sys_clock_khz(48'000, false);
+
+	stdio_init_all(); // only for serial over usb - printf
+
 #if DBG
 	sleep_ms(2000);
 	utils_printf("Slept for 2 seconds\n");
 #endif
 
-	set_sys_clock_khz(48'000, false);
-
-	stdio_init_all(); // only for serial over usb - printf
-
+	mcp_init(); // init first, other modules use mcp...
 	numbers_init();
-	mcp_init();
 
 	adc_init();
 	adc_set_temp_sensor_enabled(true);

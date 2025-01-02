@@ -13,7 +13,40 @@
 #include "modules/numbers/numbers.h"
 
 void set_state() {
+	// Numbers module
+	auto num_btn_pressed = mcp_is_pin_low(MOD_NUM_BTN);
+	if (state.numbers.btn_pressed != num_btn_pressed) {
+		state.numbers.btn_pressed = num_btn_pressed;
+		if (num_btn_pressed) {
+			numbers_generate_target();
+		}
+	}
 
+	// todo: cache mcp_is_pin_low based on mcp no and bank, because each read is 130 microseconds! cache for 5 miliseconds?
+	if (utils_time_diff_ms(state.numbers.last_encoder_change, time_us_32()) > MOD_NUM_ENC_DEBOUNCE_MS) {
+		auto num_enc1 = mcp_is_pin_low(MOD_NUM_ENC1);
+		auto num_enc2 = mcp_is_pin_low(MOD_NUM_ENC2);
+		if (num_enc1 != num_enc2) { // discard 1 and 1, can't tell direction (0 and 0 also discarded - not spinning)
+			state.numbers.last_encoder_change = time_us_32();
+			if (num_enc1 == true && num_enc2 == false) {
+				numbers_dec();
+				state.numbers.last_encoder_incrementing = false;
+				state.numbers.last_encoder_decrementing = true;
+			}
+			else if (num_enc1 == false && num_enc2 == true) {
+				numbers_inc();
+				state.numbers.last_encoder_incrementing = true;
+				state.numbers.last_encoder_decrementing = false;
+			}
+		// wtf is this crap...
+		} else if (num_enc1 == true && num_enc2 == true) {
+			if (state.numbers.last_encoder_incrementing) numbers_inc();
+			else if (state.numbers.last_encoder_decrementing) numbers_dec();
+		} else {
+			state.numbers.last_encoder_incrementing = false;
+			state.numbers.last_encoder_decrementing = false;
+		}
+	}
 }
 
 void render_state() {
@@ -29,7 +62,9 @@ void render_state() {
 }
 
 void renderer_loop() {
+#if DBG
 	int64_t acc_elapsed_us = 0;
+#endif
 
 	for (;;) {
 		// ------------ start

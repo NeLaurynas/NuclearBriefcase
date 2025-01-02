@@ -14,6 +14,10 @@ void numbers_ok(bool ok);
 
 void numbers_generate_target();
 
+void numbers_inc();
+
+void numbers_dec();
+
 void anim(uint8_t frame);
 
 #endif //NUMBERS_H
