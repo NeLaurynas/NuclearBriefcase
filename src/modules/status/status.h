@@ -4,8 +4,10 @@
 #ifndef STATUS_H
 #define STATUS_H
 
+#include <stdint.h>
+
 void status_init();
 
-void status_numbers_on(bool on);
+void status_set_on(uint8_t led, bool on);
 
 #endif //STATUS_H

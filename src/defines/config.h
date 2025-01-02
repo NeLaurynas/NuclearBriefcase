@@ -29,14 +29,14 @@
  *    7   6   5   4   3   2   1   0
  *  | M | B |       number          |
  */
-#define MOD_NUM_LEDR ((0 << 7) | (1 << 6) | 0) // MCP - first bit - MCP 1, second bit - Bank B - pin 0
-#define MOD_NUM_LEDG ((0 << 7) | (1 << 6) | 1) // MCP - first bit - MCP 1, second bit - Bank B - pin 1
-#define MOD_NUM_BTN ((0 << 7) | (1 << 6) | 2) // MCP - first bit - MCP 1, second bit - Bank B - pin 2
-#define MOD_NUM_ENC1 ((0 << 7) | (1 << 6) | 3)
-#define MOD_NUM_ENC2 ((0 << 7) | (1 << 6) | 4)
+#define MOD_NUM_LEDR	(uint8_t)((0 << 7) | (1 << 6) | 0) // MCP - first bit - MCP 1, second bit - Bank B - pin 0
+#define MOD_NUM_LEDG	(uint8_t)((0 << 7) | (1 << 6) | 1) // MCP - first bit - MCP 1, second bit - Bank B - pin 1
+#define MOD_NUM_BTN		(uint8_t)((0 << 7) | (1 << 6) | 2) // MCP - first bit - MCP 1, second bit - Bank B - pin 2
+#define MOD_NUM_ENC1	(uint8_t)((0 << 7) | (1 << 6) | 3)
+#define MOD_NUM_ENC2	(uint8_t)((0 << 7) | (1 << 6) | 4)
 #define MOD_NUM_ENC_DEBOUNCE_MS 66
 
-#define MOD_STAT_LED_NUMBERS ((1 << 7) | (1 << 6) | 0)
+#define MOD_STAT_LED_NUMBERS (uint8_t)((1 << 7) | (1 << 6) | 0)
 
 #define MOD_MCP_PIN_SDA 16
 #define MOD_MCP_PIN_SCL 17

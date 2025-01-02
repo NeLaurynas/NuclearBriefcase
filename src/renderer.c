@@ -64,7 +64,7 @@ void render_state() {
 	// Status module
 	if (state.status.numbers_on != currentState.status.numbers_on) {
 		currentState.status.numbers_on = state.status.numbers_on;
-		status_numbers_on(state.status.numbers_on);
+		status_set_on(MOD_STAT_LED_NUMBERS, state.status.numbers_on);
 	}
 }
 
