@@ -23,7 +23,7 @@ void set_state() {
 		}
 	}
 
-	// todo: cache mcp_is_pin_low based on mcp no and bank, because each read is 130 microseconds! cache for 5 miliseconds?
+	// potential refactor...
 	if (utils_time_diff_ms(state.numbers.last_encoder_change, time_us_32()) > MOD_NUM_ENC_DEBOUNCE_MS) {
 		const auto num_enc1 = mcp_is_pin_low(MOD_NUM_ENC1);
 		const auto num_enc2 = mcp_is_pin_low(MOD_NUM_ENC2);
@@ -38,7 +38,6 @@ void set_state() {
 				state.numbers.last_encoder_incrementing = true;
 				state.numbers.last_encoder_decrementing = false;
 			}
-			// wtf is this crap...
 		} else if (num_enc1 == true && num_enc2 == true) {
 			if (state.numbers.last_encoder_incrementing) numbers_inc();
 			else if (state.numbers.last_encoder_decrementing) numbers_dec();
