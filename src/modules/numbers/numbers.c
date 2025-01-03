@@ -48,7 +48,7 @@ u8 animation_bits[] = {
 u16 buffer[] = { 0b11111111111111 };
 
 void numbers_init() {
-	state.numbers.target = util_random_in_range(3, 9);
+	state.numbers.target = util_random_in_range(4, 9);
 
 	// init DMA
 	dma_channel_claim(MOD_NUM_DMA_CH);
