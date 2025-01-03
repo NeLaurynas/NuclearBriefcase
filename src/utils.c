@@ -45,11 +45,15 @@ void utils_print_cpu_speed() {
 #endif
 }
 
-float utils_calculate_pio_clk_div(float instruction_execution_in_us) {
+float utils_calculate_pio_clk_div(const float instruction_execution_in_us) {
 	const auto frequency_hz = clock_get_hz(clk_sys);
+	auto const clk_div = ((float)frequency_hz * instruction_execution_in_us) / 1'000'000.0f;
+	return clk_div;
+}
 
-	float const clk_div = ((float)frequency_hz * instruction_execution_in_us) / 1'000'000.0f;
-
+float utils_calculate_pio_clk_div_ns(const float instruction_execution_in_ns) {
+	const auto frequency_hz = clock_get_hz(clk_sys);
+	const auto clk_div = ((float)frequency_hz * instruction_execution_in_ns) / 1'000'000'000.0f;
 	return clk_div;
 }
 
@@ -65,6 +69,6 @@ void utils_printf(const char* format, ...) {
 #endif
 }
 
-inline int32_t utils_time_diff_ms(uint32_t start_us, uint32_t end_us) {
+inline int32_t utils_time_diff_ms(const uint32_t start_us, const uint32_t end_us) {
 	return (int32_t)(end_us - start_us) / 1000;
 }

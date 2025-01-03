@@ -58,7 +58,7 @@ void numbers_init() {
 	channel_config_set_write_increment(&dma_c, false);
 	channel_config_set_dreq(&dma_c, DREQ_FORCE);
 	dma_channel_configure(MOD_NUM_DMA_CH, &dma_c, &MOD_NUM_PIO->txf[MOD_NUM_SM], buffer, 1, false);
-	sleep_ms(2);
+	sleep_ms(1);
 
 	// get clock divider
 	const auto clk_div = utils_calculate_pio_clk_div(7);
@@ -72,17 +72,17 @@ void numbers_init() {
 	                         MOD_NUM_DISP4, MOD_NUM_DISP3, MOD_NUM_DISP2, MOD_NUM_DISP1, MOD_NUM_DPGROUND2,
 	                         MOD_NUM_DPGROUND1, clk_div);
 	pio_sm_set_enabled(MOD_NUM_PIO, MOD_NUM_SM, true);
-	sleep_ms(2);
+	sleep_ms(1);
 
 	// init MCP
 	mcp_cfg_set_pin_out_mode(MOD_NUM_LEDG, true);
 	mcp_cfg_set_pin_out_mode(MOD_NUM_LEDR, true);
-	mcp_cfg_set_pin_out_mode(MOD_NUM_BTN, false);
-	mcp_cfg_set_pull_up(MOD_NUM_BTN, true);
 	mcp_cfg_set_pin_out_mode(MOD_NUM_ENC1, false);
 	mcp_cfg_set_pull_up(MOD_NUM_ENC1, true);
 	mcp_cfg_set_pin_out_mode(MOD_NUM_ENC2, false);
 	mcp_cfg_set_pull_up(MOD_NUM_ENC2, true);
+	mcp_cfg_set_pin_out_mode(MOD_NUM_BTN, false);
+	mcp_cfg_set_pull_up(MOD_NUM_BTN, true);
 }
 
 void numbers_display(const uint8_t number1, const uint8_t number2) {

@@ -15,6 +15,8 @@ void utils_print_cpu_speed();
 
 float utils_calculate_pio_clk_div(float instruction_execution_in_us);
 
+float utils_calculate_pio_clk_div_ns(float instruction_execution_in_ns);
+
 void utils_printf(const char *format, ...);
 
 int32_t utils_time_diff_ms(uint32_t start_us, uint32_t end_us);
