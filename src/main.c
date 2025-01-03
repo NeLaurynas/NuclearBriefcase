@@ -33,8 +33,8 @@ int main() {
 	adc_set_temp_sensor_enabled(true);
 	adc_select_input(4);
 
-	gpio_init(25); // internal LED
-	gpio_set_dir(25, GPIO_OUT);
+	gpio_init(INTERNAL_LED);
+	gpio_set_dir(INTERNAL_LED, GPIO_OUT);
 
 	renderer_loop();
 }

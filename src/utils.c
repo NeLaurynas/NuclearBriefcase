@@ -72,3 +72,11 @@ void utils_printf(const char* format, ...) {
 inline int32_t utils_time_diff_ms(const uint32_t start_us, const uint32_t end_us) {
 	return (int32_t)(end_us - start_us) / 1000;
 }
+
+int32_t utils_time_diff_us(uint32_t start_us, uint32_t end_us) {
+	return (int32_t)(end_us - start_us);
+}
+
+void utils_internal_led(const bool on) {
+	gpio_put(INTERNAL_LED, on);
+}

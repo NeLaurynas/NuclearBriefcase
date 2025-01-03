@@ -45,4 +45,6 @@
 #define MOD_MCP_ADDR2		0x21
 #define MOD_MCP_GPIO_CACHE_MS 6
 
+#define INTERNAL_LED 25
+
 #endif //CONFIG_H

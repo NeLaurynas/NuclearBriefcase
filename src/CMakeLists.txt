@@ -43,15 +43,25 @@ target_compile_options(NuclearBriefcase PRIVATE
 		-Wall
 		-Wextra
 		-Winline
-		-Werror
+#		-Werror
 		-Wno-error=old-style-declaration
+#		-O3
+		-mcpu=cortex-m33
+		-mfpu=fpv5-sp-d16
+		-mthumb
 )
 
 target_compile_options(NuclearBriefcase PRIVATE
 		$<$<COMPILE_LANGUAGE:C>:-Wno-old-style-declaration>
 )
 
-# Generate PIO header
+target_link_options(NuclearBriefcase PRIVATE
+		-mcpu=cortex-m33
+		-mfpu=fpv5-sp-d16
+		-mthumb
+)
+
+# Generate PIO Numbers header
 pico_generate_pio_header(NuclearBriefcase ${CMAKE_CURRENT_LIST_DIR}/modules/numbers/pio_numbers.pio)
 
 # Modify the below lines to enable/disable output over UART/USB

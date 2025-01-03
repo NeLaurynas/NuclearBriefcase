@@ -49,7 +49,7 @@ uint8_t read_register(const uint8_t address, const uint8_t regist) {
 	return value;
 }
 
-uint16_t read_dual_register(const uint8_t address, const uint8_t regist) {
+uint16_t read_dual_registers(const uint8_t address, const uint8_t regist) {
 	uint8_t value[2] = { 0 };
 	i2c_write_blocking(MOD_MCP_I2C_PORT, address, &regist, 1, true);
 	i2c_read_blocking(MOD_MCP_I2C_PORT, address, value, 2, false);
@@ -139,25 +139,25 @@ void mcp_set_out(const uint8_t pinData, const bool out) {
 	write_register(address, bank, data);
 }
 
-bool mcp_is_pin_low(uint8_t pinData) {
+bool mcp_is_pin_low(const uint8_t pinData) {
 	const auto address = cfg_address(pinData);
 	const auto bank = cfg_gpio_bank(pinData);
 	uint8_t data;
 	const bool first_mcp = address == MOD_MCP_ADDR1;
-	const bool possible_cache = utils_time_diff_ms(first_mcp ? cache_last_mcp1_gpio : cache_last_mcp2_gpio, time_us_32()) < MOD_MCP_GPIO_CACHE_MS;
+	uint32_t* cache_time = first_mcp ? &cache_last_mcp1_gpio : &cache_last_mcp2_gpio;
+	const bool cache_possible = utils_time_diff_ms(*cache_time, time_us_32()) < MOD_MCP_GPIO_CACHE_MS;
 	const bool first_bank = bank == C_GPIOA;
 
-	if (first_mcp && possible_cache) {
+	if (first_mcp && cache_possible) {
 		data = (first_bank ? cache_mcp1_gpioa : cache_mcp1_gpiob);
-	} else if (!first_mcp && possible_cache) {
+	} else if (!first_mcp && cache_possible) {
 		data = (first_bank ? cache_mcp2_gpioa : cache_mcp2_gpiob);
 	} else {
-		const auto newData = read_dual_register(address, C_GPIOA); // read both A and B registers
+		const auto newData = read_dual_registers(address, C_GPIOA); // read both A and B registers
 		const uint8_t bank_a = newData & 0b11111111;
 		const uint8_t bank_b = (newData >> 8) & 0b11111111;
 		uint8_t* cache_a = first_mcp ? &cache_mcp1_gpioa : &cache_mcp2_gpioa;
 		uint8_t* cache_b = first_mcp ? &cache_mcp1_gpiob : &cache_mcp2_gpiob;
-		uint32_t* cache_time = first_mcp ? &cache_last_mcp1_gpio : &cache_last_mcp2_gpio;
 
 		*cache_a = bank_a;
 		*cache_b = bank_b;

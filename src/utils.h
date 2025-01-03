@@ -21,4 +21,8 @@ void utils_printf(const char *format, ...);
 
 int32_t utils_time_diff_ms(uint32_t start_us, uint32_t end_us);
 
+int32_t utils_time_diff_us(uint32_t start_us, uint32_t end_us);
+
+void utils_internal_led(bool on);
+
 #endif //UTILS_H

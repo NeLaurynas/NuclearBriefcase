@@ -39,6 +39,7 @@ void set_state() {
 				state.numbers.last_encoder_decrementing = false;
 			}
 		} else if (num_enc1 == true && num_enc2 == true) {
+			state.numbers.last_encoder_change = time_us_32();
 			if (state.numbers.last_encoder_incrementing) numbers_inc();
 			else if (state.numbers.last_encoder_decrementing) numbers_dec();
 		} else {
@@ -73,34 +74,39 @@ void renderer_loop() {
 	int64_t acc_elapsed_us = 0;
 #endif
 
+	uint16_t anim_frame = 0;
+
 	for (;;) {
 		// ------------ start
-		const absolute_time_t start = get_absolute_time();
+		const auto start = time_us_32();
 
 		// ------------ work
 		set_state();
 		render_state();
 
 		// ------------ end
-		auto end = get_absolute_time();
-		auto elapsed_us = absolute_time_diff_us(start, end);
+		auto end = time_us_32();
+		auto elapsed_us = utils_time_diff_us(start, end);
 		auto remaining_us = RENDER_TICK - elapsed_us;
 
 #if DBG
 		acc_elapsed_us += (remaining_us + elapsed_us);
 
 		if (acc_elapsed_us >= 10 * 1'000'000) { // 10 seconds
-			float elapsed_ms = elapsed_us / 1000.0f;
-			printf("render took: %.2f ms (%lld us)\n", elapsed_ms, elapsed_us);
+			const float elapsed_ms = elapsed_us / 1000.0f;
+			printf("render took: %.2f ms (%ld us)\n", elapsed_ms, elapsed_us);
 			utils_print_onboard_temp();
 			acc_elapsed_us = 0;
 			// recalculate because printf is slow
-			end = get_absolute_time();
-			elapsed_us = absolute_time_diff_us(start, end);
+			end = time_us_32();
+			elapsed_us = utils_time_diff_us(start, end);
 			remaining_us = RENDER_TICK - elapsed_us;
 		}
 #endif
 
 		if (remaining_us > 0) sleep_us(remaining_us);
+
+		anim_frame = (anim_frame + 1) % 1000;
+		utils_internal_led(anim_frame % 100 == 0);
 	}
 }
