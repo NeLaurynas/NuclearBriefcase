@@ -7,7 +7,9 @@
 #include <stdint.h>
 #include <stdio.h>
 
-uint32_t util_random_in_range(uint32_t fromInclusive, uint32_t toInclusive);
+#include "defines/config.h"
+
+u32 util_random_in_range(u32 fromInclusive, u32 toInclusive);
 
 float utils_print_onboard_temp();
 
@@ -19,9 +21,9 @@ float utils_calculate_pio_clk_div_ns(float instruction_execution_in_ns);
 
 void utils_printf(const char *format, ...);
 
-int32_t utils_time_diff_ms(uint32_t start_us, uint32_t end_us);
+int32_t utils_time_diff_ms(u32 start_us, u32 end_us);
 
-int32_t utils_time_diff_us(uint32_t start_us, uint32_t end_us);
+int32_t utils_time_diff_us(u32 start_us, u32 end_us);
 
 void utils_internal_led(bool on);
 

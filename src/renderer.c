@@ -74,7 +74,7 @@ void renderer_loop() {
 	int64_t acc_elapsed_us = 0;
 #endif
 
-	uint16_t anim_frame = 0;
+	u16 anim_frame = 0;
 
 	for (;;) {
 		// ------------ start

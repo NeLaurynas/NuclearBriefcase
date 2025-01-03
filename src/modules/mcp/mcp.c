@@ -30,53 +30,53 @@
 #define C_IOCON_INTPOL_BIT	1
 
 // cache variables
-static uint8_t cache_mcp1_gpioa = 0;
-static uint8_t cache_mcp1_gpiob = 0;
-static uint8_t cache_mcp2_gpioa = 0;
-static uint8_t cache_mcp2_gpiob = 0;
-static uint32_t cache_last_mcp1_gpio = 0;
-static uint32_t cache_last_mcp2_gpio = 0;
+static u8 cache_mcp1_gpioa = 0;
+static u8 cache_mcp1_gpiob = 0;
+static u8 cache_mcp2_gpioa = 0;
+static u8 cache_mcp2_gpiob = 0;
+static u32 cache_last_mcp1_gpio = 0;
+static u32 cache_last_mcp2_gpio = 0;
 
-void write_register(const uint8_t address, const uint8_t regist, const uint8_t value) {
-	const uint8_t data[2] = { regist, value };
+void write_register(const u8 address, const u8 regist, const u8 value) {
+	const u8 data[2] = { regist, value };
 	i2c_write_blocking(MOD_MCP_I2C_PORT, address, data, 2, false);
 }
 
-uint8_t read_register(const uint8_t address, const uint8_t regist) {
-	uint8_t value;
+u8 read_register(const u8 address, const u8 regist) {
+	u8 value;
 	i2c_write_blocking(MOD_MCP_I2C_PORT, address, &regist, 1, true);
 	i2c_read_blocking(MOD_MCP_I2C_PORT, address, &value, 1, false);
 	return value;
 }
 
-uint16_t read_dual_registers(const uint8_t address, const uint8_t regist) {
-	uint8_t value[2] = { 0 };
+u16 read_dual_registers(const u8 address, const u8 regist) {
+	u8 value[2] = { 0 };
 	i2c_write_blocking(MOD_MCP_I2C_PORT, address, &regist, 1, true);
 	i2c_read_blocking(MOD_MCP_I2C_PORT, address, value, 2, false);
 	return (value[1] << 8) | value[0];
 }
 
-inline bool is_bit_set(const uint8_t value, const uint8_t bit) {
+inline bool is_bit_set(const u8 value, const u8 bit) {
 	return 0b1 & (value >> bit);
 }
 
-inline uint8_t cfg_address(const uint8_t data) {
+inline u8 cfg_address(const u8 data) {
 	return is_bit_set(data, 7) ? MOD_MCP_ADDR2 : MOD_MCP_ADDR1;
 }
 
-inline uint8_t cfg_gpio_bank(const uint8_t data) {
+inline u8 cfg_gpio_bank(const u8 data) {
 	return is_bit_set(data, 6) ? C_GPIOB : C_GPIOA;
 }
 
-inline uint8_t cfg_iodir_bank(const uint8_t data) {
+inline u8 cfg_iodir_bank(const u8 data) {
 	return is_bit_set(data, 6) ? C_IODIRB : C_IODIRA;
 }
 
-inline uint8_t cfg_gppu_bank(const uint8_t data) {
+inline u8 cfg_gppu_bank(const u8 data) {
 	return is_bit_set(data, 6) ? C_GPPUB : C_GPPUA;
 }
 
-inline void set_bit(uint8_t* value, const uint8_t bit, const bool set) {
+inline void set_bit(u8* value, const u8 bit, const bool set) {
 	if (set) {
 		*value |= (1 << bit);
 	} else {
@@ -84,11 +84,11 @@ inline void set_bit(uint8_t* value, const uint8_t bit, const bool set) {
 	}
 }
 
-inline uint8_t cfg_get_number(const uint8_t data) {
+inline u8 cfg_get_number(const u8 data) {
 	return data & 0b00111111; // last 6 bits
 }
 
-void mcp_cfg_set_pin_out_mode(const uint8_t data, const bool is_out) {
+void mcp_cfg_set_pin_out_mode(const u8 data, const bool is_out) {
 	const auto address = cfg_address(data);
 	const auto bank = cfg_iodir_bank(data);
 	auto options = read_register(address, bank);
@@ -96,7 +96,7 @@ void mcp_cfg_set_pin_out_mode(const uint8_t data, const bool is_out) {
 	write_register(address, bank, options);
 }
 
-void mcp_cfg_set_pull_up(uint8_t pinData, bool pull_up) {
+void mcp_cfg_set_pull_up(u8 pinData, bool pull_up) {
 	const auto address = cfg_address(pinData);
 	const auto bank = cfg_gppu_bank(pinData);
 	auto options = read_register(address, bank);
@@ -104,8 +104,8 @@ void mcp_cfg_set_pull_up(uint8_t pinData, bool pull_up) {
 	write_register(address, bank, options);
 }
 
-void setup_bank_configuration(const uint8_t address, const uint8_t regist) {
-	uint8_t ioconData = 0;
+void setup_bank_configuration(const u8 address, const u8 regist) {
+	u8 ioconData = 0;
 	set_bit(&ioconData, C_IOCON_BANK_BIT, false); // set to Bank Mode 0
 	set_bit(&ioconData, C_IOCON_MIRROR_BIT, false);
 	set_bit(&ioconData, C_IOCON_SEQOP_BIT, false);
@@ -131,7 +131,7 @@ void mcp_init() {
 	sleep_ms(1);
 }
 
-void mcp_set_out(const uint8_t pinData, const bool out) {
+void mcp_set_out(const u8 pinData, const bool out) {
 	const auto address = cfg_address(pinData);
 	const auto bank = cfg_gpio_bank(pinData);
 	auto data = read_register(address, bank);
@@ -139,12 +139,12 @@ void mcp_set_out(const uint8_t pinData, const bool out) {
 	write_register(address, bank, data);
 }
 
-bool mcp_is_pin_low(const uint8_t pinData) {
+bool mcp_is_pin_low(const u8 pinData) {
 	const auto address = cfg_address(pinData);
 	const auto bank = cfg_gpio_bank(pinData);
-	uint8_t data;
+	u8 data;
 	const bool first_mcp = address == MOD_MCP_ADDR1;
-	uint32_t* cache_time = first_mcp ? &cache_last_mcp1_gpio : &cache_last_mcp2_gpio;
+	u32* cache_time = first_mcp ? &cache_last_mcp1_gpio : &cache_last_mcp2_gpio;
 	const bool cache_possible = utils_time_diff_ms(*cache_time, time_us_32()) < MOD_MCP_GPIO_CACHE_MS;
 	const bool first_bank = bank == C_GPIOA;
 
@@ -154,10 +154,10 @@ bool mcp_is_pin_low(const uint8_t pinData) {
 		data = (first_bank ? cache_mcp2_gpioa : cache_mcp2_gpiob);
 	} else {
 		const auto newData = read_dual_registers(address, C_GPIOA); // read both A and B registers
-		const uint8_t bank_a = newData & 0b11111111;
-		const uint8_t bank_b = (newData >> 8) & 0b11111111;
-		uint8_t* cache_a = first_mcp ? &cache_mcp1_gpioa : &cache_mcp2_gpioa;
-		uint8_t* cache_b = first_mcp ? &cache_mcp1_gpiob : &cache_mcp2_gpiob;
+		const u8 bank_a = newData & 0b11111111;
+		const u8 bank_b = (newData >> 8) & 0b11111111;
+		u8* cache_a = first_mcp ? &cache_mcp1_gpioa : &cache_mcp2_gpioa;
+		u8* cache_b = first_mcp ? &cache_mcp1_gpiob : &cache_mcp2_gpiob;
 
 		*cache_a = bank_a;
 		*cache_b = bank_b;

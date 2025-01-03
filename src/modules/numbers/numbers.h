@@ -4,11 +4,11 @@
 #ifndef NUMBERS_H
 #define NUMBERS_H
 
-#include <stdint.h>
+#include "defines/config.h"
 
 void numbers_init();
 
-void numbers_display(uint8_t number1, uint8_t number2);
+void numbers_display(u8 number1, u8 number2);
 
 void numbers_ok(bool ok);
 
@@ -18,6 +18,6 @@ void numbers_inc();
 
 void numbers_dec();
 
-void anim(uint8_t frame);
+void anim(u8 frame);
 
 #endif //NUMBERS_H

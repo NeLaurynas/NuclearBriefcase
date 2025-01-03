@@ -13,7 +13,7 @@
 #include "defines/config.h"
 #include "modules/mcp/mcp.h"
 
-uint8_t bits[] = {
+u8 bits[] = {
 	0b0111111, // 0
 	0b0001001, // 1
 	0b1011110, // 2
@@ -28,7 +28,7 @@ uint8_t bits[] = {
 };
 
 // blank line circle
-// uint8_t animation_bytes[] = {
+// u8 animation_bytes[] = {
 // 	0b0110111, // 0
 // 	0b1010111, // 1
 // 	0b1100111, // 2
@@ -36,7 +36,7 @@ uint8_t bits[] = {
 // 	0b1110101, // 4
 // 	0b1110011, // 5
 // };
-uint8_t animation_bits[] = {
+u8 animation_bits[] = {
 	0b1000000, // 0
 	0b0100000, // 1
 	0b0010000, // 2
@@ -45,7 +45,7 @@ uint8_t animation_bits[] = {
 	0b0000100, // 5
 };
 
-uint16_t buffer[] = { 0b11111111111111 };
+u16 buffer[] = { 0b11111111111111 };
 
 void numbers_init() {
 	state.numbers.target = util_random_in_range(3, 9);
@@ -85,7 +85,7 @@ void numbers_init() {
 	mcp_cfg_set_pull_up(MOD_NUM_BTN, true);
 }
 
-void numbers_display(const uint8_t number1, const uint8_t number2) {
+void numbers_display(const u8 number1, const u8 number2) {
 	buffer[0] = bits[number1] << 7 | bits[number2];
 	dma_channel_transfer_from_buffer_now(MOD_NUM_DMA_CH, &buffer, 1);
 }
@@ -96,7 +96,7 @@ void numbers_ok(const bool ok) {
 }
 
 void numbers_generate_target() {
-	uint8_t target = util_random_in_range(0, 9);
+	u8 target = util_random_in_range(0, 9);
 
 	while (target == state.numbers.number || target == state.numbers.target) {
 		target = (target + 1) % 10;
@@ -113,7 +113,7 @@ void numbers_dec() {
 	else state.numbers.number -= 1;
 }
 
-void anim(const uint8_t frame) {
+void anim(const u8 frame) {
 	buffer[0] = animation_bits[frame] << 7 | animation_bits[frame];
 	dma_channel_transfer_from_buffer_now(MOD_NUM_DMA_CH, &buffer, 1);
 }

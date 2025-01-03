@@ -11,7 +11,7 @@
 #include "defines/config.h"
 #include "pico/rand.h"
 
-uint32_t util_random_in_range(uint32_t fromInclusive, uint32_t toInclusive) {
+u32 util_random_in_range(u32 fromInclusive, u32 toInclusive) {
 	if (fromInclusive > toInclusive) {
 		const auto tmp = toInclusive;
 		toInclusive = fromInclusive;
@@ -69,11 +69,11 @@ void utils_printf(const char* format, ...) {
 #endif
 }
 
-inline int32_t utils_time_diff_ms(const uint32_t start_us, const uint32_t end_us) {
+inline int32_t utils_time_diff_ms(const u32 start_us, const u32 end_us) {
 	return (int32_t)(end_us - start_us) / 1000;
 }
 
-int32_t utils_time_diff_us(uint32_t start_us, uint32_t end_us) {
+int32_t utils_time_diff_us(u32 start_us, u32 end_us) {
 	return (int32_t)(end_us - start_us);
 }
 

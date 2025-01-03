@@ -6,12 +6,14 @@
 
 #include <stdint.h>
 
+#include "defines/config.h"
+
 typedef struct {
 	struct {
-		uint8_t target;
-		uint8_t number;
+		u8 target;
+		u8 number;
 		bool btn_pressed;
-		uint32_t last_encoder_change;
+		u32 last_encoder_change;
 		bool last_encoder_incrementing;
 		bool last_encoder_decrementing;
 	} numbers;
@@ -25,8 +27,8 @@ typedef struct {
 
 typedef struct {
 	struct {
-		uint8_t target;
-		uint8_t number;
+		u8 target;
+		u8 number;
 	} numbers;
 
 	struct {
