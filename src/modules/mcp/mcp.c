@@ -143,8 +143,8 @@ bool mcp_is_pin_low(uint8_t pinData) {
 	const auto address = cfg_address(pinData);
 	const auto bank = cfg_gpio_bank(pinData);
 	uint8_t data;
-	const bool possible_cache = utils_time_diff_ms(cache_last_mcp1_gpio, time_us_32()) < MOD_MCP_GPIO_CACHE_MS;
 	const bool first_mcp = address == MOD_MCP_ADDR1;
+	const bool possible_cache = utils_time_diff_ms(first_mcp ? cache_last_mcp1_gpio : cache_last_mcp2_gpio, time_us_32()) < MOD_MCP_GPIO_CACHE_MS;
 	const bool first_bank = bank == C_GPIOA;
 
 	if (first_mcp && possible_cache) {

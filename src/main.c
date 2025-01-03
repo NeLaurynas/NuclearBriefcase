@@ -27,7 +27,7 @@ int main() {
 
 	mcp_init(); // init first, other modules use mcp...
 	numbers_init();
-	status_init();
+	status_init(); // init last, needs other modules up and running...
 
 	adc_init();
 	adc_set_temp_sensor_enabled(true);
