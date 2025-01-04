@@ -5,14 +5,14 @@
 ; controls two side pins - ground for display 1 and 2 ("ground" is positive, as it's common anode display, so not really ground)
 .side_set 2
 .wrap_target
-	; we turn off ground for 3 cycles, because my NPN + PNP complementary pair is too slow to react (maybe wrong resistors, maybe display has some capacity, idk)
-	PULL NOBLOCK SIDE 0b00	; pull data from FIFO into OSR, noblock - if no data, pull from X (recycle)
-	MOV X, OSR SIDE 0b00	; copy data into X register from OSR
+	PULL NOBLOCK SIDE 0b10	; pull data from FIFO into OSR, noblock - if no data, pull from X (recycle)
+	MOV X, OSR SIDE 0b10	; copy data into X register from OSR
 
 	OUT PINS, 7 SIDE 0b00	; SEND 7 bits to PINS (so like 0b100101..), and every bit is one pin either HIGH or LOW
 	NOP [7] SIDE 0b01		; turn on display 1 ground pin for 8 cycles
 
-	NOP [1] SIDE 0b00		; wait for 2 cycles (like first display waits for PULL and BLOCK instructions) - 1 cycle for NOP and 1 for [1]
+	NOP [1] SIDE 0b01		; wait for 2 cycles (like first display waits for PULL and BLOCK instructions) - 1 cycle for NOP and 1 for [1]
+
 	OUT PINS, 7 side 0b00	; SEND the rest of 7 bits
 	NOP [7] SIDE 0b10		; turn on display 2 ground pin
 .wrap

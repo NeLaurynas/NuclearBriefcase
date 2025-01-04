@@ -61,7 +61,7 @@ void numbers_init() {
 	sleep_ms(1);
 
 	// get clock divider
-	const auto clk_div = utils_calculate_pio_clk_div(7);
+	const auto clk_div = utils_calculate_pio_clk_div(700);
 	utils_printf("NUMBERS PIO CLK DIV: %f\n", clk_div);
 
 	// init PIO
