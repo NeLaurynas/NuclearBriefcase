@@ -18,16 +18,16 @@
 int main() {
 	set_sys_clock_khz(48'000, false);
 
-	stdio_init_all(); // only for serial over usb - printf
 
 #if DBG
+	stdio_init_all(); // only for serial over usb - printf
 	sleep_ms(2000);
 	utils_printf("Slept for 2 seconds\n");
 #endif
 
-	mcp_init(); // init first, other modules use mcp...
+	mcp_init(); // init first, other modules use mcp
 	numbers_init();
-	status_init(); // init last, needs other modules up and running...
+	status_init(); // init last, needs other modules up and running
 
 	adc_init();
 	adc_set_temp_sensor_enabled(true);

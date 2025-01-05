@@ -11,7 +11,7 @@
 	OUT PINS, 7 SIDE 0b00	; SEND 7 bits to PINS (so like 0b100101..), and every bit is one pin either HIGH or LOW
 	NOP [7] SIDE 0b01		; turn on display 1 ground pin for 8 cycles
 
-	NOP [1] SIDE 0b01		; wait for 2 cycles (like first display waits for PULL and BLOCK instructions) - 1 cycle for NOP and 1 for [1]
+	NOP [1] SIDE 0b01		; wait for 2 cycles (like first display waits for PULL and BLOCK instructions) - 1 cycle for NOP (PULL eq) and 1 for [1] (MOV eq)
 
 	OUT PINS, 7 side 0b00	; SEND the rest of 7 bits
 	NOP [7] SIDE 0b10		; turn on display 2 ground pin

@@ -85,6 +85,9 @@ void renderer_loop() {
 		render_state();
 
 		// ------------ end
+		anim_frame = (anim_frame + 1) % 1000;
+		utils_internal_led(anim_frame % 100 == 0);
+
 		auto end = time_us_32();
 		auto elapsed_us = utils_time_diff_us(start, end);
 		auto remaining_us = RENDER_TICK - elapsed_us;
@@ -105,8 +108,5 @@ void renderer_loop() {
 #endif
 
 		if (remaining_us > 0) sleep_us(remaining_us);
-
-		anim_frame = (anim_frame + 1) % 1000;
-		utils_internal_led(anim_frame % 100 == 0);
 	}
 }
