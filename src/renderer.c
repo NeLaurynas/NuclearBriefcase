@@ -85,7 +85,7 @@ void renderer_loop() {
 		// ------------ work
 		set_state();
 		render_state();
-		anim_flag();
+		wsleds_anim_flag();
 
 		// ------------ end
 		anim_frame = (anim_frame + 1) % 1000;
@@ -99,7 +99,7 @@ void renderer_loop() {
 		acc_elapsed_us += (remaining_us + elapsed_us);
 
 		if (acc_elapsed_us >= 10 * 1'000'000) { // 10 seconds
-			wsleds_test();
+			wsleds_test(); // actually looks better lol
 			if (test == true) {
 				test = false;
 			} else {

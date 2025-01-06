@@ -8,6 +8,6 @@ void wsleds_init();
 
 void wsleds_test();
 
-void anim_flag();
+void wsleds_anim_flag();
 
 #endif //WSLEDS_H

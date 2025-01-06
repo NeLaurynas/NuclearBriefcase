@@ -76,7 +76,7 @@ void wsleds_test() {
 
 }
 
-void anim_flag() {
+void wsleds_anim_flag() {
 	static u32 frame = 0;
 	frame++;
 	if (frame % 5 == 0) {
