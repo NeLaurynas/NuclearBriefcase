@@ -17,13 +17,16 @@
 #include "pico/stdlib.h"
 
 int main() {
-	set_sys_clock_khz(48'000, false);
+	gpio_init(INTERNAL_LED);
+	gpio_set_dir(INTERNAL_LED, GPIO_OUT);
 
 #if DBG
 	stdio_init_all(); // only for serial over usb - printf
 	sleep_ms(2000);
 	utils_printf("Slept for 2 seconds\n");
 #endif
+
+	if (!set_sys_clock_khz(48'000, false)) utils_error_mode(47);
 
 	mcp_init(); // init first, other modules use mcp
 	numbers_init();
@@ -33,9 +36,6 @@ int main() {
 	adc_init();
 	adc_set_temp_sensor_enabled(true);
 	adc_select_input(4);
-
-	gpio_init(INTERNAL_LED);
-	gpio_set_dir(INTERNAL_LED, GPIO_OUT);
 
 	renderer_loop();
 }

@@ -29,6 +29,8 @@ int32_t utils_time_diff_ms(u32 start_us, u32 end_us);
 
 int32_t utils_time_diff_us(u32 start_us, u32 end_us);
 
+void utils_error_mode(u8 code);
+
 void utils_internal_led(bool on);
 
 #endif //UTILS_H

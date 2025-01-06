@@ -22,6 +22,8 @@ static constexpr u32 c_off = 0b00000000'00000000'00000000;
 
 inline u32 set_brightness(const u8 level, const u32 color) {
 	// 8 is off, 7 is lowest, 0 is highest
+	if (level > 8) utils_error_mode(24);
+
 	const u8 mask = 0b11111111 >> level;
 	const u32 result = ((color & 0b11111111'00000000'00000000) >> 16 & mask) << 16 |
 		((color & 0b00000000'11111111'00000000) >> 8 & mask) << 8 |
@@ -53,6 +55,7 @@ void wsleds_init() {
 	memcpy(buffer, data, sizeof(data));
 
 	// init DMA
+	if (dma_channel_is_claimed(MOD_WSLEDS_DMA_CH)) utils_error_mode(25);
 	dma_channel_claim(MOD_WSLEDS_DMA_CH);
 	dma_channel_config dma_c = dma_channel_get_default_config(MOD_WSLEDS_DMA_CH);
 	channel_config_set_transfer_data_size(&dma_c, DMA_SIZE_32);
@@ -69,27 +72,29 @@ void wsleds_init() {
 
 	// init PIO
 	const auto offset = pio_add_program(MOD_WSLEDS_PIO, &pio_wsleds_program);
+	if (offset < 0) utils_error_mode(26);
+	if (pio_sm_is_claimed(MOD_WSLEDS_PIO, MOD_WSLEDS_SM)) utils_error_mode(27);
 	pio_sm_claim(MOD_WSLEDS_PIO, MOD_WSLEDS_SM);
 	pio_wsleds_program_init(MOD_WSLEDS_PIO, MOD_WSLEDS_SM, offset, MOD_WSLEDS_PIN, clk_div);
 	pio_sm_set_enabled(MOD_WSLEDS_PIO, MOD_WSLEDS_SM, true);
 	sleep_ms(1);
 }
 
-void wsleds_test() {
+void wsleds_transfer() {
 	dma_channel_transfer_from_buffer_now(MOD_WSLEDS_DMA_CH, buffer, MOD_WSLEDS_LED_COUNT);
 }
 
 void wsleds_anim_flag() {
 	static u32 frame = 0;
 	frame++;
-	if (frame % 5 == 0) {
+	if (frame % 6 == 0) {
 		for (auto row = 0; row < 8; row++) {
-			u32 tmp = buffer[row * 8 + 7];
+			const u32 tmp = buffer[row * 8 + 7];
 			for (auto column = 7; column > 0; column--) {
 				buffer[row * 8 + column] = buffer[row * 8 + column - 1];
 			}
 			buffer[row * 8] = tmp;
 		}
-		wsleds_test();
+		wsleds_transfer();
 	}
 }

@@ -6,7 +6,7 @@
 
 void wsleds_init();
 
-void wsleds_test();
+void wsleds_transfer();
 
 void wsleds_anim_flag();
 

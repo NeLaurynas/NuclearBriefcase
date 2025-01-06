@@ -99,7 +99,7 @@ void renderer_loop() {
 		acc_elapsed_us += (remaining_us + elapsed_us);
 
 		if (acc_elapsed_us >= 10 * 1'000'000) { // 10 seconds
-			wsleds_test(); // actually looks better lol
+			wsleds_transfer(); // actually looks better lol
 			if (test == true) {
 				test = false;
 			} else {
@@ -117,5 +117,6 @@ void renderer_loop() {
 #endif
 
 		if (remaining_us > 0) sleep_us(remaining_us);
+		else utils_error_mode(66); // shouldn't even take 1 ms, let alone 10, something's wrong...
 	}
 }

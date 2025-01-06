@@ -39,20 +39,25 @@ static u32 cache_last_mcp2_gpio = 0;
 
 void write_register(const u8 address, const u8 regist, const u8 value) {
 	const u8 data[2] = { regist, value };
-	i2c_write_blocking(MOD_MCP_I2C_PORT, address, data, 2, false);
+	auto const result = i2c_write_blocking(MOD_MCP_I2C_PORT, address, data, 2, false);
+	if (result == PICO_ERROR_GENERIC) utils_error_mode(address == MOD_MCP_ADDR1 ? 11 : 12); // mode(11) (mode12)
 }
 
 u8 read_register(const u8 address, const u8 regist) {
 	u8 value;
-	i2c_write_blocking(MOD_MCP_I2C_PORT, address, &regist, 1, true);
-	i2c_read_blocking(MOD_MCP_I2C_PORT, address, &value, 1, false);
+	auto result = i2c_write_blocking(MOD_MCP_I2C_PORT, address, &regist, 1, true);
+	if (result == PICO_ERROR_GENERIC) utils_error_mode(address == MOD_MCP_ADDR1 ? 13 : 14); // mode(13) (mode14)
+	result = i2c_read_blocking(MOD_MCP_I2C_PORT, address, &value, 1, false);
+	if (result == PICO_ERROR_GENERIC) utils_error_mode(address == MOD_MCP_ADDR1 ? 15 : 16); // mode(15) mode(16)
 	return value;
 }
 
 u16 read_dual_registers(const u8 address, const u8 regist) {
 	u8 value[2] = { 0 };
-	i2c_write_blocking(MOD_MCP_I2C_PORT, address, &regist, 1, true);
-	i2c_read_blocking(MOD_MCP_I2C_PORT, address, value, 2, false);
+	auto result = i2c_write_blocking(MOD_MCP_I2C_PORT, address, &regist, 1, true);
+	if (result == PICO_ERROR_GENERIC) utils_error_mode(address == MOD_MCP_ADDR1 ? 17 : 18); // mode(17) (mode18)
+	result = i2c_read_blocking(MOD_MCP_I2C_PORT, address, value, 2, false);
+	if (result == PICO_ERROR_GENERIC) utils_error_mode(address == MOD_MCP_ADDR1 ? 19 : 20); // mode(19) (mode20)
 	return (value[1] << 8) | value[0];
 }
 
@@ -117,7 +122,8 @@ void setup_bank_configuration(const u8 address, const u8 regist) {
 }
 
 void mcp_init() {
-	i2c_init(MOD_MCP_I2C_PORT, 400'000); // 400 khz
+	const auto rate = i2c_init(MOD_MCP_I2C_PORT, 400'000); // 400 khz
+	if (rate != 400'000) utils_error_mode(10);
 	gpio_set_function(MOD_MCP_PIN_SDA, GPIO_FUNC_I2C);
 	gpio_set_function(MOD_MCP_PIN_SCL, GPIO_FUNC_I2C);
 	gpio_pull_up(MOD_MCP_PIN_SDA);

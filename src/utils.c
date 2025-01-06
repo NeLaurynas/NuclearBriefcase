@@ -65,6 +65,28 @@ int32_t utils_time_diff_us(u32 start_us, u32 end_us) {
 	return (int32_t)(end_us - start_us);
 }
 
+void utils_error_mode(u8 code) {
+	utils_internal_led(false);
+	u8 long_blink = code / 10;
+	u8 short_blink = code % 10;
+	for (;;) {
+		for (u8 i = 0; i < long_blink; i++) {
+			utils_internal_led(true);
+			sleep_ms(500);
+			utils_internal_led(false);
+			sleep_ms(500);
+		}
+		sleep_ms(400);
+		for (u8 i = 0; i < short_blink; i++) {
+			utils_internal_led(true);
+			sleep_ms(75);
+			utils_internal_led(false);
+			sleep_ms(700);
+		}
+		sleep_ms(3'000); // sleep for 3 seconds
+	}
+}
+
 void utils_internal_led(const bool on) {
 	gpio_put(INTERNAL_LED, on);
 }
