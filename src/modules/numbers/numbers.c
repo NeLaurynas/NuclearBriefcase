@@ -13,7 +13,7 @@
 #include "defines/config.h"
 #include "modules/mcp/mcp.h"
 
-u8 bits[] = {
+static u8 bits[] = {
 	0b0111111, // 0
 	0b0001001, // 1
 	0b1011110, // 2
@@ -36,7 +36,7 @@ u8 bits[] = {
 // 	0b1110101, // 4
 // 	0b1110011, // 5
 // };
-u8 animation_bits[] = {
+static u8 animation_bits[] = {
 	0b1000000, // 0
 	0b0100000, // 1
 	0b0010000, // 2
@@ -45,7 +45,7 @@ u8 animation_bits[] = {
 	0b0000100, // 5
 };
 
-u16 buffer[] = { 0b11111111111111 };
+static u16 buffer[] = { 0b11111111111111 };
 
 void numbers_init() {
 	state.numbers.target = util_random_in_range(4, 9);
@@ -54,7 +54,7 @@ void numbers_init() {
 	dma_channel_claim(MOD_NUM_DMA_CH);
 	dma_channel_config dma_c = dma_channel_get_default_config(MOD_NUM_DMA_CH);
 	channel_config_set_transfer_data_size(&dma_c, DMA_SIZE_16);
-	channel_config_set_read_increment(&dma_c, false); // incr false - we always read from same memory location
+	channel_config_set_read_increment(&dma_c, false); // incr false - we always read from same memory location (array of size 1)
 	channel_config_set_write_increment(&dma_c, false);
 	channel_config_set_dreq(&dma_c, DREQ_FORCE);
 	dma_channel_configure(MOD_NUM_DMA_CH, &dma_c, &MOD_NUM_PIO->txf[MOD_NUM_SM], buffer, 1, false);
@@ -87,7 +87,7 @@ void numbers_init() {
 
 void numbers_display(const u8 number1, const u8 number2) {
 	buffer[0] = bits[number1] << 7 | bits[number2];
-	dma_channel_transfer_from_buffer_now(MOD_NUM_DMA_CH, &buffer, 1);
+	dma_channel_transfer_from_buffer_now(MOD_NUM_DMA_CH, buffer, 1);
 }
 
 void numbers_ok(const bool ok) {

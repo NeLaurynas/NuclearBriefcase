@@ -9,6 +9,9 @@
 typedef uint32_t u32;
 typedef uint16_t u16;
 typedef uint8_t u8;
+typedef int32_t i32;
+typedef int16_t i16;
+typedef int8_t i8;
 
 #define DBG true
 
@@ -48,6 +51,12 @@ typedef uint8_t u8;
 #define MOD_MCP_ADDR1		0x20
 #define MOD_MCP_ADDR2		0x21
 #define MOD_MCP_GPIO_CACHE_MS 6
+
+#define MOD_WSLEDS_LED_COUNT	64
+#define MOD_WSLEDS_PIO			pio0
+#define MOD_WSLEDS_SM			1
+#define MOD_WSLEDS_DMA_CH		1
+#define MOD_WSLEDS_PIN			0 // GP0
 
 #define INTERNAL_LED 25
 

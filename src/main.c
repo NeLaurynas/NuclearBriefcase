@@ -13,11 +13,11 @@
 #include "modules/mcp/mcp.h"
 #include "modules/numbers/numbers.h"
 #include "modules/status/status.h"
+#include "modules/wsleds/wsleds.h"
 #include "pico/stdlib.h"
 
 int main() {
 	set_sys_clock_khz(48'000, false);
-
 
 #if DBG
 	stdio_init_all(); // only for serial over usb - printf
@@ -27,6 +27,7 @@ int main() {
 
 	mcp_init(); // init first, other modules use mcp
 	numbers_init();
+	wsleds_init();
 	status_init(); // init last, needs other modules up and running
 
 	adc_init();

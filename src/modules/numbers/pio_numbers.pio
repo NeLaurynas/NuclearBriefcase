@@ -33,7 +33,7 @@ void pio_numbers_program_init(PIO pio, uint sm, uint offset, uint pin1, uint pin
 	pio_sm_config c = pio_numbers_program_get_default_config(offset);
 
 	pio_sm_set_consecutive_pindirs(pio, sm, pin1, 9, true); // 9 pins, is_out = true
-	sm_config_set_out_pins(&c, pin1, 7); // set pin1..pin2 to be controlled with OUT PINS
+	sm_config_set_out_pins(&c, pin1, 7); // set pin1..pin7 to be controlled with OUT PINS
 	sm_config_set_sideset_pins(&c, pin8); // set pin8..pin9 to be controlled with SIDE
 
 	sm_config_set_clkdiv(&c, clk_div);

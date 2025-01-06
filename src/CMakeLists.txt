@@ -32,6 +32,8 @@ add_executable(NuclearBriefcase main.c
 		renderer.h
 		modules/status/status.c
 		modules/status/status.h
+		modules/wsleds/wsleds.c
+		modules/wsleds/wsleds.h
 )
 
 pico_set_program_name(NuclearBriefcase "NuclearBriefcase")
@@ -61,8 +63,9 @@ target_link_options(NuclearBriefcase PRIVATE
 		-mthumb
 )
 
-# Generate PIO Numbers header
+# Generate PIO headers
 pico_generate_pio_header(NuclearBriefcase ${CMAKE_CURRENT_LIST_DIR}/modules/numbers/pio_numbers.pio)
+pico_generate_pio_header(NuclearBriefcase ${CMAKE_CURRENT_LIST_DIR}/modules/wsleds/pio_wsleds.pio)
 
 # Modify the below lines to enable/disable output over UART/USB
 pico_enable_stdio_uart(NuclearBriefcase 0)

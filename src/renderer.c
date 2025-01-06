@@ -12,6 +12,7 @@
 #include "modules/mcp/mcp.h"
 #include "modules/numbers/numbers.h"
 #include "modules/status/status.h"
+#include "modules/wsleds/wsleds.h"
 
 void set_state() {
 	// Numbers module
@@ -75,6 +76,7 @@ void renderer_loop() {
 #endif
 
 	u16 anim_frame = 0;
+	bool test = true;
 
 	for (;;) {
 		// ------------ start
@@ -95,10 +97,16 @@ void renderer_loop() {
 #if DBG
 		acc_elapsed_us += (remaining_us + elapsed_us);
 
-		if (acc_elapsed_us >= 10 * 1'000'000) { // 10 seconds
+		if (acc_elapsed_us >= 0.035 * 1'000'000) { // 10 seconds
+			wsleds_test();
+			if (test == true) {
+				test = false;
+			} else {
+				test = true;
+			}
 			const float elapsed_ms = elapsed_us / 1000.0f;
-			printf("render took: %.2f ms (%ld us)\n", elapsed_ms, elapsed_us);
-			utils_print_onboard_temp();
+			// printf("render took: %.2f ms (%ld us)\n", elapsed_ms, elapsed_us);
+			// utils_print_onboard_temp();
 			acc_elapsed_us = 0;
 			// recalculate because printf is slow
 			end = time_us_32();
