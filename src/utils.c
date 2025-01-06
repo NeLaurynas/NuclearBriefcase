@@ -57,18 +57,6 @@ float utils_calculate_pio_clk_div_ns(const float instruction_execution_in_ns) {
 	return clk_div;
 }
 
-void utils_printf(const char* format, ...) {
-#if DBG
-	va_list args;
-	va_start(args, format);
-
-	vprintf(format, args);
-	va_end(args);
-#else
-	(void)format;
-#endif
-}
-
 inline int32_t utils_time_diff_ms(const u32 start_us, const u32 end_us) {
 	return (int32_t)(end_us - start_us) / 1000;
 }

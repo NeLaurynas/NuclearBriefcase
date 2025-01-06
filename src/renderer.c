@@ -85,6 +85,7 @@ void renderer_loop() {
 		// ------------ work
 		set_state();
 		render_state();
+		anim_flag();
 
 		// ------------ end
 		anim_frame = (anim_frame + 1) % 1000;
@@ -97,7 +98,7 @@ void renderer_loop() {
 #if DBG
 		acc_elapsed_us += (remaining_us + elapsed_us);
 
-		if (acc_elapsed_us >= 0.035 * 1'000'000) { // 10 seconds
+		if (acc_elapsed_us >= 10 * 1'000'000) { // 10 seconds
 			wsleds_test();
 			if (test == true) {
 				test = false;
@@ -105,8 +106,8 @@ void renderer_loop() {
 				test = true;
 			}
 			const float elapsed_ms = elapsed_us / 1000.0f;
-			// printf("render took: %.2f ms (%ld us)\n", elapsed_ms, elapsed_us);
-			// utils_print_onboard_temp();
+			printf("render took: %.2f ms (%ld us)\n", elapsed_ms, elapsed_us);
+			utils_print_onboard_temp();
 			acc_elapsed_us = 0;
 			// recalculate because printf is slow
 			end = time_us_32();
