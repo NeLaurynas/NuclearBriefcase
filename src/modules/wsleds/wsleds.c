@@ -35,24 +35,32 @@ void wsleds_init() {
 	// init flag
 	const u32 data[MOD_WSLEDS_LED_COUNT] = {
 		c_off, c_off, c_off, c_off, c_off, c_off, c_off, c_off,
-		set_brightness(7, c_yellow), set_brightness(6, c_yellow), set_brightness(5, c_yellow), set_brightness(4, c_yellow), set_brightness(3, c_yellow), set_brightness(2, c_yellow), set_brightness(1, c_yellow), set_brightness(0, c_yellow),
-		set_brightness(7, c_yellow), set_brightness(6, c_yellow), set_brightness(5, c_yellow), set_brightness(4, c_yellow), set_brightness(3, c_yellow), set_brightness(2, c_yellow), set_brightness(1, c_yellow), set_brightness(0, c_yellow),
-		set_brightness(3, c_green), set_brightness(2, c_green), set_brightness(1, c_green), set_brightness(0, c_green), set_brightness(7, c_green), set_brightness(6, c_green), set_brightness(5, c_green), set_brightness(4, c_green),
-		set_brightness(3, c_green), set_brightness(2, c_green), set_brightness(1, c_green), set_brightness(0, c_green), set_brightness(7, c_green), set_brightness(6, c_green), set_brightness(5, c_green), set_brightness(4, c_green),
-		set_brightness(0, c_red), set_brightness(7, c_red), set_brightness(6, c_red), set_brightness(5, c_red), set_brightness(4, c_red), set_brightness(3, c_red), set_brightness(2, c_red), set_brightness(1, c_red),
-		set_brightness(0, c_red), set_brightness(7, c_red), set_brightness(6, c_red), set_brightness(5, c_red), set_brightness(4, c_red), set_brightness(3, c_red), set_brightness(2, c_red), set_brightness(1, c_red),
-		c_off, c_off, c_off, c_off, c_off, c_off, c_off, c_off};
+		set_brightness(7, c_yellow), set_brightness(6, c_yellow), set_brightness(5, c_yellow),
+		set_brightness(4, c_yellow), set_brightness(3, c_yellow), set_brightness(2, c_yellow),
+		set_brightness(1, c_yellow), set_brightness(0, c_yellow),
+		set_brightness(7, c_yellow), set_brightness(6, c_yellow), set_brightness(5, c_yellow),
+		set_brightness(4, c_yellow), set_brightness(3, c_yellow), set_brightness(2, c_yellow),
+		set_brightness(1, c_yellow), set_brightness(0, c_yellow),
+		set_brightness(3, c_green), set_brightness(2, c_green), set_brightness(1, c_green), set_brightness(0, c_green),
+		set_brightness(7, c_green), set_brightness(6, c_green), set_brightness(5, c_green), set_brightness(4, c_green),
+		set_brightness(3, c_green), set_brightness(2, c_green), set_brightness(1, c_green), set_brightness(0, c_green),
+		set_brightness(7, c_green), set_brightness(6, c_green), set_brightness(5, c_green), set_brightness(4, c_green),
+		set_brightness(0, c_red), set_brightness(7, c_red), set_brightness(6, c_red), set_brightness(5, c_red),
+		set_brightness(4, c_red), set_brightness(3, c_red), set_brightness(2, c_red), set_brightness(1, c_red),
+		set_brightness(0, c_red), set_brightness(7, c_red), set_brightness(6, c_red), set_brightness(5, c_red),
+		set_brightness(4, c_red), set_brightness(3, c_red), set_brightness(2, c_red), set_brightness(1, c_red),
+		c_off, c_off, c_off, c_off, c_off, c_off, c_off, c_off };
 	memcpy(buffer, data, sizeof(data));
 
 	// init DMA
-	// dma_channel_claim(MOD_WSLEDS_DMA_CH);
-	// dma_channel_config dma_c = dma_channel_get_default_config(MOD_WSLEDS_DMA_CH);
-	// channel_config_set_transfer_data_size(&dma_c, DMA_SIZE_32);
-	// channel_config_set_read_increment(&dma_c, true); // incr true - we loop through MOD_WSLEDS_LED_COUNT size buffer
-	// channel_config_set_write_increment(&dma_c, false);
-	// channel_config_set_dreq(&dma_c, DREQ_FORCE);
-	// dma_channel_configure(MOD_WSLEDS_DMA_CH, &dma_c, &MOD_WSLEDS_PIO->txf[MOD_WSLEDS_SM], buffer, MOD_WSLEDS_LED_COUNT,
-	//                       false);
+	dma_channel_claim(MOD_WSLEDS_DMA_CH);
+	dma_channel_config dma_c = dma_channel_get_default_config(MOD_WSLEDS_DMA_CH);
+	channel_config_set_transfer_data_size(&dma_c, DMA_SIZE_32);
+	channel_config_set_read_increment(&dma_c, true); // incr true - we loop through MOD_WSLEDS_LED_COUNT size buffer
+	channel_config_set_write_increment(&dma_c, false);
+	channel_config_set_dreq(&dma_c, pio_get_dreq(MOD_WSLEDS_PIO, MOD_WSLEDS_SM, true));
+	dma_channel_configure(MOD_WSLEDS_DMA_CH, &dma_c, &MOD_WSLEDS_PIO->txf[MOD_WSLEDS_SM], buffer, MOD_WSLEDS_LED_COUNT,
+	                      false);
 	sleep_ms(1);
 
 	// get clock divider
@@ -68,12 +76,7 @@ void wsleds_init() {
 }
 
 void wsleds_test() {
-	// dma_channel_transfer_from_buffer_now(MOD_WSLEDS_DMA_CH, buffer, MOD_WSLEDS_LED_COUNT);
-
-	for (auto i = 0; i < 64; i++) { // put data
-		pio_sm_put_blocking(MOD_WSLEDS_PIO, MOD_WSLEDS_SM, buffer[i]);
-	}
-
+	dma_channel_transfer_from_buffer_now(MOD_WSLEDS_DMA_CH, buffer, MOD_WSLEDS_LED_COUNT);
 }
 
 void wsleds_anim_flag() {
