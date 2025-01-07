@@ -47,7 +47,9 @@ target_compile_options(NuclearBriefcase PRIVATE
 		-Winline
 #		-Werror
 		-Wno-error=old-style-declaration
-#		-O3
+		-O3
+		-s
+		-g0
 		-mcpu=cortex-m33
 		-mfpu=fpv5-sp-d16
 		-mthumb

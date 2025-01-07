@@ -78,6 +78,8 @@ void wsleds_init() {
 	pio_wsleds_program_init(MOD_WSLEDS_PIO, MOD_WSLEDS_SM, offset, MOD_WSLEDS_PIN, clk_div);
 	pio_sm_set_enabled(MOD_WSLEDS_PIO, MOD_WSLEDS_SM, true);
 	sleep_ms(1);
+
+	wsleds_transfer(); // show flag idk
 }
 
 void wsleds_transfer() {

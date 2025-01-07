@@ -99,7 +99,6 @@ void renderer_loop() {
 		acc_elapsed_us += (remaining_us + elapsed_us);
 
 		if (acc_elapsed_us >= 10 * 1'000'000) { // 10 seconds
-			wsleds_transfer(); // actually looks better lol
 			if (test == true) {
 				test = false;
 			} else {

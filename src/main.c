@@ -28,9 +28,9 @@ int main() {
 
 	if (!set_sys_clock_khz(48'000, false)) utils_error_mode(47);
 
-	mcp_init(); // init first, other modules use mcp
-	numbers_init();
 	wsleds_init();
+	mcp_init();
+	numbers_init();
 	status_init(); // init last, needs other modules up and running
 
 	adc_init();
