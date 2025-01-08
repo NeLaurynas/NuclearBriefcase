@@ -3,56 +3,59 @@
 
 #include "wsleds.h"
 
+#include <math.h>
 #include <pio_wsleds.pio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <hardware/dma.h>
 #include <hardware/pio.h>
 
+#include "anim.h"
 #include "utils.h"
 #include "defines/config.h"
 
 static constexpr u32 c_yellow = 0b11111111'11111111'00000000;
 static constexpr u32 c_green = 0b00000000'11111111'00000000;
-static constexpr u32 c_red = 0b01111111'00000000'00000000;
+static constexpr u32 c_red = 0b11111111'00000000'00000000;
 static constexpr u32 c_white = 0b11111111'11111111'11111111;
 static constexpr u32 c_blue = 0b00000000'00000000'11111111;
 static constexpr u32 c_purple = 0b11111111'00000000'11111111;
 static constexpr u32 c_cyan = 0b00000000'11111111'11111111;
 static constexpr u32 c_off = 0b00000000'00000000'00000000;
 
-inline u32 set_brightness(const u8 level, const u32 color) {
-	// 8 is off, 7 is lowest, 0 is highest
-	if (level > 8) utils_error_mode(24);
+static u8 line_width = (u8)sqrt(MOD_WSLEDS_LED_COUNT);
 
-	const u8 mask = 0b11111111 >> level;
-	const u32 result = ((color & 0b11111111'00000000'00000000) >> 16 & mask) << 16 |
-		((color & 0b00000000'11111111'00000000) >> 8 & mask) << 8 |
-		(color & 0b00000000'00000000'11111111 & mask);
-	return result;
+u32 reduce_brightness(const u8 reduction, const u32 color) {
+	u8 r = (color >> 16) & 0b11111111;
+	u8 g = (color >> 8) & 0b11111111;
+	u8 b = color & 0b11111111;
+
+	r = (r > reduction) ? (r - reduction) : 0;
+	g = (g > reduction) ? (g - reduction) : 0;
+	b = (b > reduction) ? (b - reduction) : 0;
+
+	return (r << 16) | (g << 8) | b;
 }
 
 static u32 buffer[MOD_WSLEDS_LED_COUNT] = { 0 };
 
 void wsleds_init() {
-	// init flag
+	// init flag (which is hardcoded for 64 leds kek)
+	// @formatter:off
+	auto border_color = c_off;
+
 	const u32 data[MOD_WSLEDS_LED_COUNT] = {
-		c_off, c_off, c_off, c_off, c_off, c_off, c_off, c_off,
-		set_brightness(7, c_yellow), set_brightness(6, c_yellow), set_brightness(5, c_yellow),
-		set_brightness(4, c_yellow), set_brightness(3, c_yellow), set_brightness(2, c_yellow),
-		set_brightness(1, c_yellow), set_brightness(0, c_yellow),
-		set_brightness(7, c_yellow), set_brightness(6, c_yellow), set_brightness(5, c_yellow),
-		set_brightness(4, c_yellow), set_brightness(3, c_yellow), set_brightness(2, c_yellow),
-		set_brightness(1, c_yellow), set_brightness(0, c_yellow),
-		set_brightness(3, c_green), set_brightness(2, c_green), set_brightness(1, c_green), set_brightness(0, c_green),
-		set_brightness(7, c_green), set_brightness(6, c_green), set_brightness(5, c_green), set_brightness(4, c_green),
-		set_brightness(3, c_green), set_brightness(2, c_green), set_brightness(1, c_green), set_brightness(0, c_green),
-		set_brightness(7, c_green), set_brightness(6, c_green), set_brightness(5, c_green), set_brightness(4, c_green),
-		set_brightness(0, c_red), set_brightness(7, c_red), set_brightness(6, c_red), set_brightness(5, c_red),
-		set_brightness(4, c_red), set_brightness(3, c_red), set_brightness(2, c_red), set_brightness(1, c_red),
-		set_brightness(0, c_red), set_brightness(7, c_red), set_brightness(6, c_red), set_brightness(5, c_red),
-		set_brightness(4, c_red), set_brightness(3, c_red), set_brightness(2, c_red), set_brightness(1, c_red),
-		c_off, c_off, c_off, c_off, c_off, c_off, c_off, c_off };
-	memcpy(buffer, data, sizeof(data));
+		border_color, border_color, border_color, border_color, border_color, border_color, border_color, border_color,
+		c_yellow, c_yellow, c_yellow, c_yellow, c_yellow, c_yellow,	c_yellow, c_yellow,
+		c_yellow, c_yellow, c_yellow,	c_yellow, c_yellow, c_yellow,	c_yellow, c_yellow,
+		c_green, c_green, c_green, c_green,	c_green, c_green, c_green, c_green,
+		c_green, c_green, c_green, c_green,	c_green, c_green, c_green, c_green,
+		c_red, c_red, c_red, c_red,	c_red, c_red, c_red, c_red,
+		c_red, c_red, c_red, c_red,	c_red, c_red, c_red, c_red,
+		border_color, border_color, border_color, border_color, border_color, border_color, border_color, border_color,
+	};
+	// @formatter:on
+	// memcpy(buffer, data, sizeof(data));
 
 	// init DMA
 	if (dma_channel_is_claimed(MOD_WSLEDS_DMA_CH)) utils_error_mode(25);
@@ -87,16 +90,115 @@ void wsleds_transfer() {
 }
 
 void wsleds_anim_flag() {
-	static u32 frame = 0;
-	frame++;
-	if (frame % 6 == 0) {
-		for (auto row = 0; row < 8; row++) {
-			const u32 tmp = buffer[row * 8 + 7];
-			for (auto column = 7; column > 0; column--) {
-				buffer[row * 8 + column] = buffer[row * 8 + column - 1];
-			}
-			buffer[row * 8] = tmp;
+	static u8 brightness = 0;
+	for (u8 i = 8; i < 56; i++) {
+		switch (i) {
+		case 8 ... 23: buffer[i] = reduce_brightness(brightness + i - i / 2, c_yellow);
+			break;
+
+		case 24 ... 39: buffer[i] = reduce_brightness(brightness + i - i / 2, c_green);
+			break;
+
+		case 40 ... 55: buffer[i] = reduce_brightness(brightness + i - i / 2, c_red);
+			break;
+
+		default: break;
 		}
-		wsleds_transfer();
 	}
+	wsleds_transfer();
+	brightness = brightness + 1;
+}
+
+inline u8 x_led_start(u8 x_line) {
+	return x_line * line_width;
+}
+
+inline u8 get_line_x(u8 dot) {
+	return dot / line_width;
+}
+
+inline u8 get_line_y(u8 dot) {
+	return dot % line_width;
+}
+
+void wsleds_anim_target() {
+	static u8 green_dot = 0;
+	static u8 x_line = 0;
+	static u8 y_line = 0;
+	static u8 x_steps = 0;
+	static u8 y_steps = 0;
+	static u8 current_step = 0;
+	static u16 frame = 0;
+	static constexpr u16 FRAME_SIZE = 1000;
+	static const u16 FRAME_SIZE_DIVIDER = 100;
+	static u8 freeze = 0;
+
+	memset(buffer, 0, sizeof(buffer));
+
+	// render green dot
+	buffer[green_dot] = reduce_brightness(anim_color_reduction(TO_DIM, frame, FRAME_SIZE, 0.2f, 8), c_blue);
+
+	// render X
+	for (u8 i = 0; i < line_width; i++) {
+		u8 x_led = x_led_start(x_line) + i;
+		u8 y_led = y_line + i * line_width;
+		if (x_line == get_line_x(green_dot) && y_line == get_line_y(green_dot)) {
+			// on target - blink green
+			buffer[x_led] = reduce_brightness(anim_color_reduction(TO_DIM, abs(frame), FRAME_SIZE, 0.1f, 10), c_green);
+			buffer[y_led] = buffer[x_led];
+		} else {
+			// blink dot over red lines
+			buffer[x_led] = get_line_x(x_led) == get_line_x(green_dot) && get_line_y(x_led) == get_line_y(green_dot) &&
+				buffer[green_dot] != 0
+				? buffer[green_dot]
+				: c_red;
+			buffer[y_led] = get_line_x(y_led) == get_line_x(green_dot) && get_line_y(y_led) == get_line_y(green_dot) &&
+				buffer[green_dot] != 0
+				? buffer[green_dot]
+				: c_red;
+		}
+	}
+
+	if (frame % FRAME_SIZE_DIVIDER == 0) {
+		if (get_line_x(green_dot) == x_line && get_line_y(green_dot) == y_line) {
+			if (freeze == 0) {
+				freeze = 5;
+			}
+			if (freeze == 1) {
+				green_dot = utils_random_in_range(0, 63);
+				freeze = 0;
+			} else {
+				freeze--;
+				goto end;
+			}
+			// calculate steps to take per frame for X
+			x_steps = abs((i8)get_line_x(green_dot) - x_line);
+			y_steps = abs((i8)get_line_y(green_dot) - y_line);
+			current_step = 0;
+			goto end;
+		}
+		if (x_steps != 0 || y_steps != 0) {
+			if (current_step == (x_steps > y_steps ? x_steps : y_steps)) {
+				// reached the end, reset frame?
+				x_steps = 0;
+				y_steps = 0;
+			} else {
+				current_step++;
+				// todo: proportional
+				x_line = (get_line_x(green_dot) < x_line)
+					? x_line - 1
+					: get_line_x(green_dot) == x_line
+					? x_line
+					: x_line + 1;
+				y_line = (get_line_y(green_dot) < y_line)
+					? y_line - 1
+					: get_line_y(green_dot) == y_line
+					? y_line
+					: y_line + 1;
+			}
+		}
+	}
+end:
+	frame = (frame + 1) % FRAME_SIZE;
+	wsleds_transfer();
 }

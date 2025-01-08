@@ -48,7 +48,7 @@ static u8 animation_bits[] = {
 static u16 buffer[] = { 0b11111111111111 };
 
 void numbers_init() {
-	state.numbers.target = util_random_in_range(4, 9);
+	state.numbers.target = utils_random_in_range(4, 9);
 
 	// init DMA
 	if (dma_channel_is_claimed(MOD_NUM_DMA_CH)) utils_error_mode(21);
@@ -98,7 +98,7 @@ void numbers_ok(const bool ok) {
 }
 
 void numbers_generate_target() {
-	u8 target = util_random_in_range(0, 9);
+	u8 target = utils_random_in_range(0, 9);
 
 	while (target == state.numbers.number || target == state.numbers.target) {
 		target = (target + 1) % 10;

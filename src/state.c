@@ -7,13 +7,13 @@ State state = {
 	.numbers = {
 		.target = 0,
 		.number = 0,
-		.btn_pressed = false,
+		.btn_pressed = 0,
 		.last_encoder_change = 0,
-		.last_encoder_incrementing = false,
-		.last_encoder_decrementing = false,
+		.last_encoder_incrementing = 0,
+		.last_encoder_decrementing = 0,
 	},
 	.status = {
-		.numbers_on = false,
+		.numbers_on = 0,
 	},
 	.another_value = 0
 };

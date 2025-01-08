@@ -34,6 +34,8 @@ add_executable(NuclearBriefcase main.c
 		modules/status/status.h
 		modules/wsleds/wsleds.c
 		modules/wsleds/wsleds.h
+		anim.c
+		anim.h
 )
 
 pico_set_program_name(NuclearBriefcase "NuclearBriefcase")

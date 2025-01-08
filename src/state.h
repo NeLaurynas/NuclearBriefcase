@@ -19,7 +19,7 @@ typedef struct {
 	} numbers;
 
 	struct {
-		bool numbers_on;
+		i8 numbers_on;
 	} status;
 
 	int another_value;
@@ -27,12 +27,12 @@ typedef struct {
 
 typedef struct {
 	struct {
-		u8 target;
-		u8 number;
+		i8 target;
+		i8 number;
 	} numbers;
 
 	struct {
-		bool numbers_on;
+		i8 numbers_on;
 	} status;
 
 	int another_value;

@@ -9,7 +9,7 @@
 
 #include "defines/config.h"
 
-u32 util_random_in_range(u32 fromInclusive, u32 toInclusive);
+u32 utils_random_in_range(u32 fromInclusive, u32 toInclusive);
 
 float utils_print_onboard_temp();
 
@@ -32,5 +32,7 @@ int32_t utils_time_diff_us(u32 start_us, u32 end_us);
 void utils_error_mode(u8 code);
 
 void utils_internal_led(bool on);
+
+u16 utils_proportional_reduce(u16 number, u16 proportion, u16 range);
 
 #endif //UTILS_H

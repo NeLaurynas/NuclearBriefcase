@@ -11,7 +11,7 @@
 #include "defines/config.h"
 #include "pico/rand.h"
 
-u32 util_random_in_range(u32 fromInclusive, u32 toInclusive) {
+u32 utils_random_in_range(u32 fromInclusive, u32 toInclusive) {
 	if (fromInclusive > toInclusive) {
 		const auto tmp = toInclusive;
 		toInclusive = fromInclusive;
@@ -89,4 +89,12 @@ void utils_error_mode(u8 code) {
 
 void utils_internal_led(const bool on) {
 	gpio_put(INTERNAL_LED, on);
+}
+
+u16 utils_proportional_reduce(const u16 number, const u16 proportion, const u16 range) {
+	if (proportion >= range) return 0;
+
+	u32 temp = (u32)number * (range - proportion);
+	temp /= range;
+	return temp;
 }

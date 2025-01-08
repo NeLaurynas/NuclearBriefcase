@@ -10,4 +10,6 @@ void wsleds_transfer();
 
 void wsleds_anim_flag();
 
+void wsleds_anim_target();
+
 #endif //WSLEDS_H

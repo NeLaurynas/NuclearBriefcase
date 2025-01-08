@@ -85,7 +85,7 @@ void renderer_loop() {
 		// ------------ work
 		set_state();
 		render_state();
-		wsleds_anim_flag();
+		wsleds_anim_target();
 
 		// ------------ end
 		anim_frame = (anim_frame + 1) % 1000;
