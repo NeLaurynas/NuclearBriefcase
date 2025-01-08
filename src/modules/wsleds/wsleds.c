@@ -42,18 +42,18 @@ static u32 buffer[MOD_WSLEDS_LED_COUNT] = { 0 };
 void wsleds_init() {
 	// init flag (which is hardcoded for 64 leds kek)
 	// @formatter:off
-	auto border_color = c_off;
-
-	const u32 data[MOD_WSLEDS_LED_COUNT] = {
-		border_color, border_color, border_color, border_color, border_color, border_color, border_color, border_color,
-		c_yellow, c_yellow, c_yellow, c_yellow, c_yellow, c_yellow,	c_yellow, c_yellow,
-		c_yellow, c_yellow, c_yellow,	c_yellow, c_yellow, c_yellow,	c_yellow, c_yellow,
-		c_green, c_green, c_green, c_green,	c_green, c_green, c_green, c_green,
-		c_green, c_green, c_green, c_green,	c_green, c_green, c_green, c_green,
-		c_red, c_red, c_red, c_red,	c_red, c_red, c_red, c_red,
-		c_red, c_red, c_red, c_red,	c_red, c_red, c_red, c_red,
-		border_color, border_color, border_color, border_color, border_color, border_color, border_color, border_color,
-	};
+	// auto border_color = c_off;
+	//
+	// const u32 data[MOD_WSLEDS_LED_COUNT] = {
+	// 	border_color, border_color, border_color, border_color, border_color, border_color, border_color, border_color,
+	// 	c_yellow, c_yellow, c_yellow, c_yellow, c_yellow, c_yellow,	c_yellow, c_yellow,
+	// 	c_yellow, c_yellow, c_yellow,	c_yellow, c_yellow, c_yellow,	c_yellow, c_yellow,
+	// 	c_green, c_green, c_green, c_green,	c_green, c_green, c_green, c_green,
+	// 	c_green, c_green, c_green, c_green,	c_green, c_green, c_green, c_green,
+	// 	c_red, c_red, c_red, c_red,	c_red, c_red, c_red, c_red,
+	// 	c_red, c_red, c_red, c_red,	c_red, c_red, c_red, c_red,
+	// 	border_color, border_color, border_color, border_color, border_color, border_color, border_color, border_color,
+	// };
 	// @formatter:on
 	// memcpy(buffer, data, sizeof(data));
 
@@ -129,14 +129,14 @@ void wsleds_anim_target() {
 	static u8 y_steps = 0;
 	static u8 current_step = 0;
 	static u16 frame = 0;
-	static constexpr u16 FRAME_SIZE = 1000;
-	static const u16 FRAME_SIZE_DIVIDER = 100;
-	static u8 freeze = 0;
+	static constexpr u16 FRAME_TICKS = 975;
+	static constexpr u16 FRAME_TICK_DIVIDER = 75;
+	static u8 freeze_frames = 0;
 
 	memset(buffer, 0, sizeof(buffer));
 
 	// render green dot
-	buffer[green_dot] = reduce_brightness(anim_color_reduction(TO_DIM, frame, FRAME_SIZE, 0.2f, 8), c_blue);
+	buffer[green_dot] = reduce_brightness(anim_color_reduction(TO_DIM, frame, FRAME_TICKS, 0.2f, 8), c_blue);
 
 	// render X
 	for (u8 i = 0; i < line_width; i++) {
@@ -144,7 +144,7 @@ void wsleds_anim_target() {
 		u8 y_led = y_line + i * line_width;
 		if (x_line == get_line_x(green_dot) && y_line == get_line_y(green_dot)) {
 			// on target - blink green
-			buffer[x_led] = reduce_brightness(anim_color_reduction(TO_DIM, abs(frame), FRAME_SIZE, 0.1f, 10), c_green);
+			buffer[x_led] = reduce_brightness(anim_color_reduction(TO_DIM, abs(frame), FRAME_TICKS, 0.1f, 10), c_green);
 			buffer[y_led] = buffer[x_led];
 		} else {
 			// blink dot over red lines
@@ -159,16 +159,16 @@ void wsleds_anim_target() {
 		}
 	}
 
-	if (frame % FRAME_SIZE_DIVIDER == 0) {
+	if (frame % FRAME_TICK_DIVIDER == 0) {
 		if (get_line_x(green_dot) == x_line && get_line_y(green_dot) == y_line) {
-			if (freeze == 0) {
-				freeze = 5;
+			if (freeze_frames == 0) {
+				freeze_frames = 5;
 			}
-			if (freeze == 1) {
+			if (freeze_frames == 1) {
 				green_dot = utils_random_in_range(0, 63);
-				freeze = 0;
+				freeze_frames = 0;
 			} else {
-				freeze--;
+				freeze_frames--;
 				goto end;
 			}
 			// calculate steps to take per frame for X
@@ -178,13 +178,16 @@ void wsleds_anim_target() {
 			goto end;
 		}
 		if (x_steps != 0 || y_steps != 0) {
-			if (current_step == (x_steps > y_steps ? x_steps : y_steps)) {
-				// reached the end, reset frame?
+			const auto max_steps = (x_steps > y_steps ? x_steps : y_steps);
+			if (current_step == max_steps) {
+				frame = 0;
 				x_steps = 0;
 				y_steps = 0;
 			} else {
 				current_step++;
-				// todo: proportional
+				// todo: proportional - unit test? check proportional, etc...
+				// float x_divider = (float)max_steps / (float)x_steps;
+				// float y_divider = (float)max_steps / (float)y_steps;
 				x_line = (get_line_x(green_dot) < x_line)
 					? x_line - 1
 					: get_line_x(green_dot) == x_line
@@ -199,6 +202,6 @@ void wsleds_anim_target() {
 		}
 	}
 end:
-	frame = (frame + 1) % FRAME_SIZE;
+	frame = (frame + 1) % FRAME_TICKS;
 	wsleds_transfer();
 }
