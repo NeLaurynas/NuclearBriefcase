@@ -179,7 +179,8 @@ void wsleds_anim_target() {
 				freeze_frames = 5;
 			}
 			if (freeze_frames == 1) {
-				target_dot = get_led_from_lines(utils_random_in_range(1, 6), utils_random_in_range(1, 6));;
+				// target_dot = get_led_from_lines(utils_random_in_range(1, 6), utils_random_in_range(1, 6));
+				target_dot = utils_random_in_range(0, 63);
 				freeze_frames = 0;
 			} else {
 				freeze_frames--;
