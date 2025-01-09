@@ -33,6 +33,6 @@ void utils_error_mode(u8 code);
 
 void utils_internal_led(bool on);
 
-u16 utils_proportional_reduce(u16 number, u16 proportion, u16 range);
+u16 utils_proportional_reduce(u16 number, u16 step, u16 total_steps);
 
 #endif //UTILS_H

@@ -121,59 +121,73 @@ inline u8 get_line_y(u8 dot) {
 	return dot % line_width;
 }
 
+static u8 get_led_from_lines(const u8 x_line, const u8 y_line) {
+	return line_width * y_line + x_line;
+}
+
 void wsleds_anim_target() {
-	static u8 green_dot = 0;
+	static bool init = false;
+	static u8 target_dot = 0;
 	static u8 x_line = 0;
 	static u8 y_line = 0;
 	static u8 x_steps = 0;
 	static u8 y_steps = 0;
 	static u8 current_step = 0;
-	static u16 frame = 0;
+	static u16 frame = 1;
 	static constexpr u16 FRAME_TICKS = 975;
 	static constexpr u16 FRAME_TICK_DIVIDER = 75;
 	static u8 freeze_frames = 0;
+	static float x_steps_per_step = 0;
+	static float y_steps_per_step = 0;
+
+	if (!init) {
+		target_dot = get_led_from_lines(utils_random_in_range(1, 6), utils_random_in_range(1, 6));
+		x_steps = get_line_x(target_dot);
+		y_steps = get_line_y(target_dot);
+		init = true;
+	}
 
 	memset(buffer, 0, sizeof(buffer));
 
-	// render green dot
-	buffer[green_dot] = reduce_brightness(anim_color_reduction(TO_DIM, frame, FRAME_TICKS, 0.2f, 8), c_blue);
+	// render target dot
+	buffer[target_dot] = reduce_brightness(anim_color_reduction(TO_DIM, frame, FRAME_TICKS, 1.5f, 10), c_blue);
 
 	// render X
 	for (u8 i = 0; i < line_width; i++) {
-		u8 x_led = x_led_start(x_line) + i;
-		u8 y_led = y_line + i * line_width;
-		if (x_line == get_line_x(green_dot) && y_line == get_line_y(green_dot)) {
+		const u8 x_led = x_led_start(x_line) + i;
+		const u8 y_led = y_line + i * line_width;
+		if (x_line == get_line_x(target_dot) && y_line == get_line_y(target_dot)) {
 			// on target - blink green
-			buffer[x_led] = reduce_brightness(anim_color_reduction(TO_DIM, abs(frame), FRAME_TICKS, 0.1f, 10), c_green);
+			buffer[x_led] = reduce_brightness(anim_color_reduction(TO_DIM, frame, FRAME_TICKS, 1.0f, 10), c_green);
 			buffer[y_led] = buffer[x_led];
 		} else {
 			// blink dot over red lines
-			buffer[x_led] = get_line_x(x_led) == get_line_x(green_dot) && get_line_y(x_led) == get_line_y(green_dot) &&
-				buffer[green_dot] != 0
-				? buffer[green_dot]
+			buffer[x_led] = get_line_x(x_led) == get_line_x(target_dot) && get_line_y(x_led) == get_line_y(target_dot) &&
+				buffer[target_dot] != 0
+				? buffer[target_dot]
 				: c_red;
-			buffer[y_led] = get_line_x(y_led) == get_line_x(green_dot) && get_line_y(y_led) == get_line_y(green_dot) &&
-				buffer[green_dot] != 0
-				? buffer[green_dot]
+			buffer[y_led] = get_line_x(y_led) == get_line_x(target_dot) && get_line_y(y_led) == get_line_y(target_dot) &&
+				buffer[target_dot] != 0
+				? buffer[target_dot]
 				: c_red;
 		}
 	}
 
 	if (frame % FRAME_TICK_DIVIDER == 0) {
-		if (get_line_x(green_dot) == x_line && get_line_y(green_dot) == y_line) {
+		if (get_line_x(target_dot) == x_line && get_line_y(target_dot) == y_line) {
 			if (freeze_frames == 0) {
 				freeze_frames = 5;
 			}
 			if (freeze_frames == 1) {
-				green_dot = utils_random_in_range(0, 63);
+				target_dot = get_led_from_lines(utils_random_in_range(1, 6), utils_random_in_range(1, 6));;
 				freeze_frames = 0;
 			} else {
 				freeze_frames--;
 				goto end;
 			}
 			// calculate steps to take per frame for X
-			x_steps = abs((i8)get_line_x(green_dot) - x_line);
-			y_steps = abs((i8)get_line_y(green_dot) - y_line);
+			x_steps = abs((i8)get_line_x(target_dot) - x_line);
+			y_steps = abs((i8)get_line_y(target_dot) - y_line);
 			current_step = 0;
 			goto end;
 		}
@@ -185,17 +199,15 @@ void wsleds_anim_target() {
 				y_steps = 0;
 			} else {
 				current_step++;
-				// todo: proportional - unit test? check proportional, etc...
-				// float x_divider = (float)max_steps / (float)x_steps;
-				// float y_divider = (float)max_steps / (float)y_steps;
-				x_line = (get_line_x(green_dot) < x_line)
+
+				x_line = (get_line_x(target_dot) < x_line)
 					? x_line - 1
-					: get_line_x(green_dot) == x_line
+					: get_line_x(target_dot) == x_line
 					? x_line
 					: x_line + 1;
-				y_line = (get_line_y(green_dot) < y_line)
+				y_line = (get_line_y(target_dot) < y_line)
 					? y_line - 1
-					: get_line_y(green_dot) == y_line
+					: get_line_y(target_dot) == y_line
 					? y_line
 					: y_line + 1;
 			}

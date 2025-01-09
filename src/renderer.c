@@ -105,7 +105,7 @@ void renderer_loop() {
 				test = true;
 			}
 			const float elapsed_ms = elapsed_us / 1000.0f;
-			printf("render took: %.2f ms (%ld us)\n", elapsed_ms, elapsed_us);
+			utils_printf("render took: %.2f ms (%ld us)\n", elapsed_ms, elapsed_us);
 			utils_print_onboard_temp();
 			acc_elapsed_us = 0;
 			// recalculate because printf is slow

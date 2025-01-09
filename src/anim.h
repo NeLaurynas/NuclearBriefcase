@@ -11,6 +11,12 @@ typedef enum {
 	PULSE
 } anim_direction_t;
 
-u8 anim_color_reduction(anim_direction_t direction, u16 frame, u16 frame_size, float speed, float freq);
+/**
+ * Reduces color brightness
+ *
+ * @param speed  How fast animation will go to an end (will hold)
+ * @param freq How many times in frame_ticks it will get repeated
+ */
+u8 anim_color_reduction(anim_direction_t direction, u16 frame, u16 frame_ticks, float speed,  float freq);
 
 #endif //ANIM_H

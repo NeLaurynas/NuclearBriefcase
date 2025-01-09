@@ -3,7 +3,6 @@
 
 #include "utils.h"
 
-#include <stdarg.h>
 #include <stdio.h>
 #include <hardware/adc.h>
 #include <hardware/clocks.h>
@@ -91,10 +90,7 @@ void utils_internal_led(const bool on) {
 	gpio_put(INTERNAL_LED, on);
 }
 
-u16 utils_proportional_reduce(const u16 number, const u16 proportion, const u16 range) {
-	if (proportion >= range) return 0;
-
-	u32 temp = (u32)number * (range - proportion);
-	temp /= range;
-	return temp;
+u16 utils_proportional_reduce(u16 number, u16 step, u16 total_steps) {
+	if (step >= total_steps) step = total_steps;
+	return (float)number / total_steps * step;
 }
