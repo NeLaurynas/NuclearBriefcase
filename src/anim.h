@@ -6,9 +6,7 @@
 #include "defines/config.h"
 
 typedef enum {
-	TO_BRIGHT,
-	TO_DIM,
-	PULSE
+	TO_BRIGHT, TO_DIM, PULSE
 } anim_direction_t;
 
 /**

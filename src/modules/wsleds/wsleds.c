@@ -32,6 +32,10 @@ u32 reduce_brightness(const u8 reduction, const u32 color) {
 
 static u32 buffer[MOD_WSLEDS_LED_COUNT] = { 0 };
 
+void buffer_transfer() {
+	dma_channel_transfer_from_buffer_now(MOD_WSLEDS_DMA_CH, buffer, MOD_WSLEDS_LED_COUNT);
+}
+
 void wsleds_init() {
 	// init DMA
 	if (dma_channel_is_claimed(MOD_WSLEDS_DMA_CH)) utils_error_mode(25);
@@ -46,7 +50,7 @@ void wsleds_init() {
 	sleep_ms(1);
 
 	// get clock divider
-	const auto clk_div = utils_calculate_pio_clk_div_ns(88);
+	const auto clk_div = utils_calculate_pio_clk_div_ns(87);
 	utils_printf("WSLEDS PIO CLK DIV: %f\n", clk_div);
 
 	// init PIO
@@ -58,11 +62,7 @@ void wsleds_init() {
 	pio_sm_set_enabled(MOD_WSLEDS_PIO, MOD_WSLEDS_SM, true);
 	sleep_ms(1);
 
-	wsleds_transfer(); // show flag idk
-}
-
-void wsleds_transfer() {
-	dma_channel_transfer_from_buffer_now(MOD_WSLEDS_DMA_CH, buffer, MOD_WSLEDS_LED_COUNT);
+	// buffer_transfer();
 }
 
 inline u8 x_led_start(const u8 x_line) {
@@ -173,7 +173,7 @@ void anim_target() {
 	}
 end:
 	frame = (frame + 1) % FRAME_TICKS;
-	wsleds_transfer();
+	buffer_transfer();
 }
 
 void anim_countdown() {
@@ -191,9 +191,10 @@ void anim_countdown() {
 	if (number == -2) {
 		// deinit
 		init = false;
-		currentState.wsleds.animation = TARGET;
+		state.phase = IDLE; // TODO: explosion
 		memset(buffer, 0, sizeof(buffer));
-		wsleds_transfer();
+		buffer_transfer();
+		state_set_minus();
 		return;
 	}
 
@@ -205,6 +206,7 @@ void anim_countdown() {
 		if (buffer[i] == 0) continue;
 
 		u32 color = COLOR_RED;
+		// ReSharper disable once CppDefaultCaseNotHandledInSwitchStatement
 		switch (number + 1) {
 			case 0:
 			case 1:
@@ -221,14 +223,13 @@ void anim_countdown() {
 		buffer[i] = reduce_brightness(anim_color_reduction(TO_DIM, frame, FRAME_TICKS, 1.00f, 1), color);
 	}
 
-	wsleds_transfer();
-
+	buffer_transfer();
 	frame = (frame + 1) % FRAME_TICKS;
 }
 
 void wsleds_animation(const u16 frame) {
-	switch (currentState.wsleds.animation) {
-		case TARGET:
+	switch (state.phase) {
+		case IDLE:
 			anim_target();
 			break;
 		case COUNTDOWN:

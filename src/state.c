@@ -13,13 +13,27 @@ State state = {
 		.last_encoder_decrementing = 0,
 	},
 	.status = {
-		.numbers_on = 0,
+		.numbers_on = -1,
 	},
-	.another_value = 0
+
+	.phase = IDLE,
 };
 
-CurrentState currentState = {
-	.wsleds = {
-		.animation = TARGET,
-	},
-};
+CurrentState currentState = { };
+
+void state_set_0(i8 *number) {
+	if (*number < 0) *number = 0;
+}
+
+inline bool state_get_bool(const i8 number) {
+	return number > 0;
+}
+
+void state_set_bool(i8 *number, const bool val) {
+	if (*number < 0) return;
+	*number = val;
+}
+
+void state_set_minus() {
+	state.status.numbers_on = -1;
+}

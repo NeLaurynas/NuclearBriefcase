@@ -12,18 +12,15 @@
 #include "modules/mcp/mcp.h"
 #include "modules/numbers/numbers.h"
 #include "modules/status/status.h"
-#include "modules/wsleds/wsleds.h"
 
 void set_state() {
+	if (state.phase != IDLE) return; // busy
+
 	// Numbers module
 	const auto num_btn_pressed = mcp_is_pin_low(MOD_NUM_BTN);
 	if (state.numbers.btn_pressed != num_btn_pressed) {
 		state.numbers.btn_pressed = num_btn_pressed;
-		if (num_btn_pressed) {
-			numbers_generate_target();
-			// TODO: debug
-			currentState.wsleds.animation = COUNTDOWN;
-		}
+		if (num_btn_pressed) numbers_generate_target();
 	}
 
 	// potential refactor...
@@ -34,10 +31,12 @@ void set_state() {
 			state.numbers.last_encoder_change = time_us_32(); // TODO: change in other paths for debounce?
 			if (num_enc1 == true && num_enc2 == false) {
 				numbers_dec();
+				state_set_0(&state.status.numbers_on);
 				state.numbers.last_encoder_incrementing = false;
 				state.numbers.last_encoder_decrementing = true;
 			} else if (num_enc1 == false && num_enc2 == true) {
 				numbers_inc();
+				state_set_0(&state.status.numbers_on);
 				state.numbers.last_encoder_incrementing = true;
 				state.numbers.last_encoder_decrementing = false;
 			}
@@ -52,17 +51,18 @@ void set_state() {
 	}
 
 	// Status module
-	state.status.numbers_on = state.numbers.target == state.numbers.number;
+	state_set_bool(&state.status.numbers_on, state.numbers.target == state.numbers.number);
 }
 
 void render_state() {
 	// Numbers module
-	if (state.numbers.number != currentState.numbers.number || state.numbers.target != currentState.numbers.target) {
+	if (state.numbers.number != currentState.numbers.number || state.numbers.target != currentState.numbers.target
+		|| state.status.numbers_on == -1) {
 		currentState.numbers.number = state.numbers.number;
 		currentState.numbers.target = state.numbers.target;
 
 		numbers_display(state.numbers.number, state.numbers.target);
-		numbers_ok(state.numbers.number == state.numbers.target);
+		numbers_ok(state_get_bool(state.status.numbers_on));
 	}
 
 	// Status module
@@ -70,11 +70,17 @@ void render_state() {
 		currentState.status.numbers_on = state.status.numbers_on;
 		status_set_on(MOD_STAT_LED_NUMBERS, state.status.numbers_on);
 	}
+	if (state.phase == IDLE && state.status.numbers_on == 1) {
+		// if all systems green - go to next phase
+		state.phase = COUNTDOWN;
+	}
+
 }
+
 static void (**animation_fns)(u16);
 static u8 animation_fn_count;
 
-void renderer_init(void(* animation_functions[])(u16), u8 animation_function_count) {
+void renderer_init(void (*animation_functions[])(u16), u8 animation_function_count) {
 	animation_fns = animation_functions;
 	animation_fn_count = animation_function_count;
 }

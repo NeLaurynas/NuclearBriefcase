@@ -10,6 +10,6 @@
 
 void status_init();
 
-void status_set_on(u8 led, bool on);
+void status_set_on(u8 led, i8 on);
 
 #endif //STATUS_H

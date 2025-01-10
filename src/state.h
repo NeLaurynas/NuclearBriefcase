@@ -11,13 +11,22 @@
 // ENUMS
 
 typedef enum {
-	TARGET,
+	IDLE,
 	COUNTDOWN,
 	ROCKET,
 	EXPLOSION,
 	DARKNESS
-} wsleds_animation_t;
+} phase_t;
 
+// FUNCTIONS
+
+void state_set_0(i8 *number);
+
+bool state_get_bool(i8 number);
+
+void state_set_bool(i8 *number, bool val);
+
+void state_set_minus();
 
 // STATES
 
@@ -35,7 +44,7 @@ typedef struct {
 		i8 numbers_on;
 	} status;
 
-	int another_value;
+	phase_t phase;
 } State;
 
 typedef struct {
@@ -49,11 +58,8 @@ typedef struct {
 	} status;
 
 	struct {
-		wsleds_animation_t animation;
 		bool on_target;
 	} wsleds;
-
-	int another_value;
 } CurrentState;
 
 extern State state;

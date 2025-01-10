@@ -55,7 +55,8 @@ void numbers_init() {
 	dma_channel_claim(MOD_NUM_DMA_CH);
 	dma_channel_config dma_c = dma_channel_get_default_config(MOD_NUM_DMA_CH);
 	channel_config_set_transfer_data_size(&dma_c, DMA_SIZE_16);
-	channel_config_set_read_increment(&dma_c, false); // incr false - we always read from same memory location (array of size 1)
+	channel_config_set_read_increment(&dma_c, false);
+	// incr false - we always read from same memory location (array of size 1)
 	channel_config_set_write_increment(&dma_c, false);
 	channel_config_set_dreq(&dma_c, DREQ_FORCE); // immediately push no matter what
 	dma_channel_configure(MOD_NUM_DMA_CH, &dma_c, &MOD_NUM_PIO->txf[MOD_NUM_SM], buffer, 1, false);

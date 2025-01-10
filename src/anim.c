@@ -7,7 +7,8 @@
 
 #include "utils.h"
 
-u8 anim_color_reduction(const anim_direction_t direction, const u16 frame, u16 frame_count, const float speed, float freq) {
+u8 anim_color_reduction(const anim_direction_t direction, const u16 frame, const u16 frame_count, const float speed,
+                        const float freq) {
 	const u16 divisor = frame_count / freq;
 	const float adjusted_frame = fmod(frame, divisor) * speed;
 

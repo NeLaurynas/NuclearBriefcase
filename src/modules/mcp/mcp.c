@@ -79,7 +79,7 @@ inline u8 cfg_gppu_bank(const u8 data) {
 	return is_bit_set(data, 6) ? C_GPPUB : C_GPPUA;
 }
 
-inline void set_bit(u8* value, const u8 bit, const bool set) {
+inline void set_bit(u8 *value, const u8 bit, const bool set) {
 	if (set) {
 		*value |= (1 << bit);
 	} else {
@@ -148,7 +148,7 @@ bool mcp_is_pin_low(const u8 pinData) {
 	const auto bank = cfg_gpio_bank(pinData);
 	u8 data;
 	const bool first_mcp = address == MOD_MCP_ADDR1;
-	u32* cache_time = first_mcp ? &cache_last_mcp1_gpio : &cache_last_mcp2_gpio;
+	u32 *cache_time = first_mcp ? &cache_last_mcp1_gpio : &cache_last_mcp2_gpio;
 	const bool cache_possible = utils_time_diff_ms(*cache_time, time_us_32()) < MOD_MCP_GPIO_CACHE_MS;
 	const bool first_bank = bank == C_GPIOA;
 
@@ -160,8 +160,8 @@ bool mcp_is_pin_low(const u8 pinData) {
 		const auto newData = read_dual_registers(address, C_GPIOA); // read both A and B registers
 		const u8 bank_a = newData & 0b11111111;
 		const u8 bank_b = (newData >> 8) & 0b11111111;
-		u8* cache_a = first_mcp ? &cache_mcp1_gpioa : &cache_mcp2_gpioa;
-		u8* cache_b = first_mcp ? &cache_mcp1_gpiob : &cache_mcp2_gpiob;
+		u8 *cache_a = first_mcp ? &cache_mcp1_gpioa : &cache_mcp2_gpioa;
+		u8 *cache_b = first_mcp ? &cache_mcp1_gpiob : &cache_mcp2_gpiob;
 
 		*cache_a = bank_a;
 		*cache_b = bank_b;

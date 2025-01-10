@@ -51,9 +51,7 @@ float utils_calculate_pio_clk_div(const float instruction_execution_in_us) {
 }
 
 float utils_calculate_pio_clk_div_ns(const float instruction_execution_in_ns) {
-	const auto frequency_hz = clock_get_hz(clk_sys);
-	const auto clk_div = ((float)frequency_hz * instruction_execution_in_ns) / 1'000'000'000.0f;
-	return clk_div;
+	return utils_calculate_pio_clk_div(instruction_execution_in_ns / 1'000.0f);
 }
 
 inline int32_t utils_time_diff_ms(const u32 start_us, const u32 end_us) {
