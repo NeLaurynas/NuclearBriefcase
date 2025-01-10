@@ -16,6 +16,7 @@ typedef int8_t i8;
 #define DBG true
 
 #define RENDER_TICK 10'000
+#define ANIM_FRAME_COUNT 10'000 // dividers are 1, 2, 4, 5, 8, 10, 16, 20, 25, 40, 50, 80, 100, 125, 200, 250, 400, 500, 625, 1000, 1250, 2000, 2500, 5000, 10000
 
 #define MOD_NUM_DPGROUND1	15
 #define MOD_NUM_DPGROUND2	14

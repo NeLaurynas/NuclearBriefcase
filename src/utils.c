@@ -60,14 +60,15 @@ inline int32_t utils_time_diff_ms(const u32 start_us, const u32 end_us) {
 	return (int32_t)(end_us - start_us) / 1000;
 }
 
-int32_t utils_time_diff_us(u32 start_us, u32 end_us) {
+int32_t utils_time_diff_us(const u32 start_us, const u32 end_us) {
 	return (int32_t)(end_us - start_us);
 }
 
-void utils_error_mode(u8 code) {
+void utils_error_mode(const u8 code) {
 	utils_internal_led(false);
-	u8 long_blink = code / 10;
-	u8 short_blink = code % 10;
+	const u8 long_blink = code / 10;
+	const u8 short_blink = code % 10;
+	// ReSharper disable once CppDFAEndlessLoop
 	for (;;) {
 		for (u8 i = 0; i < long_blink; i++) {
 			utils_internal_led(true);
@@ -90,7 +91,7 @@ void utils_internal_led(const bool on) {
 	gpio_put(INTERNAL_LED, on);
 }
 
-u16 utils_proportional_reduce(u16 number, u16 step, u16 total_steps) {
+u16 utils_proportional_reduce(const u16 number, u16 step, const u16 total_steps) {
 	if (step >= total_steps) step = total_steps;
 	return (float)number / total_steps * step;
 }

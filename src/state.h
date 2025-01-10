@@ -8,6 +8,19 @@
 
 #include "defines/config.h"
 
+// ENUMS
+
+typedef enum {
+	TARGET,
+	COUNTDOWN,
+	ROCKET,
+	EXPLOSION,
+	DARKNESS
+} wsleds_animation_t;
+
+
+// STATES
+
 typedef struct {
 	struct {
 		u8 target;
@@ -35,9 +48,13 @@ typedef struct {
 		i8 numbers_on;
 	} status;
 
+	struct {
+		wsleds_animation_t animation;
+		bool on_target;
+	} wsleds;
+
 	int another_value;
 } CurrentState;
-
 
 extern State state;
 extern CurrentState currentState;

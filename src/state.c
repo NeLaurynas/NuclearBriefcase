@@ -18,4 +18,8 @@ State state = {
 	.another_value = 0
 };
 
-CurrentState currentState = {};
+CurrentState currentState = {
+	.wsleds = {
+		.animation = TARGET,
+	},
+};

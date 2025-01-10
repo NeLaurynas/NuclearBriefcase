@@ -3,7 +3,6 @@
 
 #ifndef MPC_H
 #define MPC_H
-#include <stdint.h>
 
 #include "defines/config.h"
 

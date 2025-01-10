@@ -9,6 +9,8 @@
 
 #include "defines/config.h"
 
+#define ARRAY_SIZE(arr) (sizeof(arr) / sizeof(arr[0])) // will not work for decayed arrays
+
 u32 utils_random_in_range(u32 fromInclusive, u32 toInclusive);
 
 float utils_print_onboard_temp();

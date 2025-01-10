@@ -3,8 +3,6 @@
 
 #include "mcp.h"
 
-#include <stdint.h>
-#include <stdio.h>
 #include <hardware/gpio.h>
 #include <hardware/i2c.h>
 

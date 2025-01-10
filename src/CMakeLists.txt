@@ -18,7 +18,6 @@ pico_sdk_init()
 # Add executable. Default name is the project name, version 0.1
 
 add_executable(NuclearBriefcase main.c
-		defines/gp_masks.h
 		defines/config.h
 		modules/numbers/numbers.c
 		modules/numbers/numbers.h
@@ -36,6 +35,7 @@ add_executable(NuclearBriefcase main.c
 		modules/wsleds/wsleds.h
 		anim.c
 		anim.h
+		modules/wsleds/wsleds_data.h
 )
 
 pico_set_program_name(NuclearBriefcase "NuclearBriefcase")

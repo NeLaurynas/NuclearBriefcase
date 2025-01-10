@@ -21,6 +21,8 @@ void set_state() {
 		state.numbers.btn_pressed = num_btn_pressed;
 		if (num_btn_pressed) {
 			numbers_generate_target();
+			// TODO: debug
+			currentState.wsleds.animation = COUNTDOWN;
 		}
 	}
 
@@ -69,15 +71,22 @@ void render_state() {
 		status_set_on(MOD_STAT_LED_NUMBERS, state.status.numbers_on);
 	}
 }
+static void (**animation_fns)(u16);
+static u8 animation_fn_count;
+
+void renderer_init(void(* animation_functions[])(u16), u8 animation_function_count) {
+	animation_fns = animation_functions;
+	animation_fn_count = animation_function_count;
+}
 
 void renderer_loop() {
 #if DBG
-	int64_t acc_elapsed_us = 0;
+	static int64_t acc_elapsed_us = 0;
 #endif
 
-	u16 anim_frame = 0;
-	bool test = true;
+	static u16 anim_frame = 0;
 
+	// ReSharper disable once CppDFAEndlessLoop
 	for (;;) {
 		// ------------ start
 		const auto start = time_us_32();
@@ -85,10 +94,10 @@ void renderer_loop() {
 		// ------------ work
 		set_state();
 		render_state();
-		wsleds_anim_target();
+		for (u8 i = 0; i < animation_fn_count; i++) animation_fns[i](anim_frame);
 
 		// ------------ end
-		anim_frame = (anim_frame + 1) % 1000;
+		anim_frame = (anim_frame + 1) % ANIM_FRAME_COUNT;
 		utils_internal_led(anim_frame % 100 == 0);
 
 		auto end = time_us_32();
@@ -99,11 +108,6 @@ void renderer_loop() {
 		acc_elapsed_us += (remaining_us + elapsed_us);
 
 		if (acc_elapsed_us >= 10 * 1'000'000) { // 10 seconds
-			if (test == true) {
-				test = false;
-			} else {
-				test = true;
-			}
 			const float elapsed_ms = elapsed_us / 1000.0f;
 			utils_printf("render took: %.2f ms (%ld us)\n", elapsed_ms, elapsed_us);
 			utils_print_onboard_temp();

@@ -11,19 +11,12 @@
 #include <hardware/pio.h>
 
 #include "anim.h"
+#include "state.h"
 #include "utils.h"
+#include "wsleds_data.h"
 #include "defines/config.h"
 
-static constexpr u32 c_yellow = 0b11111111'11111111'00000000;
-static constexpr u32 c_green = 0b00000000'11111111'00000000;
-static constexpr u32 c_red = 0b11111111'00000000'00000000;
-static constexpr u32 c_white = 0b11111111'11111111'11111111;
-static constexpr u32 c_blue = 0b00000000'00000000'11111111;
-static constexpr u32 c_purple = 0b11111111'00000000'11111111;
-static constexpr u32 c_cyan = 0b00000000'11111111'11111111;
-static constexpr u32 c_off = 0b00000000'00000000'00000000;
-
-static u8 line_width = (u8)sqrt(MOD_WSLEDS_LED_COUNT);
+static const u8 line_width = (u8)sqrt(MOD_WSLEDS_LED_COUNT);
 
 u32 reduce_brightness(const u8 reduction, const u32 color) {
 	u8 r = (color >> 16) & 0b11111111;
@@ -40,23 +33,6 @@ u32 reduce_brightness(const u8 reduction, const u32 color) {
 static u32 buffer[MOD_WSLEDS_LED_COUNT] = { 0 };
 
 void wsleds_init() {
-	// init flag (which is hardcoded for 64 leds kek)
-	// @formatter:off
-	// auto border_color = c_off;
-	//
-	// const u32 data[MOD_WSLEDS_LED_COUNT] = {
-	// 	border_color, border_color, border_color, border_color, border_color, border_color, border_color, border_color,
-	// 	c_yellow, c_yellow, c_yellow, c_yellow, c_yellow, c_yellow,	c_yellow, c_yellow,
-	// 	c_yellow, c_yellow, c_yellow,	c_yellow, c_yellow, c_yellow,	c_yellow, c_yellow,
-	// 	c_green, c_green, c_green, c_green,	c_green, c_green, c_green, c_green,
-	// 	c_green, c_green, c_green, c_green,	c_green, c_green, c_green, c_green,
-	// 	c_red, c_red, c_red, c_red,	c_red, c_red, c_red, c_red,
-	// 	c_red, c_red, c_red, c_red,	c_red, c_red, c_red, c_red,
-	// 	border_color, border_color, border_color, border_color, border_color, border_color, border_color, border_color,
-	// };
-	// @formatter:on
-	// memcpy(buffer, data, sizeof(data));
-
 	// init DMA
 	if (dma_channel_is_claimed(MOD_WSLEDS_DMA_CH)) utils_error_mode(25);
 	dma_channel_claim(MOD_WSLEDS_DMA_CH);
@@ -89,35 +65,15 @@ void wsleds_transfer() {
 	dma_channel_transfer_from_buffer_now(MOD_WSLEDS_DMA_CH, buffer, MOD_WSLEDS_LED_COUNT);
 }
 
-void wsleds_anim_flag() {
-	static u8 brightness = 0;
-	for (u8 i = 8; i < 56; i++) {
-		switch (i) {
-		case 8 ... 23: buffer[i] = reduce_brightness(brightness + i - i / 2, c_yellow);
-			break;
-
-		case 24 ... 39: buffer[i] = reduce_brightness(brightness + i - i / 2, c_green);
-			break;
-
-		case 40 ... 55: buffer[i] = reduce_brightness(brightness + i - i / 2, c_red);
-			break;
-
-		default: break;
-		}
-	}
-	wsleds_transfer();
-	brightness = brightness + 1;
-}
-
-inline u8 x_led_start(u8 x_line) {
+inline u8 x_led_start(const u8 x_line) {
 	return x_line * line_width;
 }
 
-inline u8 get_line_x(u8 dot) {
+inline u8 get_line_x(const u8 dot) {
 	return dot / line_width;
 }
 
-inline u8 get_line_y(u8 dot) {
+inline u8 get_line_y(const u8 dot) {
 	return dot % line_width;
 }
 
@@ -125,7 +81,7 @@ static u8 get_led_from_lines(const u8 x_line, const u8 y_line) {
 	return line_width * y_line + x_line;
 }
 
-void wsleds_anim_target() {
+void anim_target() {
 	static bool init = false;
 	static u8 target_dot = 0;
 	static u8 x_line = 0;
@@ -137,8 +93,6 @@ void wsleds_anim_target() {
 	static constexpr u16 FRAME_TICKS = 975;
 	static constexpr u16 FRAME_TICK_DIVIDER = 75;
 	static u8 freeze_frames = 0;
-	static float x_steps_per_step = 0;
-	static float y_steps_per_step = 0;
 
 	if (!init) {
 		target_dot = get_led_from_lines(utils_random_in_range(1, 6), utils_random_in_range(1, 6));
@@ -150,7 +104,7 @@ void wsleds_anim_target() {
 	memset(buffer, 0, sizeof(buffer));
 
 	// render target dot
-	buffer[target_dot] = reduce_brightness(anim_color_reduction(TO_DIM, frame, FRAME_TICKS, 1.5f, 10), c_blue);
+	buffer[target_dot] = reduce_brightness(anim_color_reduction(TO_DIM, frame, FRAME_TICKS, 1.5f, 10), COLOR_CYAN);
 
 	// render X
 	for (u8 i = 0; i < line_width; i++) {
@@ -158,28 +112,31 @@ void wsleds_anim_target() {
 		const u8 y_led = y_line + i * line_width;
 		if (x_line == get_line_x(target_dot) && y_line == get_line_y(target_dot)) {
 			// on target - blink green
-			buffer[x_led] = reduce_brightness(anim_color_reduction(TO_DIM, frame, FRAME_TICKS, 1.0f, 10), c_green);
+			currentState.wsleds.on_target = true;
+			buffer[x_led] = reduce_brightness(anim_color_reduction(TO_DIM, frame, FRAME_TICKS, 1.0f, 10), COLOR_GREEN);
 			buffer[y_led] = buffer[x_led];
 		} else {
 			// blink dot over red lines
-			buffer[x_led] = get_line_x(x_led) == get_line_x(target_dot) && get_line_y(x_led) == get_line_y(target_dot) &&
+			currentState.wsleds.on_target = false;
+			buffer[x_led] = get_line_x(x_led) == get_line_x(target_dot) && get_line_y(x_led) == get_line_y(target_dot)
+				&&
 				buffer[target_dot] != 0
 				? buffer[target_dot]
-				: c_red;
-			buffer[y_led] = get_line_x(y_led) == get_line_x(target_dot) && get_line_y(y_led) == get_line_y(target_dot) &&
+				: COLOR_RED;
+			buffer[y_led] = get_line_x(y_led) == get_line_x(target_dot) && get_line_y(y_led) == get_line_y(target_dot)
+				&&
 				buffer[target_dot] != 0
 				? buffer[target_dot]
-				: c_red;
+				: COLOR_RED;
 		}
 	}
 
 	if (frame % FRAME_TICK_DIVIDER == 0) {
 		if (get_line_x(target_dot) == x_line && get_line_y(target_dot) == y_line) {
 			if (freeze_frames == 0) {
-				freeze_frames = 5;
+				freeze_frames = 6;
 			}
 			if (freeze_frames == 1) {
-				// target_dot = get_led_from_lines(utils_random_in_range(1, 6), utils_random_in_range(1, 6));
 				target_dot = utils_random_in_range(0, 63);
 				freeze_frames = 0;
 			} else {
@@ -217,4 +174,67 @@ void wsleds_anim_target() {
 end:
 	frame = (frame + 1) % FRAME_TICKS;
 	wsleds_transfer();
+}
+
+void anim_countdown() {
+	static bool init = false;
+	static i8 number = 0;
+	static u16 frame = 0;
+	static constexpr u16 FRAME_TICKS = 100; // every second
+
+	if (!init) {
+		number = 9;
+		frame = 0;
+		init = true;
+	}
+
+	if (number == -2) {
+		// deinit
+		init = false;
+		currentState.wsleds.animation = TARGET;
+		memset(buffer, 0, sizeof(buffer));
+		wsleds_transfer();
+		return;
+	}
+
+	if (frame % FRAME_TICKS == 0) {
+		if (number >= 0) memcpy(buffer, NUMBERS[number], sizeof(buffer));
+		number--;
+	}
+	for (u8 i = 0; i < MOD_WSLEDS_LED_COUNT; i++) { // why use led count config, when a lot assumes it's 8x8...
+		if (buffer[i] == 0) continue;
+
+		u32 color = COLOR_RED;
+		switch (number + 1) {
+			case 0:
+			case 1:
+			case 2:
+				color = COLOR_GREEN;
+				break;
+			case 3:
+			case 4:
+			case 5:
+				color = COLOR_YELLOW;
+				break;
+		}
+
+		buffer[i] = reduce_brightness(anim_color_reduction(TO_DIM, frame, FRAME_TICKS, 1.00f, 1), color);
+	}
+
+	wsleds_transfer();
+
+	frame = (frame + 1) % FRAME_TICKS;
+}
+
+void wsleds_animation(const u16 frame) {
+	switch (currentState.wsleds.animation) {
+		case TARGET:
+			anim_target();
+			break;
+		case COUNTDOWN:
+			anim_countdown();
+			break;
+		default:
+			break;
+	}
 }

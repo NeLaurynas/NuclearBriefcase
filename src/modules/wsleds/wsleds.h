@@ -3,13 +3,12 @@
 
 #ifndef WSLEDS_H
 #define WSLEDS_H
+#include "defines/config.h"
 
 void wsleds_init();
 
 void wsleds_transfer();
 
-void wsleds_anim_flag();
-
-void wsleds_anim_target();
+void wsleds_animation(u16 frame);
 
 #endif //WSLEDS_H

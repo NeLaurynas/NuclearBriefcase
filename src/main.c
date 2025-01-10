@@ -20,6 +20,9 @@ int main() {
 	gpio_init(INTERNAL_LED);
 	gpio_set_dir(INTERNAL_LED, GPIO_OUT);
 
+	static void (*animation_functions[])(u16) = { wsleds_animation };
+	static u8 anim_fn_size = ARRAY_SIZE(animation_functions);
+
 #if DBG
 	stdio_init_all(); // only for serial over usb - printf
 	sleep_ms(2000);
@@ -31,7 +34,9 @@ int main() {
 	wsleds_init();
 	mcp_init();
 	numbers_init();
-	status_init(); // init last, needs other modules up and running
+	status_init();
+
+	renderer_init(animation_functions, anim_fn_size);
 
 	adc_init();
 	adc_set_temp_sensor_enabled(true);
