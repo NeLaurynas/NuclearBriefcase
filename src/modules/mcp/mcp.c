@@ -108,15 +108,15 @@ void mcp_cfg_set_pull_up(u8 pinData, bool pull_up) {
 }
 
 void setup_bank_configuration(const u8 address, const u8 regist) {
-	u8 ioconData = 0;
-	set_bit(&ioconData, C_IOCON_BANK_BIT, false); // set to Bank Mode 0
-	set_bit(&ioconData, C_IOCON_MIRROR_BIT, false);
-	set_bit(&ioconData, C_IOCON_SEQOP_BIT, false);
-	set_bit(&ioconData, C_IOCON_DISSLW_BIT, false);
-	set_bit(&ioconData, C_IOCON_HAEN_BIT, false);
-	set_bit(&ioconData, C_IOCON_ODR_BIT, false);
-	set_bit(&ioconData, C_IOCON_INTPOL_BIT, false);
-	write_register(address, regist, ioconData);
+	u8 iocon_data = 0;
+	set_bit(&iocon_data, C_IOCON_BANK_BIT, false); // set to Bank Mode 0
+	set_bit(&iocon_data, C_IOCON_MIRROR_BIT, false);
+	set_bit(&iocon_data, C_IOCON_SEQOP_BIT, false);
+	set_bit(&iocon_data, C_IOCON_DISSLW_BIT, false);
+	set_bit(&iocon_data, C_IOCON_HAEN_BIT, false);
+	set_bit(&iocon_data, C_IOCON_ODR_BIT, false);
+	set_bit(&iocon_data, C_IOCON_INTPOL_BIT, false);
+	write_register(address, regist, iocon_data);
 }
 
 void mcp_init() {
@@ -157,9 +157,9 @@ bool mcp_is_pin_low(const u8 pinData) {
 	} else if (!first_mcp && cache_possible) {
 		data = (first_bank ? cache_mcp2_gpioa : cache_mcp2_gpiob);
 	} else {
-		const auto newData = read_dual_registers(address, C_GPIOA); // read both A and B registers
-		const u8 bank_a = newData & 0b11111111;
-		const u8 bank_b = (newData >> 8) & 0b11111111;
+		const auto new_data = read_dual_registers(address, C_GPIOA); // read both A and B registers
+		const u8 bank_a = new_data & 0b11111111;
+		const u8 bank_b = (new_data >> 8) & 0b11111111;
 		u8 *cache_a = first_mcp ? &cache_mcp1_gpioa : &cache_mcp2_gpioa;
 		u8 *cache_b = first_mcp ? &cache_mcp1_gpiob : &cache_mcp2_gpiob;
 
