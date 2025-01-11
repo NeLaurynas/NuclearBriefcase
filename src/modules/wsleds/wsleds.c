@@ -65,19 +65,19 @@ void wsleds_init() {
 	// buffer_transfer();
 }
 
-inline u8 x_led_start(const u8 x_line) {
+static inline u8 x_led_start(const u8 x_line) {
 	return x_line * line_width;
 }
 
-inline u8 get_line_x(const u8 dot) {
+static inline u8 get_line_x(const u8 dot) {
 	return dot / line_width;
 }
 
-inline u8 get_line_y(const u8 dot) {
+static inline u8 get_line_y(const u8 dot) {
 	return dot % line_width;
 }
 
-static u8 get_led_from_lines(const u8 x_line, const u8 y_line) {
+static inline u8 get_led_from_lines(const u8 x_line, const u8 y_line) {
 	return line_width * y_line + x_line;
 }
 
