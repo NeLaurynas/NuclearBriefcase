@@ -68,6 +68,7 @@ void utils_error_mode(const u8 code) {
 	const u8 short_blink = code % 10;
 	// ReSharper disable once CppDFAEndlessLoop
 	for (;;) {
+		utils_printf("!!! ERROR MODE: %d\n", code);
 		for (u8 i = 0; i < long_blink; i++) {
 			utils_internal_led(true);
 			sleep_ms(500);
