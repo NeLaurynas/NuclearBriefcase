@@ -81,13 +81,12 @@ static inline u8 get_led_from_lines(const u8 x_line, const u8 y_line) {
 	return line_width * y_line + x_line;
 }
 
-void rotate_buffer_left(u8 times) {
+void rotate_buffer_left(const u8 times) {
 	static u32 temp[MOD_WSLEDS_LED_COUNT] = { 0 };
 	if (times == 0) return;
 
 	for (u8 t = 0; t < times; t++) {
-		for (u8 i = 0; i < 8; i++)
-			for (u8 j = 0; j < 8; j++) temp[(7 - j) * 8 + i] = buffer[i * 8 + j];
+		for (u8 i = 0; i < 8; i++) for (u8 j = 0; j < 8; j++) temp[(7 - j) * 8 + i] = buffer[i * 8 + j];
 
 		for (u8 i = 0; i < MOD_WSLEDS_LED_COUNT; i++) {
 			buffer[i] = temp[i];
@@ -219,18 +218,10 @@ void anim_countdown() {
 		if (buffer[i] == 0) continue;
 
 		u32 color = COLOR_RED;
-		// ReSharper disable once CppDefaultCaseNotHandledInSwitchStatement
-		switch (number + 1) {
-			case 0:
-			case 1:
-			case 2:
-				color = COLOR_GREEN;
-				break;
-			case 3:
-			case 4:
-			case 5:
-				color = COLOR_YELLOW;
-				break;
+		if (number + 1 >= 0 && number + 1 <= 2) {
+			color = COLOR_GREEN;
+		} else if (number + 1 >= 3 && number + 1 <= 5) {
+			color = COLOR_YELLOW;
 		}
 
 		buffer[i] = reduce_brightness(anim_color_reduction(TO_DIM, frame, FRAME_TICKS, 1.00f, 1), color);
@@ -240,7 +231,7 @@ void anim_countdown() {
 	frame = (frame + 1) % FRAME_TICKS;
 }
 
-inline void fill_ring_with_color(const u8 *ring, const u8 size, const u32 color) {
+static inline void fill_ring_with_color(const u8 *ring, const u8 size, const u32 color) {
 	for (u8 i = 0; i < size; i++) {
 		buffer[ring[i]] = color;
 	}
@@ -298,10 +289,13 @@ void anim_explosion() {
 void wsleds_animation(const u16 frame) {
 	switch (state.phase) {
 		case IDLE:
-			anim_explosion();
+			anim_target();
 			break;
 		case COUNTDOWN:
 			anim_countdown();
+			break;
+		case EXPLOSION:
+			anim_explosion();
 			break;
 		default:
 			break;
