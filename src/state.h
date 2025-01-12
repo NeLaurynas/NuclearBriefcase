@@ -13,7 +13,6 @@
 typedef enum {
 	IDLE,
 	COUNTDOWN,
-	ROCKET,
 	EXPLOSION,
 	DARKNESS
 } phase_t;

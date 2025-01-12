@@ -50,7 +50,7 @@ void wsleds_init() {
 	sleep_ms(1);
 
 	// get clock divider
-	const auto clk_div = utils_calculate_pio_clk_div_ns(87);
+	const auto clk_div = utils_calculate_pio_clk_div_ns(90);
 	utils_printf("WSLEDS PIO CLK DIV: %f\n", clk_div);
 
 	// init PIO
@@ -79,6 +79,20 @@ static inline u8 get_line_y(const u8 dot) {
 
 static inline u8 get_led_from_lines(const u8 x_line, const u8 y_line) {
 	return line_width * y_line + x_line;
+}
+
+void rotate_buffer_left(u8 times) {
+	static u32 temp[MOD_WSLEDS_LED_COUNT] = { 0 };
+	if (times == 0) return;
+
+	for (u8 t = 0; t < times; t++) {
+		for (u8 i = 0; i < 8; i++)
+			for (u8 j = 0; j < 8; j++) temp[(7 - j) * 8 + i] = buffer[i * 8 + j];
+
+		for (u8 i = 0; i < MOD_WSLEDS_LED_COUNT; i++) {
+			buffer[i] = temp[i];
+		}
+	}
 }
 
 void anim_target() {
@@ -191,10 +205,9 @@ void anim_countdown() {
 	if (number == -2) {
 		// deinit
 		init = false;
-		state.phase = IDLE; // TODO: explosion
+		state.phase = EXPLOSION;
 		memset(buffer, 0, sizeof(buffer));
 		buffer_transfer();
-		state_set_minus();
 		return;
 	}
 
@@ -227,10 +240,65 @@ void anim_countdown() {
 	frame = (frame + 1) % FRAME_TICKS;
 }
 
+inline void fill_ring_with_color(const u8 *ring, const u8 size, const u32 color) {
+	for (u8 i = 0; i < size; i++) {
+		buffer[ring[i]] = color;
+	}
+}
+
+void anim_explosion() {
+	static bool init = false;
+	static i8 number = 0;
+	static u8 rotation = 0;
+	static u8 ring0_loc[1] = { 27 };
+	static u8 ring1_loc[5] = { 19, 26, 28, 35, 36 };
+	static u8 ring2_loc[9] = { 11, 18, 20, 25, 29, 34, 37, 43, 44 };
+	static u8 ring3_loc[13] = { 3, 10, 12, 17, 21, 24, 30, 33, 38, 42, 45, 51, 52 };
+	static u8 ring4_loc[15] = { 2, 4, 9, 13, 16, 22, 31, 32, 39, 41, 46, 50, 53, 59, 60 };
+	static u8 ring5_loc[11] = { 1, 5, 8, 14, 23, 40, 47, 49, 54, 58, 61 };
+	static u8 ring6_loc[10] = { 0, 6, 7, 15, 48, 55, 56, 57, 62, 63 };
+	static u16 frame = 0;
+	static constexpr u16 FRAME_TICKS = 100; // every second
+
+	if (!init) {
+		number = 9;
+		frame = 0;
+		init = true;
+		rotation = utils_random_in_range(0, 3);
+		// ring0[1]
+	}
+
+	if (number == -2) {
+		// deinit
+		init = false;
+		state.phase = EXPLOSION;
+		memset(buffer, 0, sizeof(buffer));
+		buffer_transfer();
+		state_set_minus(); // TODO - move to darkness...
+		return;
+	}
+
+	// color test
+	fill_ring_with_color(ring0_loc, ARRAY_SIZE(ring0_loc), COLOR_WHITE);
+	fill_ring_with_color(ring1_loc, ARRAY_SIZE(ring1_loc), COLOR_RED);
+	fill_ring_with_color(ring2_loc, ARRAY_SIZE(ring2_loc), COLOR_ORANGE);
+	fill_ring_with_color(ring3_loc, ARRAY_SIZE(ring3_loc), COLOR_YELLOW);
+	fill_ring_with_color(ring4_loc, ARRAY_SIZE(ring4_loc), COLOR_WHITE);
+	fill_ring_with_color(ring5_loc, ARRAY_SIZE(ring5_loc), COLOR_CYAN);
+	fill_ring_with_color(ring6_loc, ARRAY_SIZE(ring6_loc), COLOR_BLUE);
+
+	if (frame % FRAME_TICKS == 0) {
+	}
+
+	frame = (frame + 1) % FRAME_TICKS;
+	rotate_buffer_left(rotation);
+	buffer_transfer();
+}
+
 void wsleds_animation(const u16 frame) {
 	switch (state.phase) {
 		case IDLE:
-			anim_target();
+			anim_explosion();
 			break;
 		case COUNTDOWN:
 			anim_countdown();
