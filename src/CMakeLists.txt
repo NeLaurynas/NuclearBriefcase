@@ -44,10 +44,24 @@ pico_set_program_version(NuclearBriefcase "0.1")
 get_target_property(PICO_STD_INCLUDE pico_stdlib INTERFACE_INCLUDE_DIRECTORIES)
 
 target_compile_options(NuclearBriefcase PRIVATE
+		$<$<CONFIG:Debug>:
+		-Og
+		-g
+		#-Wall
+		#-Wextra
+		#-Winline
+		#-Werror
+		-Wno-error=old-style-declaration
+		-mcpu=cortex-m33
+		-mfpu=fpv5-sp-d16
+		-mthumb
+		>
+
+		$<$<CONFIG:Release>:
 		-Wall
 		-Wextra
 		-Winline
-#		-Werror
+		#-Werror
 		-Wno-error=old-style-declaration
 		-O3
 		-s
@@ -55,6 +69,7 @@ target_compile_options(NuclearBriefcase PRIVATE
 		-mcpu=cortex-m33
 		-mfpu=fpv5-sp-d16
 		-mthumb
+		>
 )
 
 target_compile_options(NuclearBriefcase PRIVATE
@@ -72,8 +87,15 @@ pico_generate_pio_header(NuclearBriefcase ${CMAKE_CURRENT_LIST_DIR}/modules/numb
 pico_generate_pio_header(NuclearBriefcase ${CMAKE_CURRENT_LIST_DIR}/modules/wsleds/pio_wsleds.pio)
 
 # Modify the below lines to enable/disable output over UART/USB
-pico_enable_stdio_uart(NuclearBriefcase 0)
-pico_enable_stdio_usb(NuclearBriefcase 1)
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+	pico_enable_stdio_uart(NuclearBriefcase 1)
+	pico_enable_stdio_usb(NuclearBriefcase 0)
+elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
+	pico_enable_stdio_uart(NuclearBriefcase 0)
+	pico_enable_stdio_usb(NuclearBriefcase 1)
+else()
+	message(WARNING "Unhandled build type: ${CMAKE_BUILD_TYPE}")
+endif()
 
 # Add the standard library to the build
 target_link_libraries(NuclearBriefcase
@@ -91,12 +113,15 @@ target_link_libraries(NuclearBriefcase
 		hardware_adc
 		hardware_dma
 		pico_rand
+		$<$<CONFIG:Debug>:hardware_uart>
 )
 
 pico_add_extra_outputs(NuclearBriefcase)
 
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
 add_custom_command(
 		TARGET NuclearBriefcase
 		POST_BUILD
 		COMMAND /usr/bin/picotool load -f NuclearBriefcase.uf2
 )
+endif ()

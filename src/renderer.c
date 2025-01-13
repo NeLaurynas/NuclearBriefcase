@@ -22,6 +22,8 @@ void set_state() {
 	if (state.numbers.btn_pressed != num_btn_pressed) {
 		state.numbers.btn_pressed = num_btn_pressed;
 		if (num_btn_pressed) numbers_generate_target();
+		// TODO: debug
+		if (num_btn_pressed) state.phase = EXPLOSION;
 	}
 
 	// potential refactor...
@@ -58,7 +60,7 @@ void set_state() {
 void render_state() {
 	// Numbers module
 	if (state.numbers.number != currentState.numbers.number || state.numbers.target != currentState.numbers.target
-		|| state.status.numbers_on == -1) {
+		|| state.status.numbers_on == -1) { // well this needlessly renders numbers...
 		currentState.numbers.number = state.numbers.number;
 		currentState.numbers.target = state.numbers.target;
 
@@ -140,6 +142,8 @@ void renderer_loop() {
 #endif
 
 		if (remaining_us > 0) sleep_us(remaining_us);
+#if !DBG
 		else utils_error_mode(66); // shouldn't even take 1 ms, let alone 10, something's wrong...
+#endif
 	}
 }

@@ -57,7 +57,7 @@ typedef int8_t i8;
 #define MOD_WSLEDS_PIO			pio0
 #define MOD_WSLEDS_SM			1
 #define MOD_WSLEDS_DMA_CH		1
-#define MOD_WSLEDS_PIN			0 // GP0
+#define MOD_WSLEDS_PIN			2 // GP2
 
 #define INTERNAL_LED 25
 

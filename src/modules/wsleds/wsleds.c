@@ -50,7 +50,7 @@ void wsleds_init() {
 	sleep_ms(1);
 
 	// get clock divider
-	const auto clk_div = utils_calculate_pio_clk_div_ns(90);
+	const auto clk_div = utils_calculate_pio_clk_div_ns(92);
 	utils_printf("WSLEDS PIO CLK DIV: %f\n", clk_div);
 
 	// init PIO
@@ -199,6 +199,7 @@ void anim_countdown() {
 		number = 9;
 		frame = 0;
 		init = true;
+		memset(buffer, 0, sizeof(buffer));
 	}
 
 	if (number == -2) {
@@ -248,37 +249,45 @@ void anim_explosion() {
 	static u8 ring4_loc[15] = { 2, 4, 9, 13, 16, 22, 31, 32, 39, 41, 46, 50, 53, 59, 60 };
 	static u8 ring5_loc[11] = { 1, 5, 8, 14, 23, 40, 47, 49, 54, 58, 61 };
 	static u8 ring6_loc[10] = { 0, 6, 7, 15, 48, 55, 56, 57, 62, 63 };
+	static u32 ring_colors[7] = {COLOR_RED, COLOR_ORANGE, COLOR_YELLOW, COLOR_WHITE, COLOR_YELLOW, COLOR_ORANGE, COLOR_RED};
 	static u16 frame = 0;
+	static u8 stages = 12;
 	static constexpr u16 FRAME_TICKS = 100; // every second
 
 	if (!init) {
-		number = 9;
+		number = (i8)stages;
 		frame = 0;
 		init = true;
 		rotation = utils_random_in_range(0, 3);
-		// ring0[1]
+		memset(buffer, 0, sizeof(buffer));
 	}
 
-	if (number == -2) {
+	if (number == -1) {
 		// deinit
 		init = false;
 		state.phase = EXPLOSION;
 		memset(buffer, 0, sizeof(buffer));
 		buffer_transfer();
-		state_set_minus(); // TODO - move to darkness...
+		state_set_minus();
+		state.phase = IDLE; // TODO - move to darkness...
 		return;
 	}
 
 	// color test
-	fill_ring_with_color(ring0_loc, ARRAY_SIZE(ring0_loc), COLOR_WHITE);
-	fill_ring_with_color(ring1_loc, ARRAY_SIZE(ring1_loc), COLOR_RED);
-	fill_ring_with_color(ring2_loc, ARRAY_SIZE(ring2_loc), COLOR_ORANGE);
-	fill_ring_with_color(ring3_loc, ARRAY_SIZE(ring3_loc), COLOR_YELLOW);
-	fill_ring_with_color(ring4_loc, ARRAY_SIZE(ring4_loc), COLOR_WHITE);
-	fill_ring_with_color(ring5_loc, ARRAY_SIZE(ring5_loc), COLOR_CYAN);
-	fill_ring_with_color(ring6_loc, ARRAY_SIZE(ring6_loc), COLOR_BLUE);
+	// fill_ring_with_color(ring0_loc, ARRAY_SIZE(ring0_loc), COLOR_WHITE);
+	// fill_ring_with_color(ring1_loc, ARRAY_SIZE(ring1_loc), COLOR_RED);
+	// fill_ring_with_color(ring2_loc, ARRAY_SIZE(ring2_loc), COLOR_ORANGE);
+	// fill_ring_with_color(ring3_loc, ARRAY_SIZE(ring3_loc), COLOR_YELLOW);
+	// fill_ring_with_color(ring4_loc, ARRAY_SIZE(ring4_loc), COLOR_WHITE);
+	// fill_ring_with_color(ring5_loc, ARRAY_SIZE(ring5_loc), COLOR_CYAN);
+	// fill_ring_with_color(ring6_loc, ARRAY_SIZE(ring6_loc), COLOR_BLUE);
 
 	if (frame % FRAME_TICKS == 0) {
+		const u8 stage = (u8)abs(number - stages);
+		utils_printf("Stage: %d\n", stage);
+
+
+		number--;
 	}
 
 	frame = (frame + 1) % FRAME_TICKS;
