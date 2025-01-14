@@ -34,12 +34,12 @@ void set_state() {
 			state.numbers.last_encoder_change = time_us_32(); // TODO: change in other paths for debounce?
 			if (num_enc1 == true && num_enc2 == false) {
 				numbers_dec();
-				state_set_0(&state.status.numbers_on);
+				state_set_0_if_possible(&state.status.numbers_on);
 				state.numbers.last_encoder_incrementing = false;
 				state.numbers.last_encoder_decrementing = true;
 			} else if (num_enc1 == false && num_enc2 == true) {
 				numbers_inc();
-				state_set_0(&state.status.numbers_on);
+				state_set_0_if_possible(&state.status.numbers_on);
 				state.numbers.last_encoder_incrementing = true;
 				state.numbers.last_encoder_decrementing = false;
 			}
@@ -54,24 +54,23 @@ void set_state() {
 	}
 
 	// Status module
-	state_set_bool(&state.status.numbers_on, state.numbers.target == state.numbers.number);
+	state_set_bool_if_possible(&state.status.numbers_on, state.numbers.target == state.numbers.number);
 }
 
 void render_state() {
 	// Numbers module
-	if (state.numbers.number != currentState.numbers.number || state.numbers.target != currentState.numbers.target
-		|| state.status.numbers_on == -1) { // well this needlessly renders numbers...
+	if (state.numbers.number != currentState.numbers.number || state.numbers.target != currentState.numbers.target) {
 		currentState.numbers.number = state.numbers.number;
 		currentState.numbers.target = state.numbers.target;
 
 		numbers_display(state.numbers.number, state.numbers.target);
-		numbers_ok(state_get_bool(state.status.numbers_on));
 	}
 
 	// Status module
 	if (state.status.numbers_on != currentState.status.numbers_on) {
 		currentState.status.numbers_on = state.status.numbers_on;
 		status_set_on(MOD_STAT_LED_NUMBERS, state.status.numbers_on);
+		numbers_ok(state_get_bool(state.status.numbers_on));
 	}
 	if (state.phase == IDLE && state.status.numbers_on == 1) {
 		// if all systems green - go to next phase

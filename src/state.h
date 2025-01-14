@@ -19,11 +19,11 @@ typedef enum {
 
 // FUNCTIONS
 
-void state_set_0(i8 *number);
+void state_set_0_if_possible(i8 *number);
 
 bool state_get_bool(i8 number);
 
-void state_set_bool(i8 *number, bool val);
+void state_set_bool_if_possible(i8 *number, bool val);
 
 void state_set_minus();
 
@@ -31,8 +31,8 @@ void state_set_minus();
 
 typedef struct {
 	struct {
-		u8 target;
-		u8 number;
+		i8 target;
+		i8 number;
 		bool btn_pressed;
 		u32 last_encoder_change;
 		bool last_encoder_incrementing;

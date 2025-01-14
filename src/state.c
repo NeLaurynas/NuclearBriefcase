@@ -21,7 +21,7 @@ State state = {
 
 CurrentState currentState = { };
 
-void state_set_0(i8 *number) {
+void state_set_0_if_possible(i8 *number) {
 	if (*number < 0) *number = 0;
 }
 
@@ -29,7 +29,7 @@ inline bool state_get_bool(const i8 number) {
 	return number > 0;
 }
 
-void state_set_bool(i8 *number, const bool val) {
+void state_set_bool_if_possible(i8 *number, const bool val) {
 	if (*number < 0) return;
 	*number = val;
 }

@@ -135,6 +135,7 @@ void mcp_init() {
 	sleep_ms(1);
 }
 
+// TODO: cache like is_pin_low and then don't forget to flush? // takes 0.2-0.3 ms per call at 12mhz....
 void mcp_set_out(const u8 pinData, const bool out) {
 	const auto address = cfg_address(pinData);
 	const auto bank = cfg_gpio_bank(pinData);

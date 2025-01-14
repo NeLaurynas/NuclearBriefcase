@@ -50,7 +50,7 @@ void wsleds_init() {
 	sleep_ms(1);
 
 	// get clock divider
-	const auto clk_div = utils_calculate_pio_clk_div_ns(92);
+	const auto clk_div = utils_calculate_pio_clk_div_ns(98);
 	utils_printf("WSLEDS PIO CLK DIV: %f\n", clk_div);
 
 	// init PIO
@@ -103,6 +103,7 @@ void anim_target() {
 	static u8 y_steps = 0;
 	static u8 current_step = 0;
 	static u16 frame = 1;
+	static u16 green_x_frame = 0;
 	static constexpr u16 FRAME_TICKS = 975;
 	static constexpr u16 FRAME_TICK_DIVIDER = 75;
 	static u8 freeze_frames = 0;
@@ -126,10 +127,10 @@ void anim_target() {
 		if (x_line == get_line_x(target_dot) && y_line == get_line_y(target_dot)) {
 			// on target - blink green
 			currentState.wsleds.on_target = true;
-			buffer[x_led] = reduce_brightness(anim_color_reduction(TO_DIM, frame, FRAME_TICKS, 1.0f, 10), COLOR_GREEN);
-			buffer[y_led] = buffer[x_led];
+			buffer[y_led] = buffer[x_led] = reduce_brightness(anim_color_reduction(TO_DIM, green_x_frame, FRAME_TICKS, 1.0f, 10),
+			                                                  COLOR_GREEN);
 		} else {
-			// blink dot over red lines
+			// show red blink dot over red lines
 			currentState.wsleds.on_target = false;
 			buffer[x_led] = get_line_x(x_led) == get_line_x(target_dot) && get_line_y(x_led) == get_line_y(target_dot)
 				&&
@@ -152,15 +153,16 @@ void anim_target() {
 			if (freeze_frames == 1) {
 				target_dot = utils_random_in_range(0, 63);
 				freeze_frames = 0;
+				green_x_frame = 0;
 			} else {
 				freeze_frames--;
-				goto end;
+ 				goto end;
 			}
 			// calculate steps to take per frame for X
 			x_steps = abs((i8)get_line_x(target_dot) - x_line);
 			y_steps = abs((i8)get_line_y(target_dot) - y_line);
 			current_step = 0;
-			goto end;
+			goto end; // transfers maybe reduced green
 		}
 		if (x_steps != 0 || y_steps != 0) {
 			const auto max_steps = (x_steps > y_steps ? x_steps : y_steps);
@@ -184,8 +186,10 @@ void anim_target() {
 			}
 		}
 	}
+
 end:
 	frame = (frame + 1) % FRAME_TICKS;
+	if (x_line == get_line_x(target_dot) && y_line == get_line_y(target_dot)) green_x_frame = (green_x_frame + 1) % FRAME_TICKS;
 	buffer_transfer();
 }
 
@@ -240,7 +244,7 @@ static inline void fill_ring_with_color(const u8 *ring, const u8 size, const u32
 
 void anim_explosion() {
 	static bool init = false;
-	static i8 number = 0;
+	static i8 stage = 0;
 	static u8 rotation = 0;
 	static u8 ring0_loc[1] = { 27 };
 	static u8 ring1_loc[5] = { 19, 26, 28, 35, 36 };
@@ -251,20 +255,19 @@ void anim_explosion() {
 	static u8 ring6_loc[10] = { 0, 6, 7, 15, 48, 55, 56, 57, 62, 63 };
 	static u32 ring_colors[7] = { COLOR_RED, COLOR_ORANGE, COLOR_YELLOW, COLOR_WHITE, COLOR_YELLOW, COLOR_ORANGE,
 	                              COLOR_RED };
-	static u32 frame = 0;
-	static u32 max_frame = 0;
+	static u16 frame = 0;
 	static u8 stages = 13;
 	static constexpr u16 FRAME_TICKS = 100; // every second
 
 	if (!init) {
-		number = (i8)stages;
+		stage = 0;
 		frame = 0;
 		init = true;
 		rotation = utils_random_in_range(0, 3);
 		memset(buffer, 0, sizeof(buffer));
 	}
 
-	if (number == -1) {
+	if (stage == 14) {
 		// deinit
 		init = false;
 		state.phase = EXPLOSION;
@@ -272,11 +275,9 @@ void anim_explosion() {
 		buffer_transfer();
 		state_set_minus();
 		state.phase = IDLE; // TODO - move to darkness...
-		utils_printf("MAX FRAME: %d\n", max_frame);
 		return;
 	}
 
-	const u8 stage = abs(number - stages);
 	const bool expanding = stage <= 6;
 
 	// render colors
@@ -290,22 +291,35 @@ void anim_explosion() {
 			if (stage >= 5 && stage <= 6) fill_ring_with_color(ring5_loc, ARRAY_SIZE(ring5_loc), ring_colors[stage - 5]);
 			if (stage == 6) fill_ring_with_color(ring6_loc, ARRAY_SIZE(ring6_loc), ring_colors[stage - 6]);
 		}
-
-		number--;
+		utils_printf("Stage: %d\n", stage);
+		stage++;
 	}
 
 	// render brightness animation
 
 	frame = (frame + 1);
-	if (frame > max_frame) max_frame = frame;
 	rotate_buffer_left(rotation);
 	buffer_transfer();
+}
+
+void anim_test() {
+	static u16 frame = 0;
+	static constexpr u16 FRAME_TICKS = 256 * 5;
+
+	const u32 res2 = anim_color_blend(COLOR_OFF, COLOR_WHITE, frame, FRAME_TICKS, 1.0f, 1.0f);
+
+	for (auto i = 0; i < 64; i++) {
+		buffer[i] = res2;
+	}
+
+	buffer_transfer();
+	frame = (frame + 1) % FRAME_TICKS;
 }
 
 void wsleds_animation(const u16 frame) {
 	switch (state.phase) {
 		case IDLE:
-			anim_target();
+			anim_test();
 			break;
 		case COUNTDOWN:
 			anim_countdown();

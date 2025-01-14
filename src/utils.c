@@ -10,6 +10,36 @@
 #include "defines/config.h"
 #include "pico/rand.h"
 
+inline u8 utils_min_u8(const u8 x, const u8 y) {
+	return x < y ? x : y;
+}
+
+inline u16 utils_min_u16(const u16 x, const u16 y) {
+	return x < y ? x : y;
+}
+
+inline u32 utils_min_u32(const u32 x, const u32 y) {
+	return x < y ? x : y;
+}
+
+void utils_swap_u8(u8 *x, u8 *y) {
+	const auto tmp = *x;
+	*x = *y;
+	*y = tmp;
+}
+
+void utils_swap_u16(u16 *x, u16 *y) {
+	const auto tmp = *x;
+	*x = *y;
+	*y = tmp;
+}
+
+void utils_swap_u32(u32 *x, u32 *y) {
+	const auto tmp = *x;
+	*x = *y;
+	*y = tmp;
+}
+
 u32 utils_random_in_range(u32 fromInclusive, u32 toInclusive) {
 	if (fromInclusive > toInclusive) {
 		const auto tmp = toInclusive;
