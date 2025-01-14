@@ -249,9 +249,11 @@ void anim_explosion() {
 	static u8 ring4_loc[15] = { 2, 4, 9, 13, 16, 22, 31, 32, 39, 41, 46, 50, 53, 59, 60 };
 	static u8 ring5_loc[11] = { 1, 5, 8, 14, 23, 40, 47, 49, 54, 58, 61 };
 	static u8 ring6_loc[10] = { 0, 6, 7, 15, 48, 55, 56, 57, 62, 63 };
-	static u32 ring_colors[7] = {COLOR_RED, COLOR_ORANGE, COLOR_YELLOW, COLOR_WHITE, COLOR_YELLOW, COLOR_ORANGE, COLOR_RED};
-	static u16 frame = 0;
-	static u8 stages = 12;
+	static u32 ring_colors[7] = { COLOR_RED, COLOR_ORANGE, COLOR_YELLOW, COLOR_WHITE, COLOR_YELLOW, COLOR_ORANGE,
+	                              COLOR_RED };
+	static u32 frame = 0;
+	static u32 max_frame = 0;
+	static u8 stages = 13;
 	static constexpr u16 FRAME_TICKS = 100; // every second
 
 	if (!init) {
@@ -270,27 +272,32 @@ void anim_explosion() {
 		buffer_transfer();
 		state_set_minus();
 		state.phase = IDLE; // TODO - move to darkness...
+		utils_printf("MAX FRAME: %d\n", max_frame);
 		return;
 	}
 
-	// color test
-	// fill_ring_with_color(ring0_loc, ARRAY_SIZE(ring0_loc), COLOR_WHITE);
-	// fill_ring_with_color(ring1_loc, ARRAY_SIZE(ring1_loc), COLOR_RED);
-	// fill_ring_with_color(ring2_loc, ARRAY_SIZE(ring2_loc), COLOR_ORANGE);
-	// fill_ring_with_color(ring3_loc, ARRAY_SIZE(ring3_loc), COLOR_YELLOW);
-	// fill_ring_with_color(ring4_loc, ARRAY_SIZE(ring4_loc), COLOR_WHITE);
-	// fill_ring_with_color(ring5_loc, ARRAY_SIZE(ring5_loc), COLOR_CYAN);
-	// fill_ring_with_color(ring6_loc, ARRAY_SIZE(ring6_loc), COLOR_BLUE);
+	const u8 stage = abs(number - stages);
+	const bool expanding = stage <= 6;
 
+	// render colors
 	if (frame % FRAME_TICKS == 0) {
-		const u8 stage = (u8)abs(number - stages);
-		utils_printf("Stage: %d\n", stage);
-
+		if (expanding) {
+			fill_ring_with_color(ring0_loc, ARRAY_SIZE(ring0_loc), ring_colors[stage]);
+			if (stage >= 1 && stage <= 6) fill_ring_with_color(ring1_loc, ARRAY_SIZE(ring1_loc), ring_colors[stage - 1]);
+			if (stage >= 2 && stage <= 6) fill_ring_with_color(ring2_loc, ARRAY_SIZE(ring2_loc), ring_colors[stage - 2]);
+			if (stage >= 3 && stage <= 6) fill_ring_with_color(ring3_loc, ARRAY_SIZE(ring3_loc), ring_colors[stage - 3]);
+			if (stage >= 4 && stage <= 6) fill_ring_with_color(ring4_loc, ARRAY_SIZE(ring4_loc), ring_colors[stage - 4]);
+			if (stage >= 5 && stage <= 6) fill_ring_with_color(ring5_loc, ARRAY_SIZE(ring5_loc), ring_colors[stage - 5]);
+			if (stage == 6) fill_ring_with_color(ring6_loc, ARRAY_SIZE(ring6_loc), ring_colors[stage - 6]);
+		}
 
 		number--;
 	}
 
-	frame = (frame + 1) % FRAME_TICKS;
+	// render brightness animation
+
+	frame = (frame + 1);
+	if (frame > max_frame) max_frame = frame;
 	rotate_buffer_left(rotation);
 	buffer_transfer();
 }

@@ -7,10 +7,18 @@
 
 #include "utils.h"
 
+void adjust_frame_by_speed_freq(const u16 frame, const u16 frame_count, const float speed,
+						const float freq, u16 *divisor, float *adjusted_frame) {
+	*divisor = frame_count / freq;
+	*adjusted_frame = fmod(frame, *divisor) * speed;
+}
+
 u8 anim_color_reduction(const anim_direction_t direction, const u16 frame, const u16 frame_count, const float speed,
                         const float freq) {
-	const u16 divisor = frame_count / freq;
-	const float adjusted_frame = fmod(frame, divisor) * speed;
+
+	float adjusted_frame;
+	u16 divisor;
+	adjust_frame_by_speed_freq(frame, frame_count, speed, freq, &divisor, &adjusted_frame);
 
 	u8 reduction = utils_proportional_reduce(255, adjusted_frame, divisor);
 
@@ -18,4 +26,13 @@ u8 anim_color_reduction(const anim_direction_t direction, const u16 frame, const
 	// TODO: PULSE
 
 	return reduction;
+}
+
+u32 anim_color_blend(u32 color_from, u32 color_to, u16 frame, u16 frame_count, float speed, float freq) {
+	float adjusted_frame;
+	u16 divisor;
+	adjust_frame_by_speed_freq(frame, frame_count, speed, freq, &divisor, &adjusted_frame);
+
+	// todo: blend
+	return 0;
 }
