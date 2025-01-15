@@ -18,7 +18,7 @@
 
 static const u8 line_width = (u8)sqrt(MOD_WSLEDS_LED_COUNT);
 
-u32 reduce_brightness(const u8 reduction, const u32 color) {
+u32 reduce_brightness(const i16 reduction, const u32 color) {
 	u8 r = (color >> 16) & 0b11111111;
 	u8 g = (color >> 8) & 0b11111111;
 	u8 b = color & 0b11111111;
@@ -27,7 +27,7 @@ u32 reduce_brightness(const u8 reduction, const u32 color) {
 	g = (g > reduction) ? (g - reduction) : 0;
 	b = (b > reduction) ? (b - reduction) : 0;
 
-	return (r << 16) | (g << 8) | b;
+	return (utils_min(r, 255) << 16) | (utils_min(g, 255) << 8) | utils_min(b, 255);
 }
 
 static u32 buffer[MOD_WSLEDS_LED_COUNT] = { 0 };
@@ -320,7 +320,13 @@ void anim_explosion() {
 		}
 	}
 
-	// TODO: apply random flicker
+	// random flicker
+	if (frame % 10 == 0)
+		for (u8 i = 0; i < MOD_WSLEDS_LED_COUNT; i++) {
+			if (buffer[i] == 0) continue;
+			const i8 reduction = utils_random_in_range(0, 8) - 4;
+			buffer[i] = reduce_brightness(reduction, buffer[i]);
+		}
 
 	if (frame % FRAME_TICKS == 0) stage++;
 
