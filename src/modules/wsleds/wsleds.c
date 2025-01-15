@@ -127,8 +127,9 @@ void anim_target() {
 		if (x_line == get_line_x(target_dot) && y_line == get_line_y(target_dot)) {
 			// on target - blink green
 			currentState.wsleds.on_target = true;
-			buffer[y_led] = buffer[x_led] = reduce_brightness(anim_color_reduction(TO_DIM, green_x_frame, FRAME_TICKS, 1.0f, 10),
-			                                                  COLOR_GREEN);
+			buffer[y_led] = buffer[x_led] = reduce_brightness(
+				anim_color_reduction(TO_DIM, green_x_frame, FRAME_TICKS, 1.0f, 10),
+				COLOR_GREEN);
 		} else {
 			// show red blink dot over red lines
 			currentState.wsleds.on_target = false;
@@ -156,7 +157,7 @@ void anim_target() {
 				green_x_frame = 0;
 			} else {
 				freeze_frames--;
- 				goto end;
+				goto end;
 			}
 			// calculate steps to take per frame for X
 			x_steps = abs((i8)get_line_x(target_dot) - x_line);
@@ -189,7 +190,9 @@ void anim_target() {
 
 end:
 	frame = (frame + 1) % FRAME_TICKS;
-	if (x_line == get_line_x(target_dot) && y_line == get_line_y(target_dot)) green_x_frame = (green_x_frame + 1) % FRAME_TICKS;
+	if (x_line == get_line_x(target_dot) && y_line == get_line_y(target_dot))
+		green_x_frame = (green_x_frame + 1) %
+			FRAME_TICKS;
 	buffer_transfer();
 }
 
@@ -232,8 +235,10 @@ void anim_countdown() {
 		buffer[i] = reduce_brightness(anim_color_reduction(TO_DIM, frame, FRAME_TICKS, 1.00f, 1), color);
 	}
 
-	buffer_transfer();
-	frame = (frame + 1) % FRAME_TICKS;
+	if (number != -2) {
+		buffer_transfer();
+		frame = (frame + 1) % FRAME_TICKS;
+	}
 }
 
 static inline void fill_ring_with_color(const u8 *ring, const u8 size, const u32 color) {
@@ -253,24 +258,42 @@ void anim_explosion() {
 	static u8 ring4_loc[15] = { 2, 4, 9, 13, 16, 22, 31, 32, 39, 41, 46, 50, 53, 59, 60 };
 	static u8 ring5_loc[11] = { 1, 5, 8, 14, 23, 40, 47, 49, 54, 58, 61 };
 	static u8 ring6_loc[10] = { 0, 6, 7, 15, 48, 55, 56, 57, 62, 63 };
+	static u8 *const rings[] = {
+		ring0_loc,
+		ring1_loc,
+		ring2_loc,
+		ring3_loc,
+		ring4_loc,
+		ring5_loc,
+		ring6_loc
+	};
+	static u8 ring_sizes[] = {
+		sizeof(ring0_loc) / sizeof(ring0_loc[0]),
+		sizeof(ring1_loc) / sizeof(ring1_loc[0]),
+		sizeof(ring2_loc) / sizeof(ring2_loc[0]),
+		sizeof(ring3_loc) / sizeof(ring3_loc[0]),
+		sizeof(ring4_loc) / sizeof(ring4_loc[0]),
+		sizeof(ring5_loc) / sizeof(ring5_loc[0]),
+		sizeof(ring6_loc) / sizeof(ring6_loc[0])
+	};
 	static u32 ring_colors[7] = { COLOR_RED, COLOR_ORANGE, COLOR_YELLOW, COLOR_WHITE, COLOR_YELLOW, COLOR_ORANGE,
 	                              COLOR_RED };
 	static u16 frame = 0;
 	static u8 stages = 13;
-	static constexpr u16 FRAME_TICKS = 100; // every second
+	static constexpr u16 FRAME_TICKS = 33;
 
 	if (!init) {
 		stage = 0;
-		frame = 0;
+		frame = 1;
 		init = true;
 		rotation = utils_random_in_range(0, 3);
 		memset(buffer, 0, sizeof(buffer));
+		// goto end;
 	}
 
 	if (stage == 14) {
 		// deinit
 		init = false;
-		state.phase = EXPLOSION;
 		memset(buffer, 0, sizeof(buffer));
 		buffer_transfer();
 		state_set_minus();
@@ -278,35 +301,42 @@ void anim_explosion() {
 		return;
 	}
 
-	const bool expanding = stage <= 6;
-
-	// render colors
-	if (frame % FRAME_TICKS == 0) {
-		if (expanding) {
-			fill_ring_with_color(ring0_loc, ARRAY_SIZE(ring0_loc), ring_colors[stage]);
-			if (stage >= 1 && stage <= 6) fill_ring_with_color(ring1_loc, ARRAY_SIZE(ring1_loc), ring_colors[stage - 1]);
-			if (stage >= 2 && stage <= 6) fill_ring_with_color(ring2_loc, ARRAY_SIZE(ring2_loc), ring_colors[stage - 2]);
-			if (stage >= 3 && stage <= 6) fill_ring_with_color(ring3_loc, ARRAY_SIZE(ring3_loc), ring_colors[stage - 3]);
-			if (stage >= 4 && stage <= 6) fill_ring_with_color(ring4_loc, ARRAY_SIZE(ring4_loc), ring_colors[stage - 4]);
-			if (stage >= 5 && stage <= 6) fill_ring_with_color(ring5_loc, ARRAY_SIZE(ring5_loc), ring_colors[stage - 5]);
-			if (stage == 6) fill_ring_with_color(ring6_loc, ARRAY_SIZE(ring6_loc), ring_colors[stage - 6]);
+	for (u8 i = 0; i < ARRAY_SIZE(rings); i++) {
+		const i8 x = stage - i;
+		const auto ring = rings[i];
+		const auto size = ring_sizes[i];
+		if (x < 0 || x > 7) fill_ring_with_color(ring, size, COLOR_OFF);
+		else if (x == 0) {
+			fill_ring_with_color(ring, size,
+			                     reduce_brightness(anim_color_reduction(TO_BRIGHT, frame - 1, FRAME_TICKS, 1.0f, 1.0f),
+			                                       COLOR_RED));
+		} else if (x < 7) {
+			const auto color = anim_color_blend(ring_colors[x - 1], ring_colors[x], frame - 1, FRAME_TICKS, 1.0f, 1.0f);
+			fill_ring_with_color(ring, size, color);
+		} else {
+			const auto color = reduce_brightness(anim_color_reduction(TO_DIM, frame - 1, FRAME_TICKS, 1.0f, 1.0f),
+			                                     COLOR_RED);
+			fill_ring_with_color(ring, size, color);
 		}
-		utils_printf("Stage: %d\n", stage);
-		stage++;
 	}
 
-	// render brightness animation
+	// TODO: apply random flicker
 
-	frame = (frame + 1);
-	rotate_buffer_left(rotation);
-	buffer_transfer();
+	if (frame % FRAME_TICKS == 0) stage++;
+
+end:
+	if (stage != 14) {
+		frame = (frame + 1);
+		rotate_buffer_left(rotation);
+		buffer_transfer();
+	}
 }
 
 void anim_test() {
 	static u16 frame = 0;
 	static constexpr u16 FRAME_TICKS = 256 * 5;
 
-	const u32 res2 = anim_color_blend(COLOR_OFF, COLOR_WHITE, frame, FRAME_TICKS, 1.0f, 1.0f);
+	const u32 res2 = anim_color_blend(COLOR_RED, COLOR_WHITE, frame, FRAME_TICKS, 1.0f, 1.0f);
 
 	for (auto i = 0; i < 64; i++) {
 		buffer[i] = res2;
@@ -319,7 +349,7 @@ void anim_test() {
 void wsleds_animation(const u16 frame) {
 	switch (state.phase) {
 		case IDLE:
-			anim_test();
+			anim_target();
 			break;
 		case COUNTDOWN:
 			anim_countdown();
