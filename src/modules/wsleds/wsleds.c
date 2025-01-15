@@ -32,7 +32,7 @@ u32 reduce_brightness(const i16 reduction, const u32 color) {
 
 static u32 buffer[MOD_WSLEDS_LED_COUNT] = { 0 };
 
-void buffer_transfer() {
+static inline void buffer_transfer() {
 	dma_channel_transfer_from_buffer_now(MOD_WSLEDS_DMA_CH, buffer, MOD_WSLEDS_LED_COUNT);
 }
 
