@@ -27,15 +27,15 @@ int main() {
 	sleep_ms(2000);
 #endif
 
-	if (!set_sys_clock_khz(48'000, false)) utils_error_mode(47); // minimum to enable USB
-	// if (!set_sys_clock_khz(18'000, false)) utils_error_mode(47);
+	// if (!set_sys_clock_khz(48'000, false)) utils_error_mode(47); // minimum to enable USB
+	if (!set_sys_clock_khz(18'000, false)) utils_error_mode(47);
 
 #if DBG
 	stdio_init_all(); // only for serial over usb/uart - printf
 #endif
 
 	wsleds_init();
-	mcp_init();
+	// mcp_init();
 	numbers_init();
 	status_init();
 

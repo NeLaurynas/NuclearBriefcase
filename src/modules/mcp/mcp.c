@@ -27,6 +27,7 @@
 #define C_IOCON_ODR_BIT		2
 #define C_IOCON_INTPOL_BIT	1
 
+static bool init = false;
 // cache variables
 static u8 cache_mcp1_gpioa = 0;
 static u8 cache_mcp1_gpiob = 0;
@@ -92,6 +93,7 @@ inline u8 cfg_get_number(const u8 data) {
 }
 
 void mcp_cfg_set_pin_out_mode(const u8 data, const bool is_out) {
+	if (!init) return;
 	const auto address = cfg_address(data);
 	const auto bank = cfg_iodir_bank(data);
 	auto options = read_register(address, bank);
@@ -100,6 +102,7 @@ void mcp_cfg_set_pin_out_mode(const u8 data, const bool is_out) {
 }
 
 void mcp_cfg_set_pull_up(u8 pinData, bool pull_up) {
+	if (!init) return;
 	const auto address = cfg_address(pinData);
 	const auto bank = cfg_gppu_bank(pinData);
 	auto options = read_register(address, bank);
@@ -120,6 +123,7 @@ void setup_bank_configuration(const u8 address, const u8 regist) {
 }
 
 void mcp_init() {
+	init = true;
 	const auto rate = i2c_init(MOD_MCP_I2C_PORT, 400'000); // 400 khz
 	if (rate != 400'000) utils_error_mode(10);
 	gpio_set_function(MOD_MCP_PIN_SDA, GPIO_FUNC_I2C);
@@ -135,8 +139,9 @@ void mcp_init() {
 	sleep_ms(1);
 }
 
-// TODO: cache like is_pin_low and then don't forget to flush? // takes 0.2-0.3 ms per call at 12mhz....
+// TODO: cache like is_pin_low and then don't forget to flush? // takes 0.2-0.3 ms per call at 18mhz....
 void mcp_set_out(const u8 pinData, const bool out) {
+	if (!init) return;
 	const auto address = cfg_address(pinData);
 	const auto bank = cfg_gpio_bank(pinData);
 	auto data = read_register(address, bank);
@@ -145,6 +150,7 @@ void mcp_set_out(const u8 pinData, const bool out) {
 }
 
 bool mcp_is_pin_low(const u8 pinData) {
+	if (!init) return false;
 	const auto address = cfg_address(pinData);
 	const auto bank = cfg_gpio_bank(pinData);
 	u8 data;
