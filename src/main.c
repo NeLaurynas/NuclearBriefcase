@@ -12,6 +12,7 @@
 #include "hardware/pio.h"
 #include "modules/mcp/mcp.h"
 #include "modules/numbers/numbers.h"
+#include "modules/piezo/piezo.h"
 #include "modules/status/status.h"
 #include "modules/wsleds/wsleds.h"
 #include "pico/stdlib.h"
@@ -38,6 +39,7 @@ int main() {
 	// mcp_init();
 	numbers_init();
 	status_init();
+	piezo_init();
 
 	renderer_init(animation_functions, anim_fn_size);
 

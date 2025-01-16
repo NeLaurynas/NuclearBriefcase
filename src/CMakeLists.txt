@@ -36,6 +36,8 @@ add_executable(NuclearBriefcase main.c
 		anim.c
 		anim.h
 		modules/wsleds/wsleds_data.h
+		modules/piezo/piezo.c
+		modules/piezo/piezo.h
 )
 
 pico_set_program_name(NuclearBriefcase "NuclearBriefcase")
@@ -112,6 +114,7 @@ target_link_libraries(NuclearBriefcase
 		hardware_pio
 		hardware_adc
 		hardware_dma
+		hardware_pwm
 		pico_rand
 		$<$<CONFIG:Debug>:hardware_uart>
 )

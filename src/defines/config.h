@@ -60,6 +60,9 @@ typedef int8_t i8;
 #define MOD_WSLEDS_DMA_CH		1
 #define MOD_WSLEDS_PIN			2 // GP2
 
+#define MOD_PIEZO_PIN		6
+#define MOD_PIEZO_DMA_CH	2
+
 #define INTERNAL_LED 25
 
 #endif //CONFIG_H
