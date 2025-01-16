@@ -5,7 +5,6 @@
 
 #include <stdlib.h>
 #include <pico/time.h>
-#include <pico/types.h>
 
 #include "state.h"
 #include "utils.h"
@@ -23,7 +22,7 @@ void set_state() {
 		state.numbers.btn_pressed = num_btn_pressed;
 		if (num_btn_pressed) numbers_generate_target();
 		// TODO: debug
-		if (num_btn_pressed) state.phase = EXPLOSION;
+		if (num_btn_pressed) state.phase = DARKNESS;
 	}
 
 	// potential refactor...

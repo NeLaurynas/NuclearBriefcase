@@ -16,6 +16,7 @@ typedef enum {
  * @param freq How many times in frame_ticks it will get repeated
  */
 u8 anim_color_reduction(anim_direction_t direction, u16 frame, u16 frame_count, float speed, float freq);
+// TODO: maybe return color (like below, because it's always used with reduce_brightness from wsleds.c)
 
 /**
  * Switches from color to color (returns blended color

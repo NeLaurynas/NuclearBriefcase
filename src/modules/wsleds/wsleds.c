@@ -19,9 +19,9 @@
 static const u8 line_width = (u8)sqrt(MOD_WSLEDS_LED_COUNT);
 
 u32 reduce_brightness(const i16 reduction, const u32 color) {
-	u8 r = (color >> 16) & 0b11111111;
-	u8 g = (color >> 8) & 0b11111111;
-	u8 b = color & 0b11111111;
+	u16 r = (color >> 16) & 0b11111111;
+	u16 g = (color >> 8) & 0b11111111;
+	u16 b = color & 0b11111111;
 
 	r = (r > reduction) ? (r - reduction) : 0;
 	g = (g > reduction) ? (g - reduction) : 0;
@@ -296,8 +296,7 @@ void anim_explosion() {
 		init = false;
 		memset(buffer, 0, sizeof(buffer));
 		buffer_transfer();
-		state_set_minus();
-		state.phase = IDLE; // TODO - move to darkness...
+		state.phase = DARKNESS;
 		return;
 	}
 
@@ -338,18 +337,50 @@ end:
 	}
 }
 
-void anim_test() {
+void anim_darkness() {
+	static bool init = false;
+	static i8 cycle = 0;
 	static u16 frame = 0;
-	static constexpr u16 FRAME_TICKS = 256 * 5;
+	static u8 cycles = 6;
+	static constexpr u16 FRAME_TICKS = 64;
 
-	const u32 res2 = anim_color_blend(COLOR_RED, COLOR_WHITE, frame, FRAME_TICKS, 1.0f, 1.0f);
-
-	for (auto i = 0; i < 64; i++) {
-		buffer[i] = res2;
+	if (!init) {
+		cycle = 0;
+		frame = 1;
+		init = true;
+		state_set_minus();
 	}
 
+	if (cycle == cycles + 3) {
+		// deinit
+		init = false;
+		state.phase = IDLE;
+		return;
+	}
+
+	// random flicker
+	if (frame % 10 == 0)
+		for (u8 i = 0; i < MOD_WSLEDS_LED_COUNT; i++) {
+			if (buffer[i] == 0) continue;
+			const i8 reduction = utils_random_in_range(0, 8) - 4;
+			buffer[i] = reduce_brightness(reduction, buffer[i]);
+		}
+
+	if (frame % FRAME_TICKS == 0) {
+		if (cycle <= cycles) {
+			memset(buffer, 0, sizeof(buffer));
+			u32 color = currentState.wsleds.on_target ? COLOR_GREEN : COLOR_RED;
+			for (u8 i = 0; i < utils_random_in_range(1, MOD_WSLEDS_LED_COUNT); i++) {
+				buffer[utils_random_in_range(0, MOD_WSLEDS_LED_COUNT)] = reduce_brightness(
+					255 - ((255 / cycles) * cycle), color);
+			}
+		}
+
+		cycle++;
+	}
+
+	frame = (frame + 1);
 	buffer_transfer();
-	frame = (frame + 1) % FRAME_TICKS;
 }
 
 void wsleds_animation(const u16 frame) {
@@ -362,6 +393,9 @@ void wsleds_animation(const u16 frame) {
 			break;
 		case EXPLOSION:
 			anim_explosion();
+			break;
+		case DARKNESS:
+			anim_darkness();
 			break;
 		default:
 			break;

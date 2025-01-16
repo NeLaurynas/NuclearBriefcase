@@ -5,6 +5,7 @@
 #define CONFIG_H
 
 #include <hardware/i2c.h>
+#include <pico/types.h>
 
 typedef uint32_t u32;
 typedef uint16_t u16;
