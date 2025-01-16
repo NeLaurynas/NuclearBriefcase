@@ -16,7 +16,20 @@ State state = {
 		.numbers_on = -1,
 	},
 
+	.piezo = {
+		.anim = OFF,
+		.busy = false,
+		.freq = 150,
+	},
+
 	.phase = IDLE,
+
+	.debug = {
+		.dbg_btn = false,
+		.last_encoder_change = 0,
+		.last_encoder_incrementing = 0,
+		.last_encoder_decrementing = 0,
+	},
 };
 
 CurrentState currentState = { };

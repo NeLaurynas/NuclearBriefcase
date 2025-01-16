@@ -17,6 +17,12 @@ typedef enum {
 	DARKNESS
 } phase_t;
 
+typedef enum {
+	OFF,
+	ERROR,
+	SHORT_ACK
+} piezo_anim_t;
+
 // FUNCTIONS
 
 void state_set_0_if_possible(i8 *number);
@@ -43,7 +49,20 @@ typedef struct {
 		i8 numbers_on;
 	} status;
 
+	struct {
+		piezo_anim_t anim;
+		bool busy;
+		float freq;
+	} piezo;
+
 	phase_t phase;
+
+	struct {
+		bool dbg_btn;
+		u32 last_encoder_change;
+		bool last_encoder_incrementing;
+		bool last_encoder_decrementing;
+	} debug;
 } State;
 
 typedef struct {

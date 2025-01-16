@@ -6,7 +6,7 @@
 
 #include "defines/config.h"
 
-void renderer_init(void (*animation_functions[])(u16), u8 animation_function_count);
+void renderer_init(void (*animation_functions[])(), u8 animation_function_count);
 
 void renderer_loop();
 

@@ -4,6 +4,7 @@
 #include "renderer.h"
 
 #include <stdlib.h>
+#include <hardware/gpio.h>
 #include <pico/time.h>
 
 #include "state.h"
@@ -11,6 +12,7 @@
 #include "defines/config.h"
 #include "modules/mcp/mcp.h"
 #include "modules/numbers/numbers.h"
+#include "modules/piezo/piezo.h"
 #include "modules/status/status.h"
 
 void set_state() {
@@ -21,8 +23,6 @@ void set_state() {
 	if (state.numbers.btn_pressed != num_btn_pressed) {
 		state.numbers.btn_pressed = num_btn_pressed;
 		if (num_btn_pressed) numbers_generate_target();
-		// TODO: debug
-		if (num_btn_pressed) state.phase = DARKNESS;
 	}
 
 	// potential refactor...
@@ -54,6 +54,43 @@ void set_state() {
 
 	// Status module
 	state_set_bool_if_possible(&state.status.numbers_on, state.numbers.target == state.numbers.number);
+
+	// potential refactor...
+	if (utils_time_diff_ms(state.debug.last_encoder_change, time_us_32()) > MOD_NUM_ENC_DEBOUNCE_MS) {
+		const bool num_enc1 = !gpio_get(DBG_ENC1);
+		const bool num_enc2 = !gpio_get(DBG_ENC2);
+		if (num_enc1 != num_enc2) {
+			state.debug.last_encoder_change = time_us_32(); // TODO: change in other paths for debounce?
+			if (num_enc1 == true && num_enc2 == false) {
+				dec();
+				state.debug.last_encoder_incrementing = false;
+				state.debug.last_encoder_decrementing = true;
+			} else if (num_enc1 == false && num_enc2 == true) {
+				inc();
+				state.debug.last_encoder_incrementing = true;
+				state.debug.last_encoder_decrementing = false;
+			}
+		} else if (num_enc1 == true && num_enc2 == true) {
+			state.debug.last_encoder_change = time_us_32();
+			if (state.debug.last_encoder_incrementing) {
+				inc();
+			}
+			else if (state.debug.last_encoder_decrementing) {
+				dec();
+			}
+		} else {
+			state.debug.last_encoder_incrementing = false;
+			state.debug.last_encoder_decrementing = false;
+		}
+	}
+
+	const bool dbg_btn_pressed = !gpio_get(DBG_BTN_PIN);
+	if (state.debug.dbg_btn != dbg_btn_pressed) {
+		state.debug.dbg_btn = dbg_btn_pressed;
+		if (dbg_btn_pressed) {
+			piezo_play(ERROR);
+		}
+	}
 }
 
 void render_state() {
@@ -78,10 +115,10 @@ void render_state() {
 
 }
 
-static void (**animation_fns)(u16);
+static void (**animation_fns)();
 static u8 animation_fn_count;
 
-void renderer_init(void (*animation_functions[])(u16), u8 animation_function_count) {
+void renderer_init(void (*animation_functions[])(), u8 animation_function_count) {
 	animation_fns = animation_functions;
 	animation_fn_count = animation_function_count;
 }
@@ -101,7 +138,7 @@ void renderer_loop() {
 		// ------------ work
 		set_state();
 		render_state();
-		for (u8 i = 0; i < animation_fn_count; i++) animation_fns[i](anim_frame);
+		for (u8 i = 0; i < animation_fn_count; i++) animation_fns[i]();
 
 		// ------------ end
 		anim_frame = (anim_frame + 1) % ANIM_FRAME_COUNT;

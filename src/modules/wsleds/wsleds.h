@@ -7,6 +7,6 @@
 
 void wsleds_init();
 
-void wsleds_animation(u16 frame);
+void wsleds_animation();
 
 #endif //WSLEDS_H

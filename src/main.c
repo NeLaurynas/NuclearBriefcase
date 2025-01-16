@@ -21,11 +21,12 @@ int main() {
 	gpio_init(INTERNAL_LED);
 	gpio_set_dir(INTERNAL_LED, GPIO_OUT);
 
-	static void (*animation_functions[])(u16) = { wsleds_animation };
+	static void (*animation_functions[])() = { wsleds_animation, piezo_animation };
 	static u8 anim_fn_size = ARRAY_SIZE(animation_functions);
 
 #if DBG
 	sleep_ms(2000);
+	utils_printf("slept for 2 seconds");
 #endif
 
 	// if (!set_sys_clock_khz(48'000, false)) utils_error_mode(47); // minimum to enable USB
@@ -33,12 +34,22 @@ int main() {
 
 #if DBG
 	stdio_init_all(); // only for serial over usb/uart - printf
+	gpio_init(DBG_BTN_PIN);
+	gpio_init(DBG_ENC1);
+	gpio_init(DBG_ENC2);
+	gpio_pull_up(DBG_BTN_PIN);
+	gpio_pull_up(DBG_ENC1);
+	gpio_pull_up(DBG_ENC2);
+	gpio_set_dir(DBG_BTN_PIN, false);
+	gpio_set_dir(DBG_ENC1, false);
+	gpio_set_dir(DBG_ENC2, false);
+	sleep_ms(1000);
 #endif
 
 	wsleds_init();
 	// mcp_init();
 	numbers_init();
-	status_init();
+	// status_init();
 	piezo_init();
 
 	renderer_init(animation_functions, anim_fn_size);

@@ -3,34 +3,159 @@
 
 #include "piezo.h"
 
+#include <hardware/clocks.h>
+#include <hardware/dma.h>
 #include <hardware/gpio.h>
 #include <hardware/pwm.h>
 
+#include "state.h"
 #include "utils.h"
 #include "defines/config.h"
+
+static uint slice = 0;
+static uint channel = 0;
+static u32 clock_freq_hz = 0;
+static u32 buffer_top[0] = { 0 };
+static u32 buffer_cc[0] = { 0 };
 
 void piezo_init() {
 	gpio_set_function(MOD_PIEZO_PIN, GPIO_FUNC_PWM);
 
-	uint slice = pwm_gpio_to_slice_num(MOD_PIEZO_PIN);
-	uint channel = pwm_gpio_to_channel(MOD_PIEZO_PIN);
+	slice = pwm_gpio_to_slice_num(MOD_PIEZO_PIN);
+	channel = pwm_gpio_to_channel(MOD_PIEZO_PIN);
+	// 28
 
-	auto config = pwm_get_default_config();
-
-	const auto clk_div = utils_calculate_pio_clk_div(10);
-	utils_printf("PIEZO PWM CLK DIV: %f\n", clk_div);
-
-	pwm_init(slice, &config, false);
-
-	pwm_set_wrap(slice, 99); // [0, 99] - 100 cycles
-	for (auto i = 0; i < 50; i++) {
-		pwm_set_chan_level(slice, channel, 1);
-	}
-	for (auto i = 50; i < 100; i++) {
-		pwm_set_chan_level(slice, channel, 0);
-	}
-
+	auto pwm_c = pwm_get_default_config();
+	pwm_c.top = 0;
+	pwm_init(slice, &pwm_c, false);
+	pwm_set_clkdiv(slice, 75.f);
+	pwm_set_phase_correct(slice, false); // true - counts to wrap for up, then counts down from top to wrap, for precision
 	pwm_set_enabled(slice, true);
+	sleep_ms(1);
 
 	// init DMA
+	// init top
+	if (dma_channel_is_claimed(MOD_PIEZO_DMA_CH_TOP)) utils_error_mode(28);
+	dma_channel_claim(MOD_PIEZO_DMA_CH_TOP);
+	dma_channel_config dma_top_c = dma_channel_get_default_config(MOD_PIEZO_DMA_CH_TOP);
+	channel_config_set_transfer_data_size(&dma_top_c, DMA_SIZE_32);
+	channel_config_set_read_increment(&dma_top_c, false);
+	channel_config_set_write_increment(&dma_top_c, false);
+	channel_config_set_dreq(&dma_top_c, DREQ_FORCE);
+	dma_channel_configure(MOD_PIEZO_DMA_CH_TOP, &dma_top_c, &pwm_hw->slice[slice].top, buffer_top, 1, false);
+	// init cc
+	if (dma_channel_is_claimed(MOD_PIEZO_DMA_CH_CC)) utils_error_mode(29);
+	dma_channel_claim(MOD_PIEZO_DMA_CH_CC);
+	dma_channel_config dma_cc_c = dma_channel_get_default_config(MOD_PIEZO_DMA_CH_CC);
+	channel_config_set_transfer_data_size(&dma_cc_c, DMA_SIZE_32);
+	channel_config_set_read_increment(&dma_cc_c, false);
+	channel_config_set_write_increment(&dma_cc_c, false);
+	channel_config_set_dreq(&dma_cc_c, DREQ_FORCE);
+	dma_channel_configure(MOD_PIEZO_DMA_CH_CC, &dma_cc_c, &pwm_hw->slice[slice].cc, buffer_cc, 1, false);
+	sleep_ms(1);
+
+	clock_freq_hz = clock_get_hz(clk_sys);
+}
+
+void piezo_play(const piezo_anim_t anim) {
+	// if (!state.piezo.busy)
+	state.piezo.anim = anim;
+}
+
+void set_pwm_freq(float freq_hz) {
+	u32 top = freq_hz == 0.f ? 0 : (clock_freq_hz / (75.f * freq_hz)) - 1;
+	u32 cc = top / 2;
+
+	buffer_top[0] = top;
+	buffer_cc[0] = cc;
+	dma_channel_transfer_from_buffer_now(MOD_PIEZO_DMA_CH_CC, buffer_cc, 1);
+	dma_channel_transfer_from_buffer_now(MOD_PIEZO_DMA_CH_TOP, buffer_top, 1);
+	// pwm_set_wrap(slice, top);
+	// pwm_set_chan_level(slice, channel, cc);
+
+	printf("PWM Configured: Frequency = %.2f Hz, TOP = %u, LEVEL = %u\n",
+	       freq_hz, top, top / 2);
+}
+
+void anim_off(const bool is_off) {
+	static bool off = false;
+
+	if (is_off == off) return;
+
+	off = is_off;
+	if (off) {
+		const auto start = time_us_32();
+
+		set_pwm_freq(0);
+
+		const auto end = time_us_32();
+		auto elapsed_us = utils_time_diff_us(start, end);
+		const float elapsed_ms = elapsed_us / 1000.0f;
+		utils_printf("OFF took: %.2f ms (%ld us)\n", elapsed_ms, elapsed_us); // 7 MS!!!!!!!
+	}
+}
+
+void anim_error() {
+	static bool init = false;
+	static i8 cycle = 0;
+	static u16 frame = 0;
+	static u8 cycles = 6;
+	static constexpr u16 FRAME_TICKS = 10; // 100 ms
+
+	const auto start = time_us_32();
+
+	if (!init) {
+		if (state.piezo.busy) return;
+		anim_off(false);
+		cycle = 0;
+		frame = 1;
+		init = true;
+		state.piezo.busy = true;
+		set_pwm_freq(state.piezo.freq);
+		const auto end = time_us_32();
+		auto elapsed_us = utils_time_diff_us(start, end);
+		const float elapsed_ms = elapsed_us / 1000.0f;
+		utils_printf("INIT took: %.2f ms (%ld us)\n", elapsed_ms, elapsed_us); // 7 MS!!!!!!!
+	}
+
+	if (cycle == cycles + 3 || state.debug.dbg_btn == false) {
+		// deinit
+		init = false;
+		anim_off(true);
+		state.piezo.busy = false;
+		state.piezo.anim = false;
+		return;
+	}
+
+	frame = (frame + 1) % FRAME_TICKS;
+
+	if (frame % FRAME_TICKS == 0) {
+		// toodles
+	}
+}
+
+void piezo_anim_short_ack() {
+}
+
+void piezo_animation() {
+	switch (state.piezo.anim) {
+		case OFF:
+			anim_off(true);
+			break;
+		case ERROR:
+			anim_error();
+			break;
+		default:
+			break;
+	}
+}
+
+void inc() {
+	state.piezo.freq += 50.f;
+	utils_printf("++, %f\n",state.piezo.freq);
+}
+
+void dec() {
+	state.piezo.freq -= 50.f;
+	utils_printf("--, %f\n",state.piezo.freq);
 }

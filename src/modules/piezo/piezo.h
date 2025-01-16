@@ -3,7 +3,15 @@
 
 #ifndef PIEZO_H
 #define PIEZO_H
+#include "state.h"
 
 void piezo_init();
+
+void piezo_play(piezo_anim_t anim);
+
+void piezo_animation();
+
+void inc();
+void dec();
 
 #endif //PIEZO_H
