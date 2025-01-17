@@ -20,7 +20,8 @@ typedef enum {
 typedef enum {
 	OFF,
 	ERROR,
-	SHORT_ACK
+	SHORT_ACK,
+	SHORT_ERROR,
 } piezo_anim_t;
 
 // FUNCTIONS

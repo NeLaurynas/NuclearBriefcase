@@ -8,7 +8,7 @@
 
 #include "utils.h"
 
-void adjust_frame_by_speed_freq(const u16 frame, const u16 frame_count, const float speed,
+static void adjust_frame_by_speed_freq(const u16 frame, const u16 frame_count, const float speed,
                                 const float freq, u16 *divisor, float *adjusted_frame) {
 	*divisor = frame_count / freq;
 	*adjusted_frame = fmod(frame, *divisor) * speed;

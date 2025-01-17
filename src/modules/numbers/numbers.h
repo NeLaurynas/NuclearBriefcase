@@ -18,6 +18,4 @@ void numbers_inc();
 
 void numbers_dec();
 
-void anim(u8 frame);
-
 #endif //NUMBERS_H

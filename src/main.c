@@ -35,14 +35,8 @@ int main() {
 #if DBG
 	stdio_init_all(); // only for serial over usb/uart - printf
 	gpio_init(DBG_BTN_PIN);
-	gpio_init(DBG_ENC1);
-	gpio_init(DBG_ENC2);
 	gpio_pull_up(DBG_BTN_PIN);
-	gpio_pull_up(DBG_ENC1);
-	gpio_pull_up(DBG_ENC2);
 	gpio_set_dir(DBG_BTN_PIN, false);
-	gpio_set_dir(DBG_ENC1, false);
-	gpio_set_dir(DBG_ENC2, false);
 	sleep_ms(1000);
 #endif
 

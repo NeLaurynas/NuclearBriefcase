@@ -11,7 +11,4 @@ void piezo_play(piezo_anim_t anim);
 
 void piezo_animation();
 
-void inc();
-void dec();
-
 #endif //PIEZO_H

@@ -116,7 +116,7 @@ void numbers_dec() {
 	else state.numbers.number -= 1;
 }
 
-void anim(const u8 frame) {
+static void anim(const u8 frame) {
 	buffer[0] = animation_bits[frame] << 7 | animation_bits[frame];
 	dma_channel_transfer_from_buffer_now(MOD_NUM_DMA_CH, &buffer, 1);
 }

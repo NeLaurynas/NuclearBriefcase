@@ -15,7 +15,7 @@
 #include "modules/piezo/piezo.h"
 #include "modules/status/status.h"
 
-void set_state() {
+static void set_state() {
 	if (state.phase != IDLE) return; // busy
 
 	// Numbers module
@@ -55,45 +55,16 @@ void set_state() {
 	// Status module
 	state_set_bool_if_possible(&state.status.numbers_on, state.numbers.target == state.numbers.number);
 
-	// potential refactor...
-	if (utils_time_diff_ms(state.debug.last_encoder_change, time_us_32()) > MOD_NUM_ENC_DEBOUNCE_MS) {
-		const bool num_enc1 = !gpio_get(DBG_ENC1);
-		const bool num_enc2 = !gpio_get(DBG_ENC2);
-		if (num_enc1 != num_enc2) {
-			state.debug.last_encoder_change = time_us_32(); // TODO: change in other paths for debounce?
-			if (num_enc1 == true && num_enc2 == false) {
-				dec();
-				state.debug.last_encoder_incrementing = false;
-				state.debug.last_encoder_decrementing = true;
-			} else if (num_enc1 == false && num_enc2 == true) {
-				inc();
-				state.debug.last_encoder_incrementing = true;
-				state.debug.last_encoder_decrementing = false;
-			}
-		} else if (num_enc1 == true && num_enc2 == true) {
-			state.debug.last_encoder_change = time_us_32();
-			if (state.debug.last_encoder_incrementing) {
-				inc();
-			}
-			else if (state.debug.last_encoder_decrementing) {
-				dec();
-			}
-		} else {
-			state.debug.last_encoder_incrementing = false;
-			state.debug.last_encoder_decrementing = false;
-		}
-	}
-
 	const bool dbg_btn_pressed = !gpio_get(DBG_BTN_PIN);
 	if (state.debug.dbg_btn != dbg_btn_pressed) {
 		state.debug.dbg_btn = dbg_btn_pressed;
 		if (dbg_btn_pressed) {
-			piezo_play(ERROR);
+			piezo_play(SHORT_ACK);
 		}
 	}
 }
 
-void render_state() {
+static void render_state() {
 	// Numbers module
 	if (state.numbers.number != currentState.numbers.number || state.numbers.target != currentState.numbers.target) {
 		currentState.numbers.number = state.numbers.number;

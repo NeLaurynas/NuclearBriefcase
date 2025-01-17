@@ -18,7 +18,7 @@
 
 static const u8 line_width = (u8)sqrt(MOD_WSLEDS_LED_COUNT);
 
-u32 reduce_brightness(const i16 reduction, const u32 color) {
+static u32 reduce_brightness(const i16 reduction, const u32 color) {
 	u16 r = (color >> 16) & 0b11111111;
 	u16 g = (color >> 8) & 0b11111111;
 	u16 b = color & 0b11111111;
@@ -81,7 +81,7 @@ static inline u8 get_led_from_lines(const u8 x_line, const u8 y_line) {
 	return line_width * y_line + x_line;
 }
 
-void rotate_buffer_left(const u8 times) {
+static void rotate_buffer_left(const u8 times) {
 	static u32 temp[MOD_WSLEDS_LED_COUNT] = { 0 };
 	if (times == 0) return;
 
@@ -94,7 +94,7 @@ void rotate_buffer_left(const u8 times) {
 	}
 }
 
-void anim_target() {
+static void anim_target() {
 	static bool init = false;
 	static u8 target_dot = 0;
 	static u8 x_line = 0;
@@ -196,7 +196,7 @@ end:
 	buffer_transfer();
 }
 
-void anim_countdown() {
+static void anim_countdown() {
 	static bool init = false;
 	static i8 number = 0;
 	static u16 frame = 0;
@@ -247,7 +247,7 @@ static inline void fill_ring_with_color(const u8 *ring, const u8 size, const u32
 	}
 }
 
-void anim_explosion() {
+static void anim_explosion() {
 	static bool init = false;
 	static i8 stage = 0;
 	static u8 rotation = 0;
@@ -337,7 +337,7 @@ end:
 	}
 }
 
-void anim_darkness() {
+static void anim_darkness() {
 	static bool init = false;
 	static u8 cycle = 0;
 	static u16 frame = 0;

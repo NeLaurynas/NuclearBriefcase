@@ -64,9 +64,7 @@ typedef int8_t i8;
 #define MOD_PIEZO_DMA_CH_TOP	2
 #define MOD_PIEZO_DMA_CH_CC		3
 
-#define DBG_BTN_PIN 7
-#define DBG_ENC1	20
-#define DBG_ENC2	21
+#define DBG_BTN_PIN		7
 
 #define INTERNAL_LED 25
 

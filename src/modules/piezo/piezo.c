@@ -62,7 +62,7 @@ void piezo_play(const piezo_anim_t anim) {
 	state.piezo.anim = anim;
 }
 
-void set_pwm_freq(float freq_hz) {
+static void set_pwm_freq(float freq_hz) {
 	u32 top = freq_hz == 0.f ? 0 : (clock_freq_hz / (75.f * freq_hz)) - 1;
 	u32 cc = top / 2;
 
@@ -70,71 +70,59 @@ void set_pwm_freq(float freq_hz) {
 	buffer_cc[0] = cc;
 	dma_channel_transfer_from_buffer_now(MOD_PIEZO_DMA_CH_CC, buffer_cc, 1);
 	dma_channel_transfer_from_buffer_now(MOD_PIEZO_DMA_CH_TOP, buffer_top, 1);
-	// pwm_set_wrap(slice, top);
-	// pwm_set_chan_level(slice, channel, cc);
-
-	printf("PWM Configured: Frequency = %.2f Hz, TOP = %u, LEVEL = %u\n",
-	       freq_hz, top, top / 2);
 }
 
-void anim_off(const bool is_off) {
+static void anim_off(const bool is_off) {
 	static bool off = false;
 
 	if (is_off == off) return;
 
 	off = is_off;
-	if (off) {
-		const auto start = time_us_32();
-
-		set_pwm_freq(0);
-
-		const auto end = time_us_32();
-		auto elapsed_us = utils_time_diff_us(start, end);
-		const float elapsed_ms = elapsed_us / 1000.0f;
-		utils_printf("OFF took: %.2f ms (%ld us)\n", elapsed_ms, elapsed_us); // 7 MS!!!!!!!
-	}
+	if (off) set_pwm_freq(0);
 }
 
-void anim_error() {
+static void anim(const float freq, const u8 repeat, const u16 play_x10ms, const u16 pause_x10ms) {
 	static bool init = false;
-	static i8 cycle = 0;
+	static u8 cycle = 0;
 	static u16 frame = 0;
-	static u8 cycles = 6;
-	static constexpr u16 FRAME_TICKS = 10; // 100 ms
-
-	const auto start = time_us_32();
+	static u8 cycles = 0;
 
 	if (!init) {
 		if (state.piezo.busy) return;
 		anim_off(false);
 		cycle = 0;
-		frame = 1;
-		init = true;
+		cycles = repeat;
 		state.piezo.busy = true;
-		set_pwm_freq(state.piezo.freq);
-		const auto end = time_us_32();
-		auto elapsed_us = utils_time_diff_us(start, end);
-		const float elapsed_ms = elapsed_us / 1000.0f;
-		utils_printf("INIT took: %.2f ms (%ld us)\n", elapsed_ms, elapsed_us); // 7 MS!!!!!!!
+		init = true;
 	}
 
-	if (cycle == cycles + 3 || state.debug.dbg_btn == false) {
-		// deinit
+	if (cycle == cycles) {
 		init = false;
 		anim_off(true);
 		state.piezo.busy = false;
-		state.piezo.anim = false;
+		state.piezo.anim = OFF;
 		return;
 	}
 
-	frame = (frame + 1) % FRAME_TICKS;
+	if (frame < play_x10ms) set_pwm_freq(freq);
+	else set_pwm_freq(0);
 
-	if (frame % FRAME_TICKS == 0) {
-		// toodles
+	frame = (frame + 1) % (play_x10ms + pause_x10ms);
+	if (frame % (play_x10ms + pause_x10ms) == 0) {
+		cycle++;
 	}
 }
 
-void piezo_anim_short_ack() {
+static void anim_error() {
+	anim(100.f, 2, 10, 7);
+}
+
+static void anim_short_ack() {
+	anim(3050.f, 1, 4, 0);
+}
+
+static void anim_short_error() {
+	anim(100.f, 1, 4, 0);
 }
 
 void piezo_animation() {
@@ -145,17 +133,13 @@ void piezo_animation() {
 		case ERROR:
 			anim_error();
 			break;
+		case SHORT_ACK:
+			anim_short_ack();
+			break;
+		case SHORT_ERROR:
+			anim_short_error();
+		break;
 		default:
 			break;
 	}
-}
-
-void inc() {
-	state.piezo.freq += 50.f;
-	utils_printf("++, %f\n",state.piezo.freq);
-}
-
-void dec() {
-	state.piezo.freq -= 50.f;
-	utils_printf("--, %f\n",state.piezo.freq);
 }

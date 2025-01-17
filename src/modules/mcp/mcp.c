@@ -36,13 +36,13 @@ static u8 cache_mcp2_gpiob = 0;
 static u32 cache_last_mcp1_gpio = 0;
 static u32 cache_last_mcp2_gpio = 0;
 
-void write_register(const u8 address, const u8 regist, const u8 value) {
+static void write_register(const u8 address, const u8 regist, const u8 value) {
 	const u8 data[2] = { regist, value };
 	auto const result = i2c_write_blocking(MOD_MCP_I2C_PORT, address, data, 2, false);
 	if (result == PICO_ERROR_GENERIC) utils_error_mode(address == MOD_MCP_ADDR1 ? 11 : 12); // mode(11) (mode12)
 }
 
-u8 read_register(const u8 address, const u8 regist) {
+static u8 read_register(const u8 address, const u8 regist) {
 	u8 value;
 	auto result = i2c_write_blocking(MOD_MCP_I2C_PORT, address, &regist, 1, true);
 	if (result == PICO_ERROR_GENERIC) utils_error_mode(address == MOD_MCP_ADDR1 ? 13 : 14); // mode(13) (mode14)
@@ -51,7 +51,7 @@ u8 read_register(const u8 address, const u8 regist) {
 	return value;
 }
 
-u16 read_dual_registers(const u8 address, const u8 regist) {
+static u16 read_dual_registers(const u8 address, const u8 regist) {
 	u8 value[2] = { 0 };
 	auto result = i2c_write_blocking(MOD_MCP_I2C_PORT, address, &regist, 1, true);
 	if (result == PICO_ERROR_GENERIC) utils_error_mode(address == MOD_MCP_ADDR1 ? 17 : 18); // mode(17) (mode18)
@@ -60,27 +60,27 @@ u16 read_dual_registers(const u8 address, const u8 regist) {
 	return (value[1] << 8) | value[0];
 }
 
-inline bool is_bit_set(const u8 value, const u8 bit) {
+static inline bool is_bit_set(const u8 value, const u8 bit) {
 	return 0b1 & (value >> bit);
 }
 
-inline u8 cfg_address(const u8 data) {
+static inline u8 cfg_address(const u8 data) {
 	return is_bit_set(data, 7) ? MOD_MCP_ADDR2 : MOD_MCP_ADDR1;
 }
 
-inline u8 cfg_gpio_bank(const u8 data) {
+static inline u8 cfg_gpio_bank(const u8 data) {
 	return is_bit_set(data, 6) ? C_GPIOB : C_GPIOA;
 }
 
-inline u8 cfg_iodir_bank(const u8 data) {
+static inline u8 cfg_iodir_bank(const u8 data) {
 	return is_bit_set(data, 6) ? C_IODIRB : C_IODIRA;
 }
 
-inline u8 cfg_gppu_bank(const u8 data) {
+static inline u8 cfg_gppu_bank(const u8 data) {
 	return is_bit_set(data, 6) ? C_GPPUB : C_GPPUA;
 }
 
-inline void set_bit(u8 *value, const u8 bit, const bool set) {
+static inline void set_bit(u8 *value, const u8 bit, const bool set) {
 	if (set) {
 		*value |= (1 << bit);
 	} else {
@@ -110,7 +110,7 @@ void mcp_cfg_set_pull_up(u8 pinData, bool pull_up) {
 	write_register(address, bank, options);
 }
 
-void setup_bank_configuration(const u8 address, const u8 regist) {
+static void setup_bank_configuration(const u8 address, const u8 regist) {
 	u8 iocon_data = 0;
 	set_bit(&iocon_data, C_IOCON_BANK_BIT, false); // set to Bank Mode 0
 	set_bit(&iocon_data, C_IOCON_MIRROR_BIT, false);
