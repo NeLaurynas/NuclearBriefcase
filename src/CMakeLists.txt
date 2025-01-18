@@ -38,6 +38,8 @@ add_executable(NuclearBriefcase main.c
 		modules/wsleds/wsleds_data.h
 		modules/piezo/piezo.c
 		modules/piezo/piezo.h
+		modules/piezo/piezo_data.c
+		modules/piezo/piezo_data.h
 )
 
 pico_set_program_name(NuclearBriefcase "NuclearBriefcase")

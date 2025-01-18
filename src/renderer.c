@@ -59,7 +59,7 @@ static void set_state() {
 	if (state.debug.dbg_btn != dbg_btn_pressed) {
 		state.debug.dbg_btn = dbg_btn_pressed;
 		if (dbg_btn_pressed) {
-			piezo_play(SHORT_ACK);
+			piezo_play(MUSIC_UNDERWORLD);
 		}
 	}
 }

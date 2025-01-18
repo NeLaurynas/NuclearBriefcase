@@ -58,9 +58,9 @@ typedef int8_t i8;
 #define MOD_WSLEDS_PIO			pio0
 #define MOD_WSLEDS_SM			1
 #define MOD_WSLEDS_DMA_CH		1
-#define MOD_WSLEDS_PIN			2 // GP2
+#define MOD_WSLEDS_PIN			18
 
-#define MOD_PIEZO_PIN			6
+#define MOD_PIEZO_PIN			19
 #define MOD_PIEZO_DMA_CH_TOP	2
 #define MOD_PIEZO_DMA_CH_CC		3
 

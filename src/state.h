@@ -22,6 +22,8 @@ typedef enum {
 	ERROR,
 	SHORT_ACK,
 	SHORT_ERROR,
+	MUSIC_UNDERWORLD,
+	MUSIC_CRAZY_FROG,
 } piezo_anim_t;
 
 // FUNCTIONS

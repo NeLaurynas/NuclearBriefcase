@@ -37,12 +37,11 @@ int main() {
 	gpio_init(DBG_BTN_PIN);
 	gpio_pull_up(DBG_BTN_PIN);
 	gpio_set_dir(DBG_BTN_PIN, false);
-	sleep_ms(1000);
 #endif
 
-	wsleds_init();
+	// wsleds_init();
 	// mcp_init();
-	numbers_init();
+	// numbers_init();
 	// status_init();
 	piezo_init();
 
@@ -51,6 +50,8 @@ int main() {
 	adc_init();
 	adc_set_temp_sensor_enabled(true);
 	adc_select_input(4);
+
+	sleep_ms(1000); // let gpios settle down - doesn't work, TODO: read first gpio IN and discard result in render loop?
 
 	renderer_loop();
 }
