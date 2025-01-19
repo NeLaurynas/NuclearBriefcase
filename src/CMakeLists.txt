@@ -130,3 +130,12 @@ add_custom_command(
 		COMMAND /usr/bin/picotool load -f NuclearBriefcase.uf2
 )
 endif ()
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+	add_custom_command(
+			TARGET ${PROJECT_NAME}
+			POST_BUILD
+			COMMAND /usr/bin/openocd  -s tcl -f interface/cmsis-dap.cfg -f target/rp2350.cfg -c "adapter speed 5000" -c "program ${PROJECT_NAME}.elf verify reset exit"
+	)
+endif ()
+
