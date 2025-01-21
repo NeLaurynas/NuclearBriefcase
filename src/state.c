@@ -32,7 +32,7 @@ State state = {
 	},
 };
 
-CurrentState currentState = { };
+CurrentState current_state = { 0 };
 
 void state_set_0_if_possible(i8 *number) {
 	if (*number < 0) *number = 0;

@@ -126,13 +126,13 @@ static void anim_target() {
 		const u8 y_led = y_line + i * line_width;
 		if (x_line == get_line_x(target_dot) && y_line == get_line_y(target_dot)) {
 			// on target - blink green
-			currentState.wsleds.on_target = true;
+			current_state.wsleds.on_target = true;
 			buffer_top[y_led] = buffer_top[x_led] = reduce_brightness(
 				anim_color_reduction(TO_DIM, green_x_frame, FRAME_TICKS, 1.0f, 10),
 				COLOR_GREEN);
 		} else {
 			// show red blink dot over red lines
-			currentState.wsleds.on_target = false;
+			current_state.wsleds.on_target = false;
 			buffer_top[x_led] = get_line_x(x_led) == get_line_x(target_dot) && get_line_y(x_led) == get_line_y(target_dot)
 				&&
 				buffer_top[target_dot] != 0
@@ -369,7 +369,7 @@ static void anim_darkness() {
 	if (frame % FRAME_TICKS == 0) {
 		if (cycle <= cycles) {
 			memset(buffer_top, 0, sizeof(buffer_top));
-			const u32 color = currentState.wsleds.on_target ? COLOR_GREEN : COLOR_RED;
+			const u32 color = current_state.wsleds.on_target ? COLOR_GREEN : COLOR_RED;
 			for (u8 i = 0; i < utils_random_in_range(1, MOD_WSLEDS_LED_COUNT); i++) {
 				buffer_top[utils_random_in_range(0, MOD_WSLEDS_LED_COUNT)] = reduce_brightness(
 					255 - ((255 / cycles) * cycle), color);

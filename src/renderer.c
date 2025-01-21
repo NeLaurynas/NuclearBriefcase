@@ -66,16 +66,16 @@ static void set_state() {
 
 static void render_state() {
 	// Numbers module
-	if (state.numbers.number != currentState.numbers.number || state.numbers.target != currentState.numbers.target) {
-		currentState.numbers.number = state.numbers.number;
-		currentState.numbers.target = state.numbers.target;
+	if (state.numbers.number != current_state.numbers.number || state.numbers.target != current_state.numbers.target) {
+		current_state.numbers.number = state.numbers.number;
+		current_state.numbers.target = state.numbers.target;
 
 		numbers_display(state.numbers.number, state.numbers.target);
 	}
 
 	// Status module
-	if (state.status.numbers_on != currentState.status.numbers_on) {
-		currentState.status.numbers_on = state.status.numbers_on;
+	if (state.status.numbers_on != current_state.status.numbers_on) {
+		current_state.status.numbers_on = state.status.numbers_on;
 		status_set_on(MOD_STAT_LED_NUMBERS, state.status.numbers_on);
 		numbers_ok(state_get_bool(state.status.numbers_on));
 	}

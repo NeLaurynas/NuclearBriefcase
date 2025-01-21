@@ -84,6 +84,6 @@ typedef struct {
 } CurrentState;
 
 extern State state;
-extern CurrentState currentState;
+extern CurrentState current_state;
 
 #endif //STATE_H
