@@ -6,7 +6,7 @@
 
 #include <stdint.h>
 
-#include "defines/config.h"
+#include "shared_config.h"
 
 // ENUMS
 

@@ -11,7 +11,7 @@
 #include "state.h"
 #include "utils.h"
 #include "defines/config.h"
-#include "modules/mcp/mcp.h"
+#include "shared_modules/mcp/mcp.h"
 
 static u8 bits[] = {
 	0b0111111, // 0

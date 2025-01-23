@@ -10,7 +10,6 @@
 #include "hardware/adc.h"
 #include "hardware/clocks.h"
 #include "hardware/pio.h"
-#include "modules/mcp/mcp.h"
 #include "modules/numbers/numbers.h"
 #include "modules/piezo/piezo.h"
 #include "modules/status/status.h"

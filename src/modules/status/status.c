@@ -4,7 +4,7 @@
 #include "status.h"
 
 #include "defines/config.h"
-#include "modules/mcp/mcp.h"
+#include "shared_modules/mcp/mcp.h"
 
 void status_init() {
 	mcp_cfg_set_pin_out_mode(MOD_STAT_LED_NUMBERS, true);

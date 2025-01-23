@@ -3,7 +3,8 @@
 
 #ifndef ANIM_H
 #define ANIM_H
-#include "defines/config.h"
+
+#include "shared_config.h"
 
 typedef enum {
 	TO_BRIGHT, TO_DIM, PULSE

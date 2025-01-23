@@ -7,15 +7,6 @@
 #include <hardware/i2c.h>
 #include <pico/types.h>
 
-typedef uint32_t u32;
-typedef uint16_t u16;
-typedef uint8_t u8;
-typedef int32_t i32;
-typedef int16_t i16;
-typedef int8_t i8;
-
-#define DBG true
-
 #define RENDER_TICK 10'000
 #define ANIM_FRAME_COUNT 10'000
 
@@ -47,13 +38,6 @@ typedef int8_t i8;
 
 #define MOD_STAT_LED_NUMBERS (u8)((1 << 7) | (1 << 6) | 0)
 
-#define MOD_MCP_PIN_SDA		16
-#define MOD_MCP_PIN_SCL		17
-#define MOD_MCP_I2C_PORT	(&i2c0_inst)
-#define MOD_MCP_ADDR1		0x20
-#define MOD_MCP_ADDR2		0x21
-#define MOD_MCP_GPIO_CACHE_MS 6
-
 #define MOD_WSLEDS_LED_COUNT	64
 #define MOD_WSLEDS_PIO			pio0
 #define MOD_WSLEDS_SM			1
@@ -65,7 +49,5 @@ typedef int8_t i8;
 #define MOD_PIEZO_DMA_CH_CC		3
 
 #define DBG_BTN_PIN		7
-
-#define INTERNAL_LED 25
 
 #endif //CONFIG_H

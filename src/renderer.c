@@ -10,10 +10,10 @@
 #include "state.h"
 #include "utils.h"
 #include "defines/config.h"
-#include "modules/mcp/mcp.h"
 #include "modules/numbers/numbers.h"
 #include "modules/piezo/piezo.h"
 #include "modules/status/status.h"
+#include "shared_modules/mcp/mcp.h"
 
 static void set_state() {
 	if (state.phase != IDLE) return; // busy

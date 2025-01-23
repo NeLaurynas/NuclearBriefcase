@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.30)
 
 set(CMAKE_C_STANDARD 23)
 set(CMAKE_C_EXTENSIONS ON)
@@ -16,17 +16,12 @@ project(NuclearBriefcase C CXX ASM)
 pico_sdk_init()
 
 # Add executable. Default name is the project name, version 0.1
-
 add_executable(NuclearBriefcase main.c
 		defines/config.h
 		modules/numbers/numbers.c
 		modules/numbers/numbers.h
-		modules/mcp/mcp.c
-		modules/mcp/mcp.h
 		state.c
 		state.h
-		utils.c
-		utils.h
 		renderer.c
 		renderer.h
 		modules/status/status.c
@@ -59,6 +54,8 @@ target_compile_options(NuclearBriefcase PRIVATE
 		-mcpu=cortex-m33
 		-mfpu=fpv5-sp-d16
 		-mthumb
+		-ffunction-sections
+		-fdata-sections
 		>
 
 		$<$<CONFIG:Release>:
@@ -73,6 +70,8 @@ target_compile_options(NuclearBriefcase PRIVATE
 		-mcpu=cortex-m33
 		-mfpu=fpv5-sp-d16
 		-mthumb
+		-ffunction-sections
+		-fdata-sections
 		>
 )
 
@@ -84,6 +83,7 @@ target_link_options(NuclearBriefcase PRIVATE
 		-mcpu=cortex-m33
 		-mfpu=fpv5-sp-d16
 		-mthumb
+		-Wl,--gc-sections
 )
 
 # Generate PIO headers
@@ -108,7 +108,11 @@ target_link_libraries(NuclearBriefcase
 # Add the standard include files to the build
 target_include_directories(NuclearBriefcase PRIVATE
 		${CMAKE_CURRENT_LIST_DIR}
+		${CMAKE_CURRENT_LIST_DIR}/../lib/pico-shared
 )
+
+add_subdirectory(../lib/pico-shared ${CMAKE_BINARY_DIR}/pico-shared)
+target_link_libraries(NuclearBriefcase pico-shared)
 
 # Add any user requested libraries
 target_link_libraries(NuclearBriefcase

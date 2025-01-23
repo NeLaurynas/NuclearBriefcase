@@ -4,7 +4,7 @@
 #ifndef NUMBERS_H
 #define NUMBERS_H
 
-#include "defines/config.h"
+#include "shared_config.h"
 
 void numbers_init();
 
