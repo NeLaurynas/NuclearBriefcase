@@ -279,7 +279,6 @@ static void anim_explosion() {
 	static u32 ring_colors[7] = { COLOR_RED, COLOR_ORANGE, COLOR_YELLOW, COLOR_WHITE, COLOR_YELLOW, COLOR_ORANGE,
 	                              COLOR_RED };
 	static u16 frame = 0;
-	static u8 stages = 13;
 	static constexpr u16 FRAME_TICKS = 33;
 
 	if (!init) {
