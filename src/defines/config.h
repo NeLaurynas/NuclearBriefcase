@@ -48,6 +48,4 @@
 #define MOD_PIEZO_DMA_CH_TOP	2
 #define MOD_PIEZO_DMA_CH_CC		3
 
-#define DBG_BTN_PIN		7
-
 #endif //CONFIG_H

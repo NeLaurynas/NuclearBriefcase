@@ -17,19 +17,12 @@ State state = {
 	},
 
 	.piezo = {
-		.anim = OFF,
+		.anim = OFF_PIEZO,
 		.busy = false,
 		.freq = 150,
 	},
 
 	.phase = IDLE,
-
-	.debug = {
-		.dbg_btn = false,
-		.last_encoder_change = 0,
-		.last_encoder_incrementing = 0,
-		.last_encoder_decrementing = 0,
-	},
 };
 
 CurrentState current_state = { 0 };

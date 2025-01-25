@@ -18,7 +18,7 @@ typedef enum {
 } phase_t;
 
 typedef enum {
-	OFF,
+	OFF_PIEZO,
 	ERROR,
 	SHORT_ACK,
 	SHORT_ERROR,
@@ -59,13 +59,6 @@ typedef struct {
 	} piezo;
 
 	phase_t phase;
-
-	struct {
-		bool dbg_btn;
-		u32 last_encoder_change;
-		bool last_encoder_incrementing;
-		bool last_encoder_decrementing;
-	} debug;
 } State;
 
 typedef struct {

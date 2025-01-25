@@ -101,7 +101,7 @@ static void anim(const float freq, const u8 repeat, const u16 play_x10ms, const 
 		init = false;
 		anim_off(true);
 		state.piezo.busy = false;
-		state.piezo.anim = OFF;
+		state.piezo.anim = OFF_PIEZO;
 		return;
 	}
 
@@ -141,7 +141,7 @@ static void anim_melody(const char *melody, const float pause, const float pace)
 		init = false;
 		anim_off(true);
 		state.piezo.busy = false;
-		state.piezo.anim = OFF;
+		state.piezo.anim = OFF_PIEZO;
 		return;
 	}
 
@@ -195,7 +195,7 @@ static void anim_crazy_frog() {
 
 void piezo_animation() {
 	switch (state.piezo.anim) {
-		case OFF:
+		case OFF_PIEZO:
 			anim_off(true);
 			break;
 		case ERROR:

@@ -54,14 +54,6 @@ static void set_state() {
 
 	// Status module
 	state_set_bool_if_possible(&state.status.numbers_on, state.numbers.target == state.numbers.number);
-
-	const bool dbg_btn_pressed = !gpio_get(DBG_BTN_PIN);
-	if (state.debug.dbg_btn != dbg_btn_pressed) {
-		state.debug.dbg_btn = dbg_btn_pressed;
-		if (dbg_btn_pressed) {
-			piezo_play(MUSIC_UNDERWORLD);
-		}
-	}
 }
 
 static void render_state() {
@@ -122,12 +114,12 @@ void renderer_loop() {
 #if DBG
 		acc_elapsed_us += (remaining_us + elapsed_us);
 
-		if (acc_elapsed_us >= 10 * 1'000'000) { // 10 seconds
+		if (acc_elapsed_us >= 1 * 1'000'000) { // 10 seconds
 			const float elapsed_ms = elapsed_us / 1000.0f;
 			utils_printf("render took: %.2f ms (%ld us)\n", elapsed_ms, elapsed_us);
 			utils_print_onboard_temp();
 
-			size_t allocated = 480 * 1024;
+			size_t allocated = 502 * 1024;
 			// so 480 kb is free for sure
 			char *ptr = malloc(allocated);
 			if (ptr != NULL) { // seems to panic and not return null
