@@ -15,7 +15,6 @@
 #include "modules/status/status.h"
 #include "modules/wsleds/wsleds.h"
 #include "pico/stdlib.h"
-#include "data/firetruck_siren.h"
 
 int main() {
 	gpio_init(INTERNAL_LED);
@@ -35,8 +34,6 @@ int main() {
 	sleep_ms(2000);
 	utils_printf("slept for 2 seconds\n");
 #endif
-
-	utils_printf("!!!!!!!!!!!!!! %d\n", firetruck_siren_mp3[0]);
 
 	wsleds_init();
 	// mcp_init();
