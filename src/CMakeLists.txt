@@ -57,8 +57,6 @@ target_compile_options(NuclearBriefcase PRIVATE
 		-mthumb
 		-ffunction-sections
 		-fdata-sections
-		-fsanitize=undefined,bounds,float-divide-by-zero
-		-fsanitize-trap=undefined,bounds,float-divide-by-zero
 		>
 
 		$<$<CONFIG:Release>:
