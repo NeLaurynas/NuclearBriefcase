@@ -94,15 +94,15 @@ pico_generate_pio_header(NuclearBriefcase ${CMAKE_CURRENT_LIST_DIR}/modules/numb
 pico_generate_pio_header(NuclearBriefcase ${CMAKE_CURRENT_LIST_DIR}/modules/wsleds/pio_wsleds.pio)
 
 # Modify the below lines to enable/disable output over UART/USB
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
 	pico_enable_stdio_uart(NuclearBriefcase 1)
 	pico_enable_stdio_usb(NuclearBriefcase 0)
-elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
+elseif (CMAKE_BUILD_TYPE STREQUAL "Release")
 	pico_enable_stdio_uart(NuclearBriefcase 0)
 	pico_enable_stdio_usb(NuclearBriefcase 1)
-else()
+else ()
 	message(WARNING "Unhandled build type: ${CMAKE_BUILD_TYPE}")
-endif()
+endif ()
 
 # Add the standard library to the build
 target_link_libraries(NuclearBriefcase
@@ -130,19 +130,18 @@ target_link_libraries(NuclearBriefcase
 
 pico_add_extra_outputs(NuclearBriefcase)
 
-if(CMAKE_BUILD_TYPE STREQUAL "Release")
-add_custom_command(
-		TARGET NuclearBriefcase
-		POST_BUILD
-		COMMAND /usr/bin/picotool load -f NuclearBriefcase.uf2
-)
-endif ()
-
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+if (CMAKE_BUILD_TYPE STREQUAL "Release")
 	add_custom_command(
-			TARGET NuclearBriefcase
+			TARGET ${PROJECT_NAME}
 			POST_BUILD
-			COMMAND /usr/bin/openocd  -s tcl -f interface/cmsis-dap.cfg -f target/rp2350.cfg -c "adapter speed 5000" -c "program NuclearBriefcase.elf verify reset exit"
+			COMMAND /opt/homebrew/bin/picotool load -f ${PROJECT_NAME}.uf2
 	)
 endif ()
 
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+	add_custom_command(
+			TARGET ${PROJECT_NAME}
+			POST_BUILD
+			COMMAND /usr/local/bin/openocd -s tcl -f interface/cmsis-dap.cfg -f target/rp2350.cfg -c "adapter speed 5000" -c "program ${PROJECT_NAME}.elf verify reset exit"
+	)
+endif ()

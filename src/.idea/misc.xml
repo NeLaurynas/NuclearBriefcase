@@ -7,6 +7,7 @@
   <component name="CidrRootsConfiguration">
     <libraryRoots>
       <file path="$PROJECT_DIR$/../lib/pico-shared" />
+      <file path="$PROJECT_DIR$/../../official/pico-sdk" />
       <file path="/usr/share/pico-sdk" />
     </libraryRoots>
   </component>
