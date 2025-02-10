@@ -89,6 +89,7 @@ void renderer_init(void (*animation_functions[])(), u8 animation_function_count)
 void renderer_loop() {
 #if DBG
 	static int64_t acc_elapsed_us = 0;
+	static bool debug = true;
 #endif
 
 	static u16 anim_frame = 0;
@@ -107,9 +108,9 @@ void renderer_loop() {
 		anim_frame = (anim_frame + 1) % ANIM_FRAME_COUNT;
 		utils_internal_led(anim_frame % 100 == 0);
 
-		auto end = time_us_32();
-		auto elapsed_us = utils_time_diff_us(start, end);
-		auto remaining_us = RENDER_TICK - elapsed_us;
+		const auto end = time_us_32();
+		const auto elapsed_us = utils_time_diff_us(start, end);
+		const u32 remaining_us = elapsed_us > RENDER_TICK ? 0 : RENDER_TICK - elapsed_us;
 
 #if DBG
 		acc_elapsed_us += (remaining_us + elapsed_us);
@@ -119,7 +120,10 @@ void renderer_loop() {
 			utils_printf("render took: %.2f ms (%ld us)\n", elapsed_ms, elapsed_us);
 			utils_print_onboard_temp();
 
-			size_t allocated = 502 * 1024;
+			gpio_put(16, debug);
+			debug = !debug;
+
+			size_t allocated = 480 * 1024;
 			// so 480 kb is free for sure
 			char *ptr = malloc(allocated);
 			if (ptr != NULL) { // seems to panic and not return null
@@ -132,10 +136,6 @@ void renderer_loop() {
 			printf("Free'd: %zu KB\n", allocated / 1024);
 
 			acc_elapsed_us = 0;
-			// recalculate because printf is slow
-			end = time_us_32();
-			elapsed_us = utils_time_diff_us(start, end);
-			remaining_us = RENDER_TICK - elapsed_us;
 		}
 #endif
 
