@@ -8,6 +8,6 @@
 
 void renderer_init(void (*animation_functions[])(), u8 animation_function_count);
 
-void renderer_loop();
+[[noreturn]] void renderer_loop();
 
 #endif //RENDERER_H

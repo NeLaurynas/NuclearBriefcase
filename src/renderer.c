@@ -86,7 +86,7 @@ void renderer_init(void (*animation_functions[])(), u8 animation_function_count)
 	animation_fn_count = animation_function_count;
 }
 
-void renderer_loop() {
+[[noreturn]] void renderer_loop() {
 #if DBG
 	static int64_t acc_elapsed_us = 0;
 	static bool debug = true;
@@ -126,7 +126,7 @@ void renderer_loop() {
 			size_t allocated = 480 * 1024;
 			// so 480 kb is free for sure
 			char *ptr = malloc(allocated);
-			if (ptr != NULL) { // seems to panic and not return null
+			if (ptr != NULL) [[likely]] { // seems to panic and not return null
 				printf("Successfully allocated: %zu KB\n", allocated / 1024);
 			} else {
 				printf("Failed to allocate %zu KB\n", allocated / 1024);
