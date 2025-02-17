@@ -89,7 +89,6 @@ void renderer_init(void (*animation_functions[])(), u8 animation_function_count)
 [[noreturn]] void renderer_loop() {
 #if DBG
 	static int64_t acc_elapsed_us = 0;
-	static bool debug = true;
 #endif
 
 	static u16 anim_frame = 0;
@@ -119,9 +118,6 @@ void renderer_init(void (*animation_functions[])(), u8 animation_function_count)
 			const float elapsed_ms = elapsed_us / 1000.0f;
 			utils_printf("render took: %.2f ms (%ld us)\n", elapsed_ms, elapsed_us);
 			utils_print_onboard_temp();
-
-			gpio_put(16, debug);
-			debug = !debug;
 
 			size_t allocated = 480 * 1024;
 			// so 480 kb is free for sure

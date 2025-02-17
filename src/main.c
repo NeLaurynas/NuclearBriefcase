@@ -20,9 +20,6 @@ int main() {
 	gpio_init(INTERNAL_LED);
 	gpio_set_dir(INTERNAL_LED, GPIO_OUT);
 
-	gpio_init(16);
-	gpio_set_dir(16, GPIO_OUT);
-	// gpio_set_drive_strength(16, GPIO_DRIVE_STRENGTH_2MA);
 
 	const void (*animation_functions[])() = { wsleds_animation, piezo_animation };
 	constexpr u8 anim_fn_size = ARRAY_SIZE(animation_functions);
@@ -39,7 +36,7 @@ int main() {
 	utils_printf("slept for 2 seconds\n");
 #endif
 
-	// wsleds_init();
+	wsleds_init();
 	// mcp_init();
 	// numbers_init();
 	// status_init();
