@@ -18,7 +18,7 @@
 
 static const u8 line_width = (u8)sqrt(MOD_WSLEDS_LED_COUNT);
 
-static u32 reduce_brightness(const i16 reduction, const u32 color) {
+static u32 reduce_brightness(const u32 reduction, const u32 color) {
 	u16 r = (color >> 16) & 0b11111111;
 	u16 g = (color >> 8) & 0b11111111;
 	u16 b = color & 0b11111111;
@@ -212,14 +212,14 @@ static void anim_countdown() {
 	if (number == -2) {
 		// deinit
 		init = false;
-		state.phase = EXPLOSION;
+		state.phase = PHASE_EXPLOSION;
 		memset(buffer_top, 0, sizeof(buffer_top));
 		buffer_transfer();
 		return;
 	}
 
 	if (frame % FRAME_TICKS == 0) {
-		if (number >= 0) memcpy(buffer_top, NUMBERS[number], sizeof(buffer_top));
+		if (number >= 0) memcpy(buffer_top, WSLEDS_NUMBERS[number], sizeof(buffer_top));
 		number--;
 	}
 	for (u8 i = 0; i < MOD_WSLEDS_LED_COUNT; i++) { // why use led count config, when a lot assumes it's 8x8...
@@ -242,15 +242,15 @@ static void anim_countdown() {
 }
 
 static inline void fill_ring_with_color(const u8 *ring, const u8 size, const u32 color) {
-	for (u8 i = 0; i < size; i++) {
+	for (auto i = 0; i < size; i++) {
 		buffer_top[ring[i]] = color;
 	}
 }
 
 static void anim_explosion() {
 	static bool init = false;
-	static i8 stage = 0;
-	static u8 rotation = 0;
+	static u32 stage = 0;
+	static u32 rotation = 0;
 	static u8 ring0_loc[1] = { 27 };
 	static u8 ring1_loc[5] = { 19, 26, 28, 35, 36 };
 	static u8 ring2_loc[9] = { 11, 18, 20, 25, 29, 34, 37, 43, 44 };
@@ -287,7 +287,6 @@ static void anim_explosion() {
 		init = true;
 		rotation = utils_random_in_range(0, 3);
 		memset(buffer_top, 0, sizeof(buffer_top));
-		// goto end;
 	}
 
 	if (stage == 14) {
@@ -295,12 +294,12 @@ static void anim_explosion() {
 		init = false;
 		memset(buffer_top, 0, sizeof(buffer_top));
 		buffer_transfer();
-		state.phase = DARKNESS;
+		state.phase = PHASE_DARKNESS;
 		return;
 	}
 
-	for (u8 i = 0; i < ARRAY_SIZE(rings); i++) {
-		const i8 x = stage - i;
+	for (u32 i = 0; i < ARRAY_SIZE(rings); i++) {
+		const i32 x = (i32)(stage - i);
 		const auto ring = rings[i];
 		const auto size = ring_sizes[i];
 		if (x < 0 || x > 7) fill_ring_with_color(ring, size, COLOR_OFF);
@@ -320,15 +319,14 @@ static void anim_explosion() {
 
 	// random flicker
 	if (frame % 10 == 0)
-		for (u8 i = 0; i < MOD_WSLEDS_LED_COUNT; i++) {
+		for (auto i = 0; i < MOD_WSLEDS_LED_COUNT; i++) {
 			if (buffer_top[i] == 0) continue;
-			const i8 reduction = utils_random_in_range(0, 8) - 4;
+			const u32 reduction = utils_random_in_range(0, 8) - 4;
 			buffer_top[i] = reduce_brightness(reduction, buffer_top[i]);
 		}
 
 	if (frame % FRAME_TICKS == 0) stage++;
 
-end:
 	if (stage != 14) {
 		frame = (frame + 1);
 		rotate_buffer_left(rotation);
@@ -338,10 +336,10 @@ end:
 
 static void anim_darkness() {
 	static bool init = false;
-	static u8 cycle = 0;
-	static u16 frame = 0;
-	static u8 cycles = 6;
-	static constexpr u16 FRAME_TICKS = 64;
+	static u32 cycle = 0;
+	static u32 frame = 0;
+	static u32 cycles = 6;
+	static constexpr u32 FRAME_TICKS = 64;
 
 	if (!init) {
 		cycle = 0;
@@ -353,15 +351,15 @@ static void anim_darkness() {
 	if (cycle == cycles + 3) {
 		// deinit
 		init = false;
-		state.phase = IDLE;
+		state.phase = PHASE_IDLE;
 		return;
 	}
 
 	// random flicker
 	if (frame % 10 == 0)
-		for (u8 i = 0; i < MOD_WSLEDS_LED_COUNT; i++) {
+		for (auto i = 0; i < MOD_WSLEDS_LED_COUNT; i++) {
 			if (buffer_top[i] == 0) continue;
-			const i8 reduction = utils_random_in_range(0, 8) - 4;
+			const u32 reduction = utils_random_in_range(0, 8) - 4;
 			buffer_top[i] = reduce_brightness(reduction, buffer_top[i]);
 		}
 
@@ -369,32 +367,68 @@ static void anim_darkness() {
 		if (cycle <= cycles) {
 			memset(buffer_top, 0, sizeof(buffer_top));
 			const u32 color = current_state.wsleds.on_target ? COLOR_GREEN : COLOR_RED;
-			for (u8 i = 0; i < utils_random_in_range(1, MOD_WSLEDS_LED_COUNT); i++) {
-				buffer_top[utils_random_in_range(0, MOD_WSLEDS_LED_COUNT)] = reduce_brightness(
-					255 - ((255 / cycles) * cycle), color);
+			for (u32 i = 0; i < utils_random_in_range(1, MOD_WSLEDS_LED_COUNT); i++) {
+				buffer_top[utils_random_in_range(0, MOD_WSLEDS_LED_COUNT)] =
+					reduce_brightness(255 - ((255 / cycles) * cycle), color);
 			}
 		}
 
 		cycle++;
 	}
 
-	frame = (frame + 1);
+	frame++;
 	buffer_transfer();
+}
+
+static void anim_error(void) {
+	static bool init = false;
+	static u32 cycle = 0;
+	static u32 frame = 0;
+	static u32 cycles = 3;
+	static constexpr u16 FRAME_TICKS = 50;
+
+	if (!init) {
+		cycle = 0;
+		frame = 0;
+		init = true;
+	}
+
+	if (frame % FRAME_TICKS == 0) {
+		memcpy(buffer_top, WSLEDS_ERROR, sizeof(buffer_top));
+		cycle++;
+		if (cycle != cycles) state.piezo.anim = PIEZO_SHORT_ERROR;
+	}
+	for (auto i = 0; i < MOD_WSLEDS_LED_COUNT; i++) {
+		if (buffer_top[i] == 0) continue;
+		buffer_top[i] = reduce_brightness(anim_color_reduction(TO_DIM, frame, FRAME_TICKS, 1.00f, 1), COLOR_RED);
+	}
+
+	if (cycle == cycles) {
+		// deinit
+		init = false;
+		state.phase = PHASE_IDLE;
+	} else {
+		frame++;
+		buffer_transfer();
+	}
 }
 
 void wsleds_animation() {
 	switch (state.phase) {
-		case IDLE:
+		case PHASE_IDLE:
 			anim_target();
 			break;
-		case COUNTDOWN:
+		case PHASE_COUNTDOWN:
 			anim_countdown();
 			break;
-		case EXPLOSION:
+		case PHASE_EXPLOSION:
 			anim_explosion();
 			break;
-		case DARKNESS:
+		case PHASE_DARKNESS:
 			anim_darkness();
+			break;
+		case PHASE_ERROR:
+			anim_error();
 			break;
 		default:
 			break;

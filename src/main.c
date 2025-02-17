@@ -20,8 +20,11 @@ int main() {
 	gpio_init(INTERNAL_LED);
 	gpio_set_dir(INTERNAL_LED, GPIO_OUT);
 
+	gpio_init(MOD_DBG_BTN);
+	gpio_set_dir(MOD_DBG_BTN, GPIO_IN);
+	gpio_pull_up(MOD_DBG_BTN);
 
-	const void (*animation_functions[])() = { wsleds_animation, piezo_animation };
+	const void (*animation_functions[])() = { piezo_animation, wsleds_animation };
 	constexpr u8 anim_fn_size = ARRAY_SIZE(animation_functions);
 
 	// if (!set_sys_clock_khz(48'000, false)) utils_error_mode(47); // minimum to enable USB
@@ -40,7 +43,7 @@ int main() {
 	// mcp_init();
 	// numbers_init();
 	// status_init();
-	// piezo_init();
+	piezo_init();
 
 	renderer_init(animation_functions, anim_fn_size);
 

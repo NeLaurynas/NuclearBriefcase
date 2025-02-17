@@ -11,17 +11,18 @@
 // ENUMS
 
 typedef enum {
-	IDLE,
-	COUNTDOWN,
-	EXPLOSION,
-	DARKNESS
+	PHASE_IDLE,
+	PHASE_ERROR,
+	PHASE_COUNTDOWN,
+	PHASE_EXPLOSION,
+	PHASE_DARKNESS
 } phase_t;
 
 typedef enum {
-	OFF_PIEZO,
-	ERROR,
-	SHORT_ACK,
-	SHORT_ERROR,
+	PIEZO_OFF,
+	PIEZO_ERROR,
+	PIEZO_SHORT_ACK,
+	PIEZO_SHORT_ERROR,
 	MUSIC_UNDERWORLD,
 	MUSIC_CRAZY_FROG,
 } piezo_anim_t;
@@ -59,6 +60,8 @@ typedef struct {
 	} piezo;
 
 	phase_t phase;
+
+	bool dbg_pressed;
 } State;
 
 typedef struct {
@@ -74,6 +77,8 @@ typedef struct {
 	struct {
 		bool on_target;
 	} wsleds;
+
+	bool dbg_pressed;
 } CurrentState;
 
 extern State state;

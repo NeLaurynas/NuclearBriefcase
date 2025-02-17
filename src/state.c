@@ -17,12 +17,11 @@ State state = {
 	},
 
 	.piezo = {
-		.anim = OFF_PIEZO,
+		.anim = PIEZO_OFF,
 		.busy = false,
-		.freq = 150,
 	},
 
-	.phase = IDLE,
+	.phase = PHASE_IDLE,
 };
 
 CurrentState current_state = { 0 };

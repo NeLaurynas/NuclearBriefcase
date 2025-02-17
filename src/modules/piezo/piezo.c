@@ -101,7 +101,7 @@ static void anim(const float freq, const u8 repeat, const u16 play_x10ms, const 
 		init = false;
 		anim_off(true);
 		state.piezo.busy = false;
-		state.piezo.anim = OFF_PIEZO;
+		state.piezo.anim = PIEZO_OFF;
 		return;
 	}
 
@@ -141,7 +141,7 @@ static void anim_melody(const char *melody, const float pause, const float pace)
 		init = false;
 		anim_off(true);
 		state.piezo.busy = false;
-		state.piezo.anim = OFF_PIEZO;
+		state.piezo.anim = PIEZO_OFF;
 		return;
 	}
 
@@ -180,7 +180,7 @@ static void anim_short_ack() {
 }
 
 static void anim_short_error() {
-	anim(100.f, 1, 4, 0);
+	anim(100.f, 1, 10, 0);
 }
 
 static void anim_underworld() {
@@ -195,16 +195,16 @@ static void anim_crazy_frog() {
 
 void piezo_animation() {
 	switch (state.piezo.anim) {
-		case OFF_PIEZO:
+		case PIEZO_OFF:
 			anim_off(true);
 			break;
-		case ERROR:
+		case PIEZO_ERROR:
 			anim_error();
 			break;
-		case SHORT_ACK:
+		case PIEZO_SHORT_ACK:
 			anim_short_ack();
 			break;
-		case SHORT_ERROR:
+		case PIEZO_SHORT_ERROR:
 			anim_short_error();
 			break;
 		case MUSIC_UNDERWORLD:

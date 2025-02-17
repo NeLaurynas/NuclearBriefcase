@@ -16,7 +16,7 @@
 #include "shared_modules/mcp/mcp.h"
 
 static void set_state() {
-	if (state.phase != IDLE) return; // busy
+	if (state.phase != PHASE_IDLE) return; // busy
 
 	// Numbers module
 	const auto num_btn_pressed = mcp_is_pin_low(MOD_NUM_BTN);
@@ -54,6 +54,9 @@ static void set_state() {
 
 	// Status module
 	state_set_bool_if_possible(&state.status.numbers_on, state.numbers.target == state.numbers.number);
+
+	const bool dbg_pressed = gpio_get(MOD_DBG_BTN) == false; // pressed because is low
+	if (state.dbg_pressed != dbg_pressed) state.dbg_pressed = dbg_pressed;
 }
 
 static void render_state() {
@@ -71,9 +74,14 @@ static void render_state() {
 		status_set_on(MOD_STAT_LED_NUMBERS, state.status.numbers_on);
 		numbers_ok(state_get_bool(state.status.numbers_on));
 	}
-	if (state.phase == IDLE && state.status.numbers_on == 1) {
+	if (state.phase == PHASE_IDLE && state.status.numbers_on == 1) {
 		// if all systems green - go to next phase
-		state.phase = COUNTDOWN;
+		state.phase = PHASE_COUNTDOWN;
+	}
+
+	if (state.dbg_pressed != current_state.dbg_pressed) {
+		current_state.dbg_pressed = state.dbg_pressed;
+		if (state.dbg_pressed) state.phase = PHASE_ERROR;
 	}
 
 }
