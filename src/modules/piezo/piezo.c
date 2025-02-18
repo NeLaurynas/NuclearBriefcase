@@ -155,7 +155,7 @@ static void anim_melody(const char *melody, const float pause, const float pace)
 		const char octave = melody[i + 2];
 		const float frequency = piezo_data_get_frequency(note, accidental, octave);
 
-		next_trigger_frame = frame + (pace/(float)length) * 100;
+		next_trigger_frame = frame + (pace / (float)length) * 100;
 		next_trigger_pause = true;
 
 		cycle++;
@@ -164,7 +164,7 @@ static void anim_melody(const char *melody, const float pause, const float pace)
 		set_pwm_freq(frequency);
 	} else if (frame == next_trigger_frame && next_trigger_pause) {
 		set_pwm_freq(0);
-		next_trigger_frame = frame + ((pace/(float)length) * 100) * pause;
+		next_trigger_frame = frame + ((pace / (float)length) * 100) * pause;
 		next_trigger_pause = false;
 	}
 
@@ -183,13 +183,19 @@ static void anim_short_error() {
 	anim(100.f, 1, 10, 0);
 }
 
+static void anim_custom() {
+	anim(state.piezo.freq, 1, 4, 0);
+}
+
 static void anim_underworld() {
-	const char *melody = "Cn412Cn512An312An412As312As412Oxx06Oxx03Cn412Cn512An312An412As312As412Oxx06Oxx03Fn312Fn412Dn312Dn412Ds312Ds412Oxx06Oxx03Fn312Fn412Dn312Dn412Ds312Ds412Oxx06Oxx06Ds418Cs418Dn418Cs406Ds406Ds406Gs306Gn306Cs406Cn418Fs418Fn418En318As418An418Gs410Ds410Bn310As310An310Gs310Oxx03Oxx03Oxx03";
+	const char *melody =
+		"Cn412Cn512An312An412As312As412Oxx06Oxx03Cn412Cn512An312An412As312As412Oxx06Oxx03Fn312Fn412Dn312Dn412Ds312Ds412Oxx06Oxx03Fn312Fn412Dn312Dn412Ds312Ds412Oxx06Oxx06Ds418Cs418Dn418Cs406Ds406Ds406Gs306Gn306Cs406Cn418Fs418Fn418En318As418An418Gs410Ds410Bn310As310An310Gs310Oxx03Oxx03Oxx03";
 	anim_melody(melody, 1.3f, .8f);
 }
 
 static void anim_crazy_frog() {
-	const char *melody = "An402Cn504An404An408Dn504An404Gn404An402En504An404An408Fn504En504Cn504An404En504An504An408Gn404Gn408En404Bn404An401Oxx04An402Cn504An404An408Dn504An404Gn404An402En504An404An408Fn504En504Cn504An404En504An504An408Gn404Gn408En404Bn404An401Oxx04An308Gn304En304Dn304An402Cn504An404An408Dn504An404Gn404An402En504An404An408Fn504En504Cn504An404En504An504An408Gn404Gn408En404Bn404An401";
+	const char *melody =
+		"An402Cn504An404An408Dn504An404Gn404An402En504An404An408Fn504En504Cn504An404En504An504An408Gn404Gn408En404Bn404An401Oxx04An402Cn504An404An408Dn504An404Gn404An402En504An404An408Fn504En504Cn504An404En504An504An408Gn404Gn408En404Bn404An401Oxx04An308Gn304En304Dn304An402Cn504An404An408Dn504An404Gn404An402En504An404An408Fn504En504Cn504An404En504An504An408Gn404Gn408En404Bn404An401";
 	anim_melody(melody, .3f, .9f);
 }
 
@@ -203,6 +209,9 @@ void piezo_animation() {
 			break;
 		case PIEZO_SHORT_ACK:
 			anim_short_ack();
+			break;
+		case PIEZO_CUSTOM:
+			anim_custom();
 			break;
 		case PIEZO_SHORT_ERROR:
 			anim_short_error();

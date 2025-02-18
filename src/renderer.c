@@ -81,7 +81,7 @@ static void render_state() {
 
 	if (state.dbg_pressed != current_state.dbg_pressed) {
 		current_state.dbg_pressed = state.dbg_pressed;
-		if (state.dbg_pressed) state.phase = PHASE_ERROR;
+		if (state.dbg_pressed) state.phase = PHASE_COUNTDOWN;
 	}
 
 }

@@ -219,7 +219,11 @@ static void anim_countdown() {
 	}
 
 	if (frame % FRAME_TICKS == 0) {
-		if (number >= 0) memcpy(buffer_top, WSLEDS_NUMBERS[number], sizeof(buffer_top));
+		if (number >= 0) {
+			memcpy(buffer_top, WSLEDS_NUMBERS[number], sizeof(buffer_top));
+			state.piezo.freq = 2700.f - (float)(number * 150);
+			state.piezo.anim = PIEZO_CUSTOM;
+		}
 		number--;
 	}
 	for (u8 i = 0; i < MOD_WSLEDS_LED_COUNT; i++) { // why use led count config, when a lot assumes it's 8x8...
