@@ -15,6 +15,7 @@
 #include "utils.h"
 #include "wsleds_data.h"
 #include "defines/config.h"
+#include "modules/piezo/piezo.h"
 
 static const u8 line_width = (u8)sqrt(MOD_WSLEDS_LED_COUNT);
 
@@ -213,6 +214,7 @@ static void anim_countdown() {
 		// deinit
 		init = false;
 		state.phase = PHASE_EXPLOSION;
+		piezo_play(MUSIC_UNDERWORLD);
 		memset(buffer_top, 0, sizeof(buffer_top));
 		buffer_transfer();
 		return;
@@ -222,7 +224,7 @@ static void anim_countdown() {
 		if (number >= 0) {
 			memcpy(buffer_top, WSLEDS_NUMBERS[number], sizeof(buffer_top));
 			state.piezo.freq = 2700.f - (float)(number * 150);
-			state.piezo.anim = PIEZO_CUSTOM;
+			piezo_play(PIEZO_CUSTOM);
 		}
 		number--;
 	}
@@ -262,7 +264,7 @@ static void anim_explosion() {
 	static u8 ring4_loc[15] = { 2, 4, 9, 13, 16, 22, 31, 32, 39, 41, 46, 50, 53, 59, 60 };
 	static u8 ring5_loc[11] = { 1, 5, 8, 14, 23, 40, 47, 49, 54, 58, 61 };
 	static u8 ring6_loc[10] = { 0, 6, 7, 15, 48, 55, 56, 57, 62, 63 };
-	static u8 *const rings[] = {
+	static u8 const *rings[] = {
 		ring0_loc,
 		ring1_loc,
 		ring2_loc,
@@ -400,7 +402,7 @@ static void anim_error(void) {
 	if (frame % FRAME_TICKS == 0) {
 		memcpy(buffer_top, WSLEDS_ERROR, sizeof(buffer_top));
 		cycle++;
-		if (cycle != cycles) state.piezo.anim = PIEZO_SHORT_ERROR;
+		if (cycle != cycles) piezo_play(PIEZO_SHORT_ERROR);
 	}
 	for (auto i = 0; i < MOD_WSLEDS_LED_COUNT; i++) {
 		if (buffer_top[i] == 0) continue;

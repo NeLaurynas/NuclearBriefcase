@@ -81,7 +81,9 @@ static void render_state() {
 
 	if (state.dbg_pressed != current_state.dbg_pressed) {
 		current_state.dbg_pressed = state.dbg_pressed;
-		if (state.dbg_pressed) state.phase = PHASE_COUNTDOWN;
+		if (state.dbg_pressed) {
+			state.phase = PHASE_COUNTDOWN;
+		}
 	}
 
 }
@@ -127,7 +129,7 @@ void renderer_init(void (*animation_functions[])(), u8 animation_function_count)
 			utils_printf("render took: %.2f ms (%ld us)\n", elapsed_ms, elapsed_us);
 			utils_print_onboard_temp();
 
-			size_t allocated = 480 * 1024;
+			size_t allocated = 503 * 1024;
 			// so 480 kb is free for sure
 			char *ptr = malloc(allocated);
 			if (ptr != NULL) [[likely]] { // seems to panic and not return null

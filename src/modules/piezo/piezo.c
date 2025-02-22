@@ -60,7 +60,13 @@ void piezo_init() {
 }
 
 void piezo_play(const piezo_anim_t anim) {
-	if (!state.piezo.busy) state.piezo.anim = anim;
+	if (state.piezo.anim != PIEZO_OFF) state.piezo.prev_anim = state.piezo.anim;
+	state.piezo.anim = anim;
+}
+
+static void piezo_end() {
+	state.piezo.anim = state.piezo.prev_anim;
+	if (state.piezo.prev_anim != PIEZO_OFF) state.piezo.prev_anim = PIEZO_OFF;
 }
 
 static void set_pwm_freq(float freq_hz) {
@@ -89,19 +95,16 @@ static void anim(const float freq, const u8 repeat, const u16 play_x10ms, const 
 	static u8 cycles = 0;
 
 	if (!init) {
-		if (state.piezo.busy) return;
 		anim_off(false);
 		cycle = 0;
 		cycles = repeat;
-		state.piezo.busy = true;
 		init = true;
 	}
 
 	if (cycle == cycles) {
 		init = false;
 		anim_off(true);
-		state.piezo.busy = false;
-		state.piezo.anim = PIEZO_OFF;
+		piezo_end();
 		return;
 	}
 
@@ -124,12 +127,10 @@ static void anim_melody(const char *melody, const float pause, const float pace)
 	static bool next_trigger_pause = false;
 
 	if (!init) {
-		if (state.piezo.busy) return;
 		anim_off(false);
 		cycle = 0;
 		i = 0;
 		cycles = strlen(melody) / 5;
-		state.piezo.busy = true;
 		init = true;
 		frame = 0;
 		next_trigger_frame = 0;
@@ -140,8 +141,7 @@ static void anim_melody(const char *melody, const float pause, const float pace)
 		utils_printf("frame: %d\n", frame);
 		init = false;
 		anim_off(true);
-		state.piezo.busy = false;
-		state.piezo.anim = PIEZO_OFF;
+		piezo_end();
 		return;
 	}
 

@@ -4,21 +4,13 @@
 #include "state.h"
 
 State state = {
-	.numbers = {
-		.target = 0,
-		.number = 0,
-		.btn_pressed = 0,
-		.last_encoder_change = 0,
-		.last_encoder_incrementing = 0,
-		.last_encoder_decrementing = 0,
-	},
 	.status = {
 		.numbers_on = -1,
 	},
 
 	.piezo = {
 		.anim = PIEZO_OFF,
-		.busy = false,
+		.prev_anim = PIEZO_OFF,
 	},
 
 	.phase = PHASE_IDLE,

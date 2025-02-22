@@ -56,7 +56,7 @@ typedef struct {
 
 	struct {
 		piezo_anim_t anim;
-		bool busy;
+		piezo_anim_t prev_anim;
 		float freq;
 	} piezo;
 
