@@ -86,10 +86,11 @@ static void rotate_buffer_left(const u8 times) {
 	static u32 temp[MOD_WSLEDS_LED_COUNT] = { 0 };
 	if (times == 0) return;
 
-	for (u8 t = 0; t < times; t++) {
-		for (u8 i = 0; i < 8; i++) for (u8 j = 0; j < 8; j++) temp[(7 - j) * 8 + i] = buffer_top[i * 8 + j];
+	for (auto t = 0; t < times; t++) {
+		for (auto i = 0; i < 8; i++)
+			for (auto j = 0; j < 8; j++) temp[(7 - j) * 8 + i] = buffer_top[i * 8 + j];
 
-		for (u8 i = 0; i < MOD_WSLEDS_LED_COUNT; i++) {
+		for (auto i = 0; i < MOD_WSLEDS_LED_COUNT; i++) {
 			buffer_top[i] = temp[i];
 		}
 	}
@@ -122,7 +123,7 @@ static void anim_target() {
 	buffer_top[target_dot] = reduce_brightness(anim_color_reduction(TO_DIM, frame, FRAME_TICKS, 1.5f, 10), COLOR_CYAN);
 
 	// render X
-	for (u8 i = 0; i < line_width; i++) {
+	for (auto i = 0; i < line_width; i++) {
 		const u8 x_led = x_led_start(x_line) + i;
 		const u8 y_led = y_line + i * line_width;
 		if (x_line == get_line_x(target_dot) && y_line == get_line_y(target_dot)) {

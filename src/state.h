@@ -42,10 +42,10 @@ void state_set_minus();
 
 typedef struct {
 	struct {
+		u32 last_encoder_change;
 		i8 target;
 		i8 number;
 		bool btn_pressed;
-		u32 last_encoder_change;
 		bool last_encoder_incrementing;
 		bool last_encoder_decrementing;
 	} numbers;
