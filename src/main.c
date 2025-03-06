@@ -10,6 +10,7 @@
 #include "hardware/adc.h"
 #include "hardware/clocks.h"
 #include "hardware/pio.h"
+#include "modules/launch/launch.h"
 #include "modules/numbers/numbers.h"
 #include "modules/piezo/piezo.h"
 #include "modules/status/status.h"
@@ -24,11 +25,11 @@ int main() {
 	gpio_set_dir(MOD_DBG_BTN, GPIO_IN);
 	gpio_pull_up(MOD_DBG_BTN);
 
-	const void (*animation_functions[])() = { piezo_animation, wsleds_animation };
+	const void (*animation_functions[])() = { piezo_animation, wsleds_animation, launch_animation };
 	constexpr u8 anim_fn_size = ARRAY_SIZE(animation_functions);
 
-	// if (!set_sys_clock_khz(48'000, false)) utils_error_mode(47); // minimum to enable USB
-	if (!set_sys_clock_khz(18'000, false)) utils_error_mode(47);
+	if (!set_sys_clock_khz(48'000, false)) utils_error_mode(47); // minimum to enable USB
+	// if (!set_sys_clock_khz(18'000, false)) utils_error_mode(47);
 
 #if DBG
 	stdio_init_all(); // only for serial over usb/uart - printf
@@ -44,6 +45,7 @@ int main() {
 	// numbers_init();
 	// status_init();
 	piezo_init();
+	launch_init();
 
 	renderer_init(animation_functions, anim_fn_size);
 

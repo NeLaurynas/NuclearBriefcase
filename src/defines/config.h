@@ -48,6 +48,10 @@
 #define MOD_PIEZO_DMA_CH_TOP	2
 #define MOD_PIEZO_DMA_CH_CC		3
 
+#define MOD_LAUNCH_BTN		0
+#define MOD_LAUNCH_LED		20
+#define MOD_LAUNCH_DMA_CH	4
+
 #define MOD_DBG_BTN 2
 
 #endif //CONFIG_H

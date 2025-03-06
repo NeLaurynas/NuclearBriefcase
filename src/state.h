@@ -28,9 +28,15 @@ typedef enum {
 	MUSIC_CRAZY_FROG,
 } piezo_anim_t;
 
+typedef enum {
+	LAUNCH_OFF,
+	LAUNCH_ERROR,
+	LAUNCH_PULSE
+} launch_anim_t;
+
 // FUNCTIONS
 
-void state_set_0_if_possible(i8 *number);
+void state_set_0_if_needed(i8 *number);
 
 bool state_get_bool(i8 number);
 
@@ -55,10 +61,20 @@ typedef struct {
 	} status;
 
 	struct {
+		bool pressed;
+		launch_anim_t anim;
+	} launch;
+
+	struct {
 		piezo_anim_t anim;
 		piezo_anim_t prev_anim;
 		float freq;
 	} piezo;
+
+	struct {
+		i8 switch1_on;
+		i8 switch2_on;
+	} tumbler;
 
 	phase_t phase;
 
@@ -74,6 +90,10 @@ typedef struct {
 	struct {
 		i8 numbers_on;
 	} status;
+
+	struct {
+		bool pressed;
+	} launch;
 
 	struct {
 		bool on_target;

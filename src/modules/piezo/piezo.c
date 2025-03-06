@@ -14,8 +14,8 @@
 #include "utils.h"
 #include "defines/config.h"
 
-static uint slice = 0;
-static uint channel = 0;
+static u32 slice = 0;
+static u32 channel = 0;
 static u32 clock_freq_hz = 0;
 static u32 buffer_top[1] = { 0 };
 static u32 buffer_cc[1] = { 0 };

@@ -10,6 +10,7 @@
 #include "state.h"
 #include "utils.h"
 #include "defines/config.h"
+#include "modules/launch/launch.h"
 #include "modules/numbers/numbers.h"
 #include "modules/piezo/piezo.h"
 #include "modules/status/status.h"
@@ -33,12 +34,12 @@ static void set_state() {
 			state.numbers.last_encoder_change = time_us_32(); // TODO: change in other paths for debounce?
 			if (num_enc1 == true && num_enc2 == false) {
 				numbers_dec();
-				state_set_0_if_possible(&state.status.numbers_on);
+				state_set_0_if_needed(&state.status.numbers_on);
 				state.numbers.last_encoder_incrementing = false;
 				state.numbers.last_encoder_decrementing = true;
 			} else if (num_enc1 == false && num_enc2 == true) {
 				numbers_inc();
-				state_set_0_if_possible(&state.status.numbers_on);
+				state_set_0_if_needed(&state.status.numbers_on);
 				state.numbers.last_encoder_incrementing = true;
 				state.numbers.last_encoder_decrementing = false;
 			}
@@ -60,6 +61,7 @@ static void set_state() {
 }
 
 static void render_state() {
+	static bool eh = false;
 	// Numbers module
 	if (state.numbers.number != current_state.numbers.number || state.numbers.target != current_state.numbers.target) {
 		current_state.numbers.number = state.numbers.number;
@@ -74,15 +76,19 @@ static void render_state() {
 		status_set_on(MOD_STAT_LED_NUMBERS, state.status.numbers_on);
 		numbers_ok(state_get_bool(state.status.numbers_on));
 	}
-	if (state.phase == PHASE_IDLE && state.status.numbers_on == 1) {
+
+	// and launch button pressed
+	// if (state.phase == PHASE_IDLE && state.status.numbers_on == 1) {
 		// if all systems green - go to next phase
-		state.phase = PHASE_COUNTDOWN;
-	}
+		// state.phase = PHASE_COUNTDOWN;
+	// }
 
 	if (state.dbg_pressed != current_state.dbg_pressed) {
 		current_state.dbg_pressed = state.dbg_pressed;
 		if (state.dbg_pressed) {
-			state.phase = PHASE_COUNTDOWN;
+			// state.phase = PHASE_COUNTDOWN;
+			eh = !eh;
+			launch_animation();
 		}
 	}
 
@@ -124,12 +130,12 @@ void renderer_init(void (*animation_functions[])(), u8 animation_function_count)
 #if DBG
 		acc_elapsed_us += (remaining_us + elapsed_us);
 
-		if (acc_elapsed_us >= 1 * 1'000'000) { // 10 seconds
+		if (acc_elapsed_us >= 10 * 1'000'000) { // 10 seconds
 			const float elapsed_ms = elapsed_us / 1000.0f;
 			utils_printf("render took: %.2f ms (%ld us)\n", elapsed_ms, elapsed_us);
 			utils_print_onboard_temp();
 
-			size_t allocated = 503 * 1024;
+			size_t allocated = 501 * 1024;
 			// so 480 kb is free for sure
 			char *ptr = malloc(allocated);
 			if (ptr != NULL) [[likely]] { // seems to panic and not return null
@@ -139,7 +145,6 @@ void renderer_init(void (*animation_functions[])(), u8 animation_function_count)
 				break;
 			}
 			free(ptr);
-			printf("Free'd: %zu KB\n", allocated / 1024);
 
 			acc_elapsed_us = 0;
 		}

@@ -13,12 +13,21 @@ State state = {
 		.prev_anim = PIEZO_OFF,
 	},
 
+	.launch = {
+		.anim = LAUNCH_OFF,
+	},
+
+	.tumbler = {
+		.switch1_on = -1,
+		.switch2_on = -1,
+	},
+
 	.phase = PHASE_IDLE,
 };
 
 CurrentState current_state = { 0 };
 
-void state_set_0_if_possible(i8 *number) {
+void state_set_0_if_needed(i8 *number) {
 	if (*number < 0) *number = 0;
 }
 
@@ -28,7 +37,7 @@ inline bool state_get_bool(const i8 number) {
 
 void state_set_bool_if_possible(i8 *number, const bool val) {
 	if (*number < 0) return;
-	*number = val;
+	*number = val ? 1 : 0;
 }
 
 void state_set_minus() {
