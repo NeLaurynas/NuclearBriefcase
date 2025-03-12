@@ -36,11 +36,13 @@ typedef enum {
 
 // FUNCTIONS
 
-void state_set_0_if_needed(i8 *number);
+// void state_set_0_if_possible(i8 *number);
 
 bool state_get_bool(i8 number);
 
-void state_set_bool_if_possible(i8 *number, bool val);
+void state_exit_minus_if_possible(i8 *number, bool val);
+
+void state_set_bool_if_not_minus(i8 *number, bool val);
 
 void state_set_minus();
 
@@ -58,6 +60,8 @@ typedef struct {
 
 	struct {
 		i8 numbers_on;
+		i8 switches1_on;
+		i8 switches2_on;
 	} status;
 
 	struct {
@@ -72,13 +76,11 @@ typedef struct {
 	} piezo;
 
 	struct {
-		i8 switch1_on;
-		i8 switch2_on;
-	} tumbler;
+		bool switch1_on;
+		bool switch2_on;
+	} switches;
 
 	phase_t phase;
-
-	bool dbg_pressed;
 } State;
 
 typedef struct {
@@ -89,7 +91,14 @@ typedef struct {
 
 	struct {
 		i8 numbers_on;
+		i8 switches1_on;
+		i8 switches2_on;
 	} status;
+
+	struct {
+		bool switch1_on;
+		bool switch2_on;
+	} switches;
 
 	struct {
 		bool pressed;
@@ -98,8 +107,6 @@ typedef struct {
 	struct {
 		bool on_target;
 	} wsleds;
-
-	bool dbg_pressed;
 } CurrentState;
 
 extern State state;

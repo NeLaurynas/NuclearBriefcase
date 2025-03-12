@@ -14,16 +14,14 @@
 #include "modules/numbers/numbers.h"
 #include "modules/piezo/piezo.h"
 #include "modules/status/status.h"
+#include "modules/switches/switches.h"
 #include "modules/wsleds/wsleds.h"
 #include "pico/stdlib.h"
+#include "shared_modules/mcp/mcp.h"
 
 int main() {
 	gpio_init(INTERNAL_LED);
 	gpio_set_dir(INTERNAL_LED, GPIO_OUT);
-
-	gpio_init(MOD_DBG_BTN);
-	gpio_set_dir(MOD_DBG_BTN, GPIO_IN);
-	gpio_pull_up(MOD_DBG_BTN);
 
 	const void (*animation_functions[])() = { piezo_animation, wsleds_animation, launch_animation };
 	constexpr u8 anim_fn_size = ARRAY_SIZE(animation_functions);
@@ -35,23 +33,26 @@ int main() {
 	stdio_init_all(); // only for serial over usb/uart - printf
 #endif
 
-#if DBG
-	sleep_ms(2000);
-	utils_printf("slept for 2 seconds\n");
-#endif
+// #if DBG
+// 	sleep_ms(2000);
+// 	utils_printf("slept for 2 seconds\n");
+// #endif
 
 	wsleds_init();
-	// mcp_init();
+	mcp_init();
 	// numbers_init();
-	// status_init();
+	status_init();
 	piezo_init();
+	switches_init();
 	launch_init();
 
-	renderer_init(animation_functions, anim_fn_size);
+	state_set_minus();
 
 	adc_init();
 	adc_set_temp_sensor_enabled(true);
 	adc_select_input(4);
+
+	renderer_init(animation_functions, anim_fn_size);
 
 	renderer_loop();
 }
