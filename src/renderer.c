@@ -80,13 +80,29 @@ static void render_state() {
 		mcp_set_out(MOD_SWITCHES_LED1_R, !state_get_bool(state.status.switches1_on));
 		mcp_set_out(MOD_SWITCHES_LED1_G, state_get_bool(state.status.switches1_on));
 	}
+	if (state.switches.switch2_on != current_state.switches.switch2_on) {
+		current_state.switches.switch2_on = state.switches.switch2_on;
+		state_exit_minus_if_possible(&state.status.switches2_on, state.switches.switch2_on);
+		state_set_bool_if_not_minus(&state.status.switches2_on, state.switches.switch2_on);
+		mcp_set_out(MOD_SWITCHES_LED2_R, !state_get_bool(state.status.switches2_on));
+		mcp_set_out(MOD_SWITCHES_LED2_G, state_get_bool(state.status.switches2_on));
+	}
 
 	// Status module
-	if (state.status.numbers_on != current_state.status.numbers_on) {
-		current_state.status.numbers_on = state.status.numbers_on;
-		status_set_on(MOD_STAT_LED_NUMBERS, state.status.numbers_on);
-		numbers_ok(state_get_bool(state.status.numbers_on));
+	bool render_status = false;
+	if (state.status.switches1_on != current_state.status.switches1_on) {
+		render_status = true;
+		current_state.status.switches1_on = state.status.switches1_on;
 	}
+	if (state.status.switches2_on != current_state.status.switches2_on) {
+		render_status = true;
+		current_state.status.switches2_on = state.status.switches2_on;
+	}
+	if (render_status) status_render_leds();
+	// if (state.status.numbers_on != current_state.status.numbers_on) {
+	// 	current_state.status.numbers_on = state.status.numbers_on;
+	// 	render_status = true;
+	// }
 
 	// and launch button pressed
 	// if (state.phase == PHASE_IDLE && state.status.numbers_on == 1) {
@@ -109,6 +125,9 @@ void renderer_init(void (*animation_functions[])(), u8 animation_function_count)
 	current_state.switches.switch1_on = state.switches.switch1_on;
 	mcp_set_out(MOD_SWITCHES_LED1_R, true);
 	mcp_set_out(MOD_SWITCHES_LED1_G, false);
+	current_state.switches.switch2_on = state.switches.switch2_on;
+	mcp_set_out(MOD_SWITCHES_LED2_R, true);
+	mcp_set_out(MOD_SWITCHES_LED2_G, false);
 }
 
 [[noreturn]] void renderer_loop() {

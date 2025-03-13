@@ -25,7 +25,6 @@ void piezo_init() {
 
 	slice = pwm_gpio_to_slice_num(MOD_PIEZO_PIN);
 	channel = pwm_gpio_to_channel(MOD_PIEZO_PIN);
-	// 28
 
 	auto pwm_c = pwm_get_default_config();
 	pwm_c.top = 0;

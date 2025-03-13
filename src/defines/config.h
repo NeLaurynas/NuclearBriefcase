@@ -29,14 +29,17 @@
  *    7   6   5   4   3   2   1   0
  *  | M | B |       number          |
  */
-#define MOD_NUM_LEDR	(u8)((1 << 7) | (1 << 6) | 0) // MCP - first bit - MCP 2, second bit - Bank B - pin 0
-#define MOD_NUM_LEDG	(u8)((1 << 7) | (1 << 6) | 1) // MCP - first bit - MCP 2, second bit - Bank B - pin 1
-#define MOD_NUM_BTN		(u8)((1 << 7) | (1 << 6) | 2) // MCP - first bit - MCP 2, second bit - Bank B - pin 2
-#define MOD_NUM_ENC1	(u8)((1 << 7) | (1 << 6) | 3)
-#define MOD_NUM_ENC2	(u8)((1 << 7) | (1 << 6) | 4)
+#define MOD_NUM_LED_G	(u8)((1 << 7) | (1 << 6) | 4) // MCP 2 | Bank B | PIN 4
+#define MOD_NUM_LED_R	(u8)((1 << 7) | (0 << 6) | 4) // MCP 2 | Bank A | PIN 4
+#define MOD_NUM_BTN		(u8)((0 << 7) | (0 << 6) | 2) // MCP 1 | Bank A | PIN 2
+#define MOD_NUM_ENC1	(u8)((0 << 7) | (0 << 6) | 3) // MCP 1 | Bank A | PIN 3
+#define MOD_NUM_ENC2	(u8)((0 << 7) | (0 << 6) | 4) // MCP 1 | Bank A | PIN 4
 #define MOD_NUM_ENC_DEBOUNCE_MS 66
 
-#define MOD_STAT_LED_NUMBERS (u8)((1 << 7) | (1 << 6) | 0)
+#define MOD_STAT_LED_1		(u8)((1 << 7) | (0 << 6) | 5)
+#define MOD_STAT_LED_2		(u8)((1 << 7) | (0 << 6) | 6)
+#define MOD_STAT_LED_3		(u8)((1 << 7) | (0 << 6) | 7)
+#define MOD_STAT_LED_4		(u8)((1 << 7) | (1 << 6) | 3)
 
 #define MOD_WSLEDS_LED_COUNT	64
 #define MOD_WSLEDS_PIO			pio0
@@ -58,5 +61,10 @@
 #define MOD_SWITCHES_LED1_G		(u8)((1 << 7) | (0 << 6) | 1) // MCP 2 | Bank A | PIN 1
 #define MOD_SWITCHES_LED2_R		(u8)((1 << 7) | (0 << 6) | 2) // MCP 2 | Bank A | PIN 2
 #define MOD_SWITCHES_LED2_G		(u8)((1 << 7) | (0 << 6) | 3) // MCP 2 | Bank A | PIN 3
+#define MOD_SWITCHES_LED3_R		(u8)((1 << 7) | (1 << 6) | 7) // MCP 2 | Bank B | PIN 7
+#define MOD_SWITCHES_LED3_G		(u8)((1 << 7) | (1 << 6) | 6)
+#define MOD_SWITCHES_LED3_1		(u8)((1 << 7) | (1 << 6) | 5)
+#define MOD_SWITCHES_LED3_3		(u8)((1 << 7) | (1 << 6) | 2)
+#define MOD_SWITCHES_LED3_2		(u8)((1 << 7) | (1 << 6) | 1)
 
 #endif //CONFIG_H

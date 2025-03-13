@@ -4,12 +4,10 @@
 #ifndef STATUS_H
 #define STATUS_H
 
-#include <stdint.h>
-
 #include "shared_config.h"
 
 void status_init();
 
-void status_set_on(u8 led, i8 on);
+void status_render_leds();
 
 #endif //STATUS_H

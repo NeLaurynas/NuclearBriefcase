@@ -78,8 +78,8 @@ void numbers_init() {
 	sleep_ms(1);
 
 	// init MCP
-	mcp_cfg_set_pin_out_mode(MOD_NUM_LEDG, true);
-	mcp_cfg_set_pin_out_mode(MOD_NUM_LEDR, true);
+	mcp_cfg_set_pin_out_mode(MOD_NUM_LED_G, true);
+	mcp_cfg_set_pin_out_mode(MOD_NUM_LED_R, true);
 	mcp_cfg_set_pin_out_mode(MOD_NUM_ENC1, false);
 	mcp_cfg_set_pull_up(MOD_NUM_ENC1, true);
 	mcp_cfg_set_pin_out_mode(MOD_NUM_ENC2, false);
@@ -91,11 +91,6 @@ void numbers_init() {
 void numbers_display(const u8 number1, const u8 number2) {
 	buffer[0] = bits[number1] << 7 | bits[number2];
 	dma_channel_transfer_from_buffer_now(MOD_NUM_DMA_CH, buffer, 1);
-}
-
-void numbers_ok(const bool ok) {
-	mcp_set_out(MOD_NUM_LEDG, ok);
-	mcp_set_out(MOD_NUM_LEDR, !ok);
 }
 
 void numbers_generate_target() {

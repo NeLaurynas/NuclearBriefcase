@@ -7,6 +7,8 @@
 
 void switches_init();
 
+void switches_animation();
+
 void switches_set_on(u8 led, u8 on);
 
 #endif //SWITCHES_H

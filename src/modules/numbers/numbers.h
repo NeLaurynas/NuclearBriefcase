@@ -10,8 +10,6 @@ void numbers_init();
 
 void numbers_display(u8 number1, u8 number2);
 
-void numbers_ok(bool ok);
-
 void numbers_generate_target();
 
 void numbers_inc();
