@@ -39,11 +39,11 @@ inline void state_set_bool_if_not_minus(i8 *number, const bool val) {
 }
 
 void state_set_minus() {
-	// we regenerate numbers and switch position anyways, they will change to red state
+	// we regenerate numbers and switch position anyway, they will change to red state
 	state.status.switches1_on = -1;
-	current_state.status.switches1_on = -1;
 	state.status.switches2_on = -1;
-	current_state.status.switches2_on = -1;
+	state.status.switches3_on = -1;
+	state.status.numbers_on = -1;
 }
 
 inline bool state_all_ok() {

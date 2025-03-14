@@ -40,7 +40,7 @@ int main() {
 
 	wsleds_init();
 	mcp_init();
-	// numbers_init();
+	numbers_init();
 	status_init();
 	piezo_init();
 	switches_init();

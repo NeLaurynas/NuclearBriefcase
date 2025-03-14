@@ -21,37 +21,36 @@ static void set_state() {
 	if (state.phase != PHASE_IDLE) return; // busy
 
 	// Numbers module
-	// const auto num_btn_pressed = mcp_is_pin_low(MOD_NUM_BTN);
-	// if (state.numbers.btn_pressed != num_btn_pressed) {
-	// 	state.numbers.btn_pressed = num_btn_pressed;
-	// 	if (num_btn_pressed) numbers_generate_target();
-	// }
+	const auto num_btn_pressed = mcp_is_pin_low(MOD_NUM_BTN);
+	if (state.numbers.btn_pressed != num_btn_pressed) {
+		state.numbers.btn_pressed = num_btn_pressed;
+		if (num_btn_pressed) numbers_generate_target();
+	}
 	// potential refactor...
-	// if (utils_time_diff_ms(state.numbers.last_encoder_change, time_us_32()) > MOD_NUM_ENC_DEBOUNCE_MS) {
-	// 	const auto num_enc1 = mcp_is_pin_low(MOD_NUM_ENC1);
-	// 	const auto num_enc2 = mcp_is_pin_low(MOD_NUM_ENC2);
-	// 	if (num_enc1 != num_enc2) {
-	// 		state.numbers.last_encoder_change = time_us_32(); // TODO: change in other paths for debounce?
-	// 		if (num_enc1 == true && num_enc2 == false) {
-	// 			numbers_dec();
-	// 			state_set_0_if_possible(&state.status.numbers_on);
-	// 			state.numbers.last_encoder_incrementing = false;
-	// 			state.numbers.last_encoder_decrementing = true;
-	// 		} else if (num_enc1 == false && num_enc2 == true) {
-	// 			numbers_inc();
-	// 			state_set_0_if_possible(&state.status.numbers_on);
-	// 			state.numbers.last_encoder_incrementing = true;
-	// 			state.numbers.last_encoder_decrementing = false;
-	// 		}
-	// 	} else if (num_enc1 == true && num_enc2 == true) {
-	// 		state.numbers.last_encoder_change = time_us_32();
-	// 		if (state.numbers.last_encoder_incrementing) numbers_inc();
-	// 		else if (state.numbers.last_encoder_decrementing) numbers_dec();
-	// 	} else {
-	// 		state.numbers.last_encoder_incrementing = false;
-	// 		state.numbers.last_encoder_decrementing = false;
-	// 	}
-	// }
+	if (utils_time_diff_ms(state.numbers.last_encoder_change, time_us_32()) > MOD_NUM_ENC_DEBOUNCE_MS) {
+		const auto num_enc1 = mcp_is_pin_low(MOD_NUM_ENC1);
+		const auto num_enc2 = mcp_is_pin_low(MOD_NUM_ENC2);
+		if (num_enc1 != num_enc2) {
+			state.numbers.last_encoder_change = time_us_32(); // TODO: change in other paths for debounce?
+			if (num_enc1 == true && num_enc2 == false) {
+				numbers_dec();
+				state.numbers.last_encoder_incrementing = false;
+				state.numbers.last_encoder_decrementing = true;
+			} else if (num_enc1 == false && num_enc2 == true) {
+				numbers_inc();
+				state.numbers.last_encoder_incrementing = true;
+				state.numbers.last_encoder_decrementing = false;
+			}
+		} else if (num_enc1 == true && num_enc2 == true) {
+			state.numbers.last_encoder_change = time_us_32();
+			if (state.numbers.last_encoder_incrementing) numbers_inc();
+			else if (state.numbers.last_encoder_decrementing) numbers_dec();
+		} else {
+			state.numbers.last_encoder_incrementing = false;
+			state.numbers.last_encoder_decrementing = false;
+		}
+	}
+	state.status.numbers_on = state.numbers.number == state.numbers.target ? 1 : 0;
 
 	// Switches module
 	state.switches.switch1_on = mcp_is_pin_low(MOD_SWITCHES_SWITCH1);
@@ -60,67 +59,66 @@ static void set_state() {
 
 	// Launch module
 	state.launch.pressed = mcp_is_pin_low(MOD_LAUNCH_BTN);
-
-	// const bool dbg_pressed = gpio_get(MOD_DBG_BTN) == false; // pressed because is low
-	// if (state.dbg_pressed != dbg_pressed) state.dbg_pressed = dbg_pressed;
 }
 
 static void render_state() {
+	bool render_status = false;
+
 	// Numbers module
-	// if (state.numbers.number != current_state.numbers.number || state.numbers.target != current_state.numbers.target) {
-	// 	current_state.numbers.number = state.numbers.number;
-	// 	current_state.numbers.target = state.numbers.target;
-	//
-	// 	numbers_display(state.numbers.number, state.numbers.target);
-	// }
+	if (state.numbers.number != current_state.numbers.number || state.numbers.target != current_state.numbers.target) {
+		numbers_display(state.numbers.number, state.numbers.target);
+		const bool on = state_get_bool(state.status.numbers_on);
+		mcp_set_out(MOD_NUM_LED_G, on);
+		mcp_set_out(MOD_NUM_LED_R, !on);
+	}
 
 	// Switches module
 	if (state.switches.switch1_on != current_state.switches.switch1_on) {
 		current_state.switches.switch1_on = state.switches.switch1_on;
 		state_exit_minus_if_possible(&state.status.switches1_on, state.switches.switch1_on);
 		state_set_bool_if_not_minus(&state.status.switches1_on, state.switches.switch1_on);
-		const bool on = state_get_bool(state.status.switches1_on);
-		mcp_set_out(MOD_SWITCHES_LED1_R, !on);
-		mcp_set_out(MOD_SWITCHES_LED1_G, on);
 	}
 	if (state.switches.switch2_on != current_state.switches.switch2_on) {
 		current_state.switches.switch2_on = state.switches.switch2_on;
 		state_exit_minus_if_possible(&state.status.switches2_on, state.switches.switch2_on);
 		state_set_bool_if_not_minus(&state.status.switches2_on, state.switches.switch2_on);
-		const bool on = state_get_bool(state.status.switches2_on);
-		mcp_set_out(MOD_SWITCHES_LED2_R, !on);
-		mcp_set_out(MOD_SWITCHES_LED2_G, on);
 	}
 	if (state.switches.switch_position != current_state.switches.switch_position) {
 		current_state.switches.switch_position = state.switches.switch_position;
-		const bool on = state.switches.switch_position == state.switches.target_position;
-		state.status.switches3_on = on ? 1 : 0;
-		mcp_set_out(MOD_SWITCHES_LED3_G, on);
-		mcp_set_out(MOD_SWITCHES_LED3_R, !on);
+		state.status.switches3_on = state.switches.switch_position == state.switches.target_position;
 		switches_manage_leds();
 	}
 
 	// Status module
-	bool render_status = false;
 	if (state.status.switches1_on != current_state.status.switches1_on) {
 		render_status = true;
 		current_state.status.switches1_on = state.status.switches1_on;
-		if (current_state.status.switches1_on) piezo_play(PIEZO_SHORT_ACK);
+		if (current_state.status.switches1_on && state.phase == PHASE_IDLE) piezo_play(PIEZO_SHORT_ACK);
+		const bool on = state_get_bool(state.status.switches1_on);
+		mcp_set_out(MOD_SWITCHES_LED1_R, !on);
+		mcp_set_out(MOD_SWITCHES_LED1_G, on);
 	}
 	if (state.status.switches2_on != current_state.status.switches2_on) {
 		render_status = true;
 		current_state.status.switches2_on = state.status.switches2_on;
-		if (current_state.status.switches2_on) piezo_play(PIEZO_SHORT_ACK);
+		if (current_state.status.switches2_on && state.phase == PHASE_IDLE) piezo_play(PIEZO_SHORT_ACK);
+		const bool on = state_get_bool(state.status.switches2_on);
+		mcp_set_out(MOD_SWITCHES_LED2_R, !on);
+		mcp_set_out(MOD_SWITCHES_LED2_G, on);
 	}
 	if (state.status.switches3_on != current_state.status.switches3_on) {
 		render_status = true;
 		current_state.status.switches3_on = state.status.switches3_on;
-		if (current_state.status.switches3_on) piezo_play(PIEZO_SHORT_ACK);
+		if (current_state.status.switches3_on && state.phase == PHASE_IDLE) piezo_play(PIEZO_SHORT_ACK);
+		const bool on = state.switches.switch_position == state.switches.target_position;
+		mcp_set_out(MOD_SWITCHES_LED3_G, on);
+		mcp_set_out(MOD_SWITCHES_LED3_R, !on);
 	}
-	// if (state.status.numbers_on != current_state.status.numbers_on) {
-	// 	current_state.status.numbers_on = state.status.numbers_on;
-	// 	render_status = true;
-	// }
+	if (state.status.numbers_on != current_state.status.numbers_on) {
+		render_status = true;
+		current_state.status.numbers_on = state.status.numbers_on;
+		if (current_state.status.numbers_on && state.phase == PHASE_IDLE) piezo_play(PIEZO_SHORT_ACK);
+	}
 	if (render_status) status_render_leds();
 
 	if (state.launch.pressed != current_state.launch.pressed) {
@@ -133,11 +131,6 @@ static void render_state() {
 			}
 		}
 	}
-	// and launch button pressed
-	// if (state.phase == PHASE_IDLE && state.status.numbers_on == 1) {
-	// if all systems green - go to next phase
-	// state.phase = PHASE_COUNTDOWN;
-	// }
 }
 
 static void (**animation_fns)();
@@ -192,18 +185,6 @@ void renderer_init(void (*animation_functions[])(), u8 animation_function_count)
 			const float elapsed_ms = elapsed_us / 1000.0f;
 			utils_printf("render took: %.2f ms (%ld us)\n", elapsed_ms, elapsed_us);
 			utils_print_onboard_temp();
-
-			size_t allocated = 460 * 1024;
-			// so 480 kb is free for sure
-			char *ptr = malloc(allocated);
-			if (ptr != NULL) [[likely]] { // seems to panic and not return null
-				// printf("Successfully allocated: %zu KB\n", allocated / 1024);
-			} else {
-				printf("Failed to allocate %zu KB\n", allocated / 1024);
-				break;
-			}
-			free(ptr);
-
 			acc_elapsed_us = 0;
 		}
 #endif

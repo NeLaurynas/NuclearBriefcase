@@ -15,7 +15,9 @@
 #include "utils.h"
 #include "wsleds_data.h"
 #include "defines/config.h"
+#include "modules/numbers/numbers.h"
 #include "modules/piezo/piezo.h"
+#include "modules/switches/switches.h"
 
 static const u8 line_width = (u8)sqrt(MOD_WSLEDS_LED_COUNT);
 
@@ -87,8 +89,7 @@ static void rotate_buffer_left(const u8 times) {
 	if (times == 0) return;
 
 	for (auto t = 0; t < times; t++) {
-		for (auto i = 0; i < 8; i++)
-			for (auto j = 0; j < 8; j++) temp[(7 - j) * 8 + i] = buffer_top[i * 8 + j];
+		for (auto i = 0; i < 8; i++) for (auto j = 0; j < 8; j++) temp[(7 - j) * 8 + i] = buffer_top[i * 8 + j];
 
 		for (auto i = 0; i < MOD_WSLEDS_LED_COUNT; i++) {
 			buffer_top[i] = temp[i];
@@ -352,7 +353,10 @@ static void anim_darkness() {
 		cycle = 0;
 		frame = 1;
 		init = true;
+		// dependencies from other modules, not great
 		state_set_minus();
+		numbers_generate_target();
+		switches_generate_position();
 	}
 
 	if (cycle == cycles + 3) {

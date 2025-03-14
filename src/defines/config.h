@@ -31,9 +31,9 @@
  */
 #define MOD_NUM_LED_G	(u8)((1 << 7) | (1 << 6) | 4) // MCP 2 | Bank B | PIN 4
 #define MOD_NUM_LED_R	(u8)((1 << 7) | (0 << 6) | 4) // MCP 2 | Bank A | PIN 4
-#define MOD_NUM_BTN		(u8)((0 << 7) | (0 << 6) | 2) // MCP 1 | Bank A | PIN 2
-#define MOD_NUM_ENC1	(u8)((0 << 7) | (0 << 6) | 3) // MCP 1 | Bank A | PIN 3
-#define MOD_NUM_ENC2	(u8)((0 << 7) | (0 << 6) | 4) // MCP 1 | Bank A | PIN 4
+#define MOD_NUM_BTN		(u8)((0 << 7) | (0 << 6) | 5) // MCP 1 | Bank A | PIN 5
+#define MOD_NUM_ENC1	(u8)((0 << 7) | (0 << 6) | 6) // MCP 1 | Bank A | PIN 6
+#define MOD_NUM_ENC2	(u8)((0 << 7) | (0 << 6) | 7) // MCP 1 | Bank A | PIN 7
 #define MOD_NUM_ENC_DEBOUNCE_MS 66
 
 #define MOD_STAT_LED_1		(u8)((1 << 7) | (0 << 6) | 5)
