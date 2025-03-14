@@ -87,7 +87,7 @@ static void render_state() {
 	}
 	if (state.switches.switch_position != current_state.switches.switch_position) {
 		current_state.switches.switch_position = state.switches.switch_position;
-		state.status.switches3_on = state.switches.switch_position == state.switches.target_position;
+		state.status.switches3_on = state.switches.switch_position == state.switches.target_position ? 1 : 0;
 		switches_manage_leds();
 	}
 
@@ -152,6 +152,8 @@ void renderer_init(void (*animation_functions[])(), u8 animation_function_count)
 	current_state.switches.switch2_on = state.switches.switch2_on;
 	mcp_set_out(MOD_SWITCHES_LED2_R, true);
 	mcp_set_out(MOD_SWITCHES_LED2_G, false);
+	mcp_set_out(MOD_SWITCHES_LED3_R, true);
+	mcp_set_out(MOD_SWITCHES_LED3_G, false);
 	switches_manage_leds();
 }
 

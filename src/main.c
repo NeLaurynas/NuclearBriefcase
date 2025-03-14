@@ -30,6 +30,7 @@ int main() {
 	// if (!set_sys_clock_khz(18'000, false)) utils_error_mode(47);
 
 	stdio_init_all(); // only for serial over usb/uart - printf (also uploading..)
+	// sleep_ms(2000);
 
 	wsleds_init();
 	mcp_init();
