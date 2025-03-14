@@ -225,6 +225,7 @@ static void anim_countdown() {
 	if (frame % FRAME_TICKS == 0) {
 		if (number >= 0) {
 			memcpy(buffer_top, WSLEDS_NUMBERS[number], sizeof(buffer_top));
+			rotate_buffer_left(3);
 			state.piezo.freq = 2700.f - (float)(number * 150);
 			piezo_play(PIEZO_CUSTOM);
 		}

@@ -66,6 +66,8 @@ static void render_state() {
 
 	// Numbers module
 	if (state.numbers.number != current_state.numbers.number || state.numbers.target != current_state.numbers.target) {
+		current_state.numbers.number = state.numbers.number;
+		current_state.numbers.target = state.numbers.target;
 		numbers_display(state.numbers.number, state.numbers.target);
 		const bool on = state_get_bool(state.status.numbers_on);
 		mcp_set_out(MOD_NUM_LED_G, on);
