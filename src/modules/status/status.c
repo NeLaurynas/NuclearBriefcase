@@ -21,6 +21,7 @@ void status_render_leds() {
 	if (state_get_bool(state.status.numbers_on)) ok_statuses++;
 	if (state_get_bool(state.status.switches1_on)) ok_statuses++;
 	if (state_get_bool(state.status.switches2_on)) ok_statuses++;
+	if (state_get_bool(state.status.switches3_on)) ok_statuses++;
 
 	for (auto i = 0; i < ok_statuses; i++) mcp_set_out(leds[i], true);
 	for (auto i = 3; i >= ok_statuses; i--) mcp_set_out(leds[i], false);

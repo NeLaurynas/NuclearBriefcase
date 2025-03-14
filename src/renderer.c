@@ -14,6 +14,7 @@
 #include "modules/numbers/numbers.h"
 #include "modules/piezo/piezo.h"
 #include "modules/status/status.h"
+#include "modules/switches/switches.h"
 #include "shared_modules/mcp/mcp.h"
 
 static void set_state() {
@@ -55,9 +56,10 @@ static void set_state() {
 	// Switches module
 	state.switches.switch1_on = mcp_is_pin_low(MOD_SWITCHES_SWITCH1);
 	state.switches.switch2_on = mcp_is_pin_low(MOD_SWITCHES_SWITCH2);
+	state.switches.switch_position = switches_get_position();
 
-	// Status module
-	// state_set_bool_if_possible(&state.status.numbers_on, state.numbers.target == state.numbers.number); // todo
+	// Launch module
+	state.launch.pressed = mcp_is_pin_low(MOD_LAUNCH_BTN);
 
 	// const bool dbg_pressed = gpio_get(MOD_DBG_BTN) == false; // pressed because is low
 	// if (state.dbg_pressed != dbg_pressed) state.dbg_pressed = dbg_pressed;
@@ -77,15 +79,25 @@ static void render_state() {
 		current_state.switches.switch1_on = state.switches.switch1_on;
 		state_exit_minus_if_possible(&state.status.switches1_on, state.switches.switch1_on);
 		state_set_bool_if_not_minus(&state.status.switches1_on, state.switches.switch1_on);
-		mcp_set_out(MOD_SWITCHES_LED1_R, !state_get_bool(state.status.switches1_on));
-		mcp_set_out(MOD_SWITCHES_LED1_G, state_get_bool(state.status.switches1_on));
+		const bool on = state_get_bool(state.status.switches1_on);
+		mcp_set_out(MOD_SWITCHES_LED1_R, !on);
+		mcp_set_out(MOD_SWITCHES_LED1_G, on);
 	}
 	if (state.switches.switch2_on != current_state.switches.switch2_on) {
 		current_state.switches.switch2_on = state.switches.switch2_on;
 		state_exit_minus_if_possible(&state.status.switches2_on, state.switches.switch2_on);
 		state_set_bool_if_not_minus(&state.status.switches2_on, state.switches.switch2_on);
-		mcp_set_out(MOD_SWITCHES_LED2_R, !state_get_bool(state.status.switches2_on));
-		mcp_set_out(MOD_SWITCHES_LED2_G, state_get_bool(state.status.switches2_on));
+		const bool on = state_get_bool(state.status.switches2_on);
+		mcp_set_out(MOD_SWITCHES_LED2_R, !on);
+		mcp_set_out(MOD_SWITCHES_LED2_G, on);
+	}
+	if (state.switches.switch_position != current_state.switches.switch_position) {
+		current_state.switches.switch_position = state.switches.switch_position;
+		const bool on = state.switches.switch_position == state.switches.target_position;
+		state.status.switches3_on = on ? 1 : 0;
+		mcp_set_out(MOD_SWITCHES_LED3_G, on);
+		mcp_set_out(MOD_SWITCHES_LED3_R, !on);
+		switches_manage_leds();
 	}
 
 	// Status module
@@ -93,21 +105,38 @@ static void render_state() {
 	if (state.status.switches1_on != current_state.status.switches1_on) {
 		render_status = true;
 		current_state.status.switches1_on = state.status.switches1_on;
+		if (current_state.status.switches1_on) piezo_play(PIEZO_SHORT_ACK);
 	}
 	if (state.status.switches2_on != current_state.status.switches2_on) {
 		render_status = true;
 		current_state.status.switches2_on = state.status.switches2_on;
+		if (current_state.status.switches2_on) piezo_play(PIEZO_SHORT_ACK);
 	}
-	if (render_status) status_render_leds();
+	if (state.status.switches3_on != current_state.status.switches3_on) {
+		render_status = true;
+		current_state.status.switches3_on = state.status.switches3_on;
+		if (current_state.status.switches3_on) piezo_play(PIEZO_SHORT_ACK);
+	}
 	// if (state.status.numbers_on != current_state.status.numbers_on) {
 	// 	current_state.status.numbers_on = state.status.numbers_on;
 	// 	render_status = true;
 	// }
+	if (render_status) status_render_leds();
 
+	if (state.launch.pressed != current_state.launch.pressed) {
+		current_state.launch.pressed = state.launch.pressed;
+		if (state.launch.pressed) {
+			if (state_all_ok()) {
+				state.phase = PHASE_COUNTDOWN;
+			} else {
+				state.phase = PHASE_ERROR;
+			}
+		}
+	}
 	// and launch button pressed
 	// if (state.phase == PHASE_IDLE && state.status.numbers_on == 1) {
-		// if all systems green - go to next phase
-		// state.phase = PHASE_COUNTDOWN;
+	// if all systems green - go to next phase
+	// state.phase = PHASE_COUNTDOWN;
 	// }
 }
 
@@ -128,6 +157,7 @@ void renderer_init(void (*animation_functions[])(), u8 animation_function_count)
 	current_state.switches.switch2_on = state.switches.switch2_on;
 	mcp_set_out(MOD_SWITCHES_LED2_R, true);
 	mcp_set_out(MOD_SWITCHES_LED2_G, false);
+	switches_manage_leds();
 }
 
 [[noreturn]] void renderer_loop() {

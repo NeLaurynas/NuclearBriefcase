@@ -258,13 +258,13 @@ static void anim_explosion() {
 	static bool init = false;
 	static u32 stage = 0;
 	static u32 rotation = 0;
-	static u8 ring0_loc[1] = { 27 };
-	static u8 ring1_loc[5] = { 19, 26, 28, 35, 36 };
-	static u8 ring2_loc[9] = { 11, 18, 20, 25, 29, 34, 37, 43, 44 };
-	static u8 ring3_loc[13] = { 3, 10, 12, 17, 21, 24, 30, 33, 38, 42, 45, 51, 52 };
-	static u8 ring4_loc[15] = { 2, 4, 9, 13, 16, 22, 31, 32, 39, 41, 46, 50, 53, 59, 60 };
-	static u8 ring5_loc[11] = { 1, 5, 8, 14, 23, 40, 47, 49, 54, 58, 61 };
-	static u8 ring6_loc[10] = { 0, 6, 7, 15, 48, 55, 56, 57, 62, 63 };
+	static constexpr u8 ring0_loc[1] = { 27 };
+	static constexpr u8 ring1_loc[5] = { 19, 26, 28, 35, 36 };
+	static constexpr u8 ring2_loc[9] = { 11, 18, 20, 25, 29, 34, 37, 43, 44 };
+	static constexpr u8 ring3_loc[13] = { 3, 10, 12, 17, 21, 24, 30, 33, 38, 42, 45, 51, 52 };
+	static constexpr u8 ring4_loc[15] = { 2, 4, 9, 13, 16, 22, 31, 32, 39, 41, 46, 50, 53, 59, 60 };
+	static constexpr u8 ring5_loc[11] = { 1, 5, 8, 14, 23, 40, 47, 49, 54, 58, 61 };
+	static constexpr u8 ring6_loc[10] = { 0, 6, 7, 15, 48, 55, 56, 57, 62, 63 };
 	static u8 const *rings[] = {
 		ring0_loc,
 		ring1_loc,
@@ -274,7 +274,7 @@ static void anim_explosion() {
 		ring5_loc,
 		ring6_loc
 	};
-	static u8 ring_sizes[] = {
+	static constexpr u8 ring_sizes[] = {
 		sizeof(ring0_loc) / sizeof(ring0_loc[0]),
 		sizeof(ring1_loc) / sizeof(ring1_loc[0]),
 		sizeof(ring2_loc) / sizeof(ring2_loc[0]),

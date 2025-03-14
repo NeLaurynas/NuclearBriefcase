@@ -9,12 +9,14 @@
 #include <hardware/pwm.h>
 
 #include "shared_config.h"
+#include "state.h"
 #include "utils.h"
 #include "defines/config.h"
+#include "shared_modules/mcp/mcp.h"
 
 static u32 slice = 0;
 static u32 channel = 0;
-static u16 buffer[1] = { 0 };
+static i16 buffer[1] = { 0 };
 static bool incrementing = true;
 
 void launch_init() {
@@ -22,6 +24,9 @@ void launch_init() {
 
 	slice = pwm_gpio_to_slice_num(MOD_LAUNCH_LED);
 	channel = pwm_gpio_to_channel(MOD_LAUNCH_LED);
+
+	mcp_cfg_set_pin_out_mode(MOD_LAUNCH_BTN, false);
+	mcp_cfg_set_pull_up(MOD_LAUNCH_BTN, true);
 
 	// init pwm
 	auto pwm_c = pwm_get_default_config();
@@ -46,12 +51,42 @@ void launch_init() {
 	sleep_ms(1);
 }
 
-void launch_animation() {
-	if (incrementing) buffer[0] += 1;
-	else buffer[0] -= 1;
+static void anim_ready() {
+	if (incrementing) {
+		buffer[0] += 1;
+		if (buffer[0] > 100) buffer[0] = 100;
+	} else {
+		buffer[0] -= 1;
+		if (buffer[0] < 0) buffer[0] = 0;
+	}
 
 	dma_channel_transfer_from_buffer_now(MOD_LAUNCH_DMA_CH, buffer, 1);
 
-	if (buffer[0] == 100) incrementing = false;
-	else if (buffer[0] == 0) incrementing = true;
+	if (buffer[0] >= 100) incrementing = false;
+	else if (buffer[0] <= 0) incrementing = true;
+}
+
+static void anim_error() {
+	if (incrementing) {
+		buffer[0] += 4;
+		if (buffer[0] > 100) buffer[0] = 100;
+	} else {
+		buffer[0] -= 4;
+		if (buffer[0] < 0) buffer[0] = 0;
+	}
+
+	dma_channel_transfer_from_buffer_now(MOD_LAUNCH_DMA_CH, buffer, 1);
+
+	if (buffer[0] >= 100) incrementing = false;
+	else if (buffer[0] <= 0) incrementing = true;
+}
+
+void launch_animation() {
+	if (state.phase == PHASE_ERROR) anim_error();
+	else if (state_all_ok()) anim_ready();
+	else if (buffer[0] != 0) {
+		incrementing = true;
+		buffer[0] = 0;
+		dma_channel_transfer_from_buffer_now(MOD_LAUNCH_DMA_CH, buffer, 1);
+	}
 }

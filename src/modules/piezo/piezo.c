@@ -171,15 +171,15 @@ static void anim_melody(const char *melody, const float pause, const float pace)
 }
 
 static void anim_error() {
-	anim(100.f, 2, 10, 7);
+	anim(170.f, 2, 10, 7);
 }
 
 static void anim_short_ack() {
-	anim(3050.f, 1, 4, 0);
+	anim(3450.f, 1, 6, 0);
 }
 
 static void anim_short_error() {
-	anim(100.f, 1, 10, 0);
+	anim(170.f, 1, 6, 0);
 }
 
 static void anim_custom() {

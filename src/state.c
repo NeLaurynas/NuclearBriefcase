@@ -5,9 +5,10 @@
 
 State state = {
 	.status = {
-		.numbers_on = -1,
 		.switches1_on = -1,
 		.switches2_on = -1,
+		.switches3_on = -1,
+		.numbers_on = -1,
 	},
 
 	.piezo = {
@@ -24,10 +25,6 @@ State state = {
 
 CurrentState current_state = { 0 };
 
-// void state_set_0_if_possible(i8 *number) {
-// 	if (*number < 0) *number = 0;
-// }
-
 inline bool state_get_bool(const i8 number) {
 	return number > 0;
 }
@@ -36,17 +33,20 @@ inline void state_exit_minus_if_possible(i8 *number, const bool val) {
 	if (val) *number = 1;
 }
 
-void state_set_bool_if_not_minus(i8 *number, const bool val) {
+inline void state_set_bool_if_not_minus(i8 *number, const bool val) {
 	if (*number < 0) return;
 	*number = val ? 1 : 0;
 }
 
 void state_set_minus() {
-	state.status.numbers_on = -1;
-	current_state.status.numbers_on = -1;
-
+	// we regenerate numbers and switch position anyways, they will change to red state
 	state.status.switches1_on = -1;
 	current_state.status.switches1_on = -1;
 	state.status.switches2_on = -1;
 	current_state.status.switches2_on = -1;
+}
+
+inline bool state_all_ok() {
+	return state_get_bool(state.status.numbers_on) && state_get_bool(state.status.switches1_on) &&
+		state_get_bool(state.status.switches2_on) && state_get_bool(state.status.switches3_on);
 }

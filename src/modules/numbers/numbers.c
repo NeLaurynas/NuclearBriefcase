@@ -13,7 +13,7 @@
 #include "defines/config.h"
 #include "shared_modules/mcp/mcp.h"
 
-static u8 bits[] = {
+static constexpr u8 bits[] = {
 	0b0111111, // 0
 	0b0001001, // 1
 	0b1011110, // 2
@@ -25,24 +25,6 @@ static u8 bits[] = {
 	0b1111111, // 8
 	0b1111011, // 9
 	0b0000000, // 10
-};
-
-// blank line circle
-// u8 animation_bytes[] = {
-// 	0b0110111, // 0
-// 	0b1010111, // 1
-// 	0b1100111, // 2
-// 	0b1110110, // 3
-// 	0b1110101, // 4
-// 	0b1110011, // 5
-// };
-static u8 animation_bits[] = {
-	0b1000000, // 0
-	0b0100000, // 1
-	0b0010000, // 2
-	0b0000001, // 3
-	0b0000010, // 4
-	0b0000100, // 5
 };
 
 static u16 buffer[] = { 0b11111111111111 };
@@ -109,9 +91,4 @@ void numbers_inc() {
 void numbers_dec() {
 	if (state.numbers.number == 0) state.numbers.number = 9;
 	else state.numbers.number -= 1;
-}
-
-static void anim(const u8 frame) {
-	buffer[0] = animation_bits[frame] << 7 | animation_bits[frame];
-	dma_channel_transfer_from_buffer_now(MOD_NUM_DMA_CH, &buffer, 1);
 }

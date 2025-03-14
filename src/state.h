@@ -46,6 +46,8 @@ void state_set_bool_if_not_minus(i8 *number, bool val);
 
 void state_set_minus();
 
+bool state_all_ok();
+
 // STATES
 
 typedef struct {
@@ -62,6 +64,7 @@ typedef struct {
 		i8 numbers_on;
 		i8 switches1_on;
 		i8 switches2_on;
+		i8 switches3_on;
 	} status;
 
 	struct {
@@ -78,6 +81,8 @@ typedef struct {
 	struct {
 		bool switch1_on;
 		bool switch2_on;
+		u8 switch_position;
+		u8 target_position;
 	} switches;
 
 	phase_t phase;
@@ -93,11 +98,13 @@ typedef struct {
 		i8 numbers_on;
 		i8 switches1_on;
 		i8 switches2_on;
+		i8 switches3_on;
 	} status;
 
 	struct {
 		bool switch1_on;
 		bool switch2_on;
+		u8 switch_position;
 	} switches;
 
 	struct {

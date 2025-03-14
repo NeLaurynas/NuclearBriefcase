@@ -5,10 +5,14 @@
 #define SWITCHES_H
 #include <shared_config.h>
 
+u8 switches_get_position();
+
+void switches_manage_leds();
+
+void switches_generate_position();
+
 void switches_init();
 
 void switches_animation();
-
-void switches_set_on(u8 led, u8 on);
 
 #endif //SWITCHES_H

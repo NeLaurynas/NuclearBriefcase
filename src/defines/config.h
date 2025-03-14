@@ -51,20 +51,22 @@
 #define MOD_PIEZO_DMA_CH_TOP	2
 #define MOD_PIEZO_DMA_CH_CC		3
 
-#define MOD_LAUNCH_BTN		0
+#define MOD_LAUNCH_BTN		(u8)((0 << 7) | (0 << 6) | 4) // MCP 1 | Bank A | PIN 4
 #define MOD_LAUNCH_LED		20
 #define MOD_LAUNCH_DMA_CH	4
 
-#define MOD_SWITCHES_SWITCH1	(u8)((0 << 7) | (0 << 6) | 0) // MCP 1 | Bank A | PIN 0
-#define MOD_SWITCHES_SWITCH2	(u8)((0 << 7) | (0 << 6) | 1) // MCP 1 | Bank A | PIN 1
-#define MOD_SWITCHES_LED1_R		(u8)((1 << 7) | (0 << 6) | 0) // MCP 2 | Bank A | PIN 0
-#define MOD_SWITCHES_LED1_G		(u8)((1 << 7) | (0 << 6) | 1) // MCP 2 | Bank A | PIN 1
-#define MOD_SWITCHES_LED2_R		(u8)((1 << 7) | (0 << 6) | 2) // MCP 2 | Bank A | PIN 2
-#define MOD_SWITCHES_LED2_G		(u8)((1 << 7) | (0 << 6) | 3) // MCP 2 | Bank A | PIN 3
-#define MOD_SWITCHES_LED3_R		(u8)((1 << 7) | (1 << 6) | 7) // MCP 2 | Bank B | PIN 7
-#define MOD_SWITCHES_LED3_G		(u8)((1 << 7) | (1 << 6) | 6)
-#define MOD_SWITCHES_LED3_1		(u8)((1 << 7) | (1 << 6) | 5)
-#define MOD_SWITCHES_LED3_3		(u8)((1 << 7) | (1 << 6) | 2)
-#define MOD_SWITCHES_LED3_2		(u8)((1 << 7) | (1 << 6) | 1)
+#define MOD_SWITCHES_SWITCH1		(u8)((0 << 7) | (0 << 6) | 0) // MCP 1 | Bank A | PIN 0
+#define MOD_SWITCHES_SWITCH2		(u8)((0 << 7) | (0 << 6) | 1) // MCP 1 | Bank A | PIN 1
+#define MOD_SWITCHES_SWITCH3_TOP	(u8)((0 << 7) | (0 << 6) | 3) // MCP 1 | Bank A | PIN 3
+#define MOD_SWITCHES_SWITCH3_BOTTOM	(u8)((0 << 7) | (0 << 6) | 2) // MCP 1 | Bank A | PIN 2
+#define MOD_SWITCHES_LED1_R			(u8)((1 << 7) | (0 << 6) | 0) // MCP 2 | Bank A | PIN 0
+#define MOD_SWITCHES_LED1_G			(u8)((1 << 7) | (0 << 6) | 1) // MCP 2 | Bank A | PIN 1
+#define MOD_SWITCHES_LED2_R			(u8)((1 << 7) | (0 << 6) | 2) // MCP 2 | Bank A | PIN 2
+#define MOD_SWITCHES_LED2_G			(u8)((1 << 7) | (0 << 6) | 3) // MCP 2 | Bank A | PIN 3
+#define MOD_SWITCHES_LED3_R			(u8)((1 << 7) | (1 << 6) | 7) // MCP 2 | Bank B | PIN 7
+#define MOD_SWITCHES_LED3_G			(u8)((1 << 7) | (1 << 6) | 6)
+#define MOD_SWITCHES_LED3_1			(u8)((1 << 7) | (1 << 6) | 5)
+#define MOD_SWITCHES_LED3_3			(u8)((1 << 7) | (1 << 6) | 2)
+#define MOD_SWITCHES_LED3_2			(u8)((1 << 7) | (1 << 6) | 1)
 
 #endif //CONFIG_H
