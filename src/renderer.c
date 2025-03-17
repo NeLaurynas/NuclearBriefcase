@@ -10,12 +10,16 @@
 #include "state.h"
 #include "utils.h"
 #include "defines/config.h"
-#include "modules/launch/launch.h"
 #include "modules/numbers/numbers.h"
 #include "modules/piezo/piezo.h"
 #include "modules/status/status.h"
 #include "modules/switches/switches.h"
 #include "shared_modules/mcp/mcp.h"
+
+#if DBG
+static u32 render_times[100] = { 0 };
+static i32 render_times_i = 0;
+#endif
 
 static void set_state() {
 	if (state.phase != PHASE_IDLE) return; // busy
@@ -183,12 +187,28 @@ void renderer_init(void (*animation_functions[])(), u8 animation_function_count)
 		const u32 remaining_us = elapsed_us > RENDER_TICK ? 0 : RENDER_TICK - elapsed_us;
 
 #if DBG
+		render_times[render_times_i] = elapsed_us;
+		render_times_i = (render_times_i + 1) % 100;
 		acc_elapsed_us += (remaining_us + elapsed_us);
 
-		if (acc_elapsed_us >= 10 * 1'000'000) { // 10 seconds
+		if (acc_elapsed_us >= 1 * 1'000'000) { // every 5 seconds
+			// render averages out
+
+			auto average = utils_avg(render_times, 100);
 			const float elapsed_ms = elapsed_us / 1000.0f;
-			utils_printf("render took: %.2f ms (%ld us)\n", elapsed_ms, elapsed_us);
+			utils_printf("render took: %.2f ms (%.0f us)\n", average / 1000.0f, average);
 			utils_print_onboard_temp();
+
+			// memory test
+			size_t size = 491 * 1024;
+			void *buffer = malloc(size);
+			if (buffer == NULL) {
+				printf("Allocation of %zu bytes failed\n", size);
+			} else {
+				printf("Allocation succeeded (%d kB)\n", size / 1024);
+				free(buffer);
+			}
+
 			acc_elapsed_us = 0;
 		}
 #endif

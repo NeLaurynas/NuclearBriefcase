@@ -26,11 +26,13 @@ int main() {
 	const void (*animation_functions[])() = { piezo_animation, wsleds_animation, launch_animation, switches_animation };
 	constexpr u8 anim_fn_size = ARRAY_SIZE(animation_functions);
 
-	if (!set_sys_clock_khz(48'000, false)) utils_error_mode(47); // minimum to enable USB
-	// if (!set_sys_clock_khz(18'000, false)) utils_error_mode(47);
+	// if (!set_sys_clock_khz(48'000, false)) utils_error_mode(47); // minimum to enable USB
+	if (!set_sys_clock_khz(18'000, false)) utils_error_mode(47);
 
+#if DBG
 	stdio_init_all(); // only for serial over usb/uart - printf (also uploading..)
-	// sleep_ms(2000);
+	sleep_ms(2000);
+#endif
 
 	wsleds_init();
 	mcp_init();
@@ -39,6 +41,7 @@ int main() {
 	piezo_init();
 	switches_init();
 	launch_init();
+	sleep_ms(1);
 
 	state_set_minus();
 
@@ -47,6 +50,7 @@ int main() {
 	adc_select_input(4);
 
 	renderer_init(animation_functions, anim_fn_size);
+	sleep_ms(1);
 
 	renderer_loop();
 }
