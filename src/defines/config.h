@@ -67,6 +67,7 @@
 #define MOD_SWITCHES_LED3_G			(u8)((1 << 7) | (1 << 6) | 6)
 #define MOD_SWITCHES_LED3_1			(u8)((1 << 7) | (1 << 6) | 5)
 #define MOD_SWITCHES_LED3_3			(u8)((1 << 7) | (1 << 6) | 2)
-#define MOD_SWITCHES_LED3_2			(u8)((1 << 7) | (1 << 6) | 1)
+// #define MOD_SWITCHES_LED3_2			(u8)((1 << 7) | (1 << 6) | 1) // first pin is broken - voltage drop
+#define MOD_SWITCHES_LED3_2			(u8)((1 << 7) | (1 << 6) | 0)
 
 #endif //CONFIG_H

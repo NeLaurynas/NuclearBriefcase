@@ -2,10 +2,10 @@ cmake_minimum_required(VERSION 3.30)
 
 set(CMAKE_C_STANDARD 23)
 set(CMAKE_C_EXTENSIONS ON)
-#set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(PICO_BOARD pico2 CACHE STRING "Board type")
+# set(PICO_BOARD pico2_w CACHE STRING "Board type") # FOR PICO 2 W
 
 # Pull in Raspberry Pi Pico SDK (must be before project)
 include(pico_sdk_import.cmake)

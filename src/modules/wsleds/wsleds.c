@@ -372,7 +372,7 @@ static void anim_darkness() {
 		for (auto i = 0; i < MOD_WSLEDS_LED_COUNT; i++) {
 			if (buffer_top[i] == 0) continue;
 			const u32 reduction = utils_random_in_range(0, 8) - 4;
-			buffer_top[i] = reduce_brightness(reduction, buffer_top[i]);
+			buffer_top[i] = reduce_brightness(reduction, buffer_top[i]); // mm I dunno
 		}
 
 	if (frame % FRAME_TICKS == 0) {
@@ -380,8 +380,8 @@ static void anim_darkness() {
 			memset(buffer_top, 0, sizeof(buffer_top));
 			const u32 color = current_state.wsleds.on_target ? COLOR_GREEN : COLOR_RED;
 			for (u32 i = 0; i < utils_random_in_range(1, MOD_WSLEDS_LED_COUNT); i++) {
-				buffer_top[utils_random_in_range(0, MOD_WSLEDS_LED_COUNT)] =
-					reduce_brightness(255 - ((255 / cycles) * cycle), color);
+				buffer_top[utils_random_in_range(0, (MOD_WSLEDS_LED_COUNT - 1))] =
+					reduce_brightness(255 - ((255 / cycles) * cycle), color); // really?
 			}
 		}
 
